@@ -69,7 +69,8 @@ for(i in 1..4){
         }
         publishers {
           archiveArtifacts {
-              pattern('*')
+              pattern('${BRANCH_NAME}_dsl_script.tar.gz')
+              pattern('output.txt')
               onlyIfSuccessful()
           }
         }

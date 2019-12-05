@@ -7,10 +7,15 @@ pipeline {
     //         args  '-v /tmp:/tmp'
     //     }
     // }
+    environment { 
+    studentbranch = 'ekomarov'
+    }
+    
     stages {
         stage('Preparation') {
             steps { 
                 echo 'Preparation'
+                github('MNT-Lab/p193e-module', '$studentbranch')
             }
         }
         stage('Building code') {

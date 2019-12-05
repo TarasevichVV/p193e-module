@@ -15,7 +15,7 @@ pipeline {
         stage('Preparation') {
             steps { 
                 echo 'Preparation'
-                github('MNT-Lab/p193e-module', "$studentbranch")
+                git branch: "${studentbranch}", url: 'https://github.com/MNT-Lab/p193e-module.git'
             }
         }
         stage('Building code') {

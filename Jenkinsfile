@@ -91,7 +91,7 @@ node {
                  container('docker') {
                      unstash "targz"
                      sh """
-                        //echo "35.186.195.40 nexus-dock.k8s.playpit.by" >> /etc/hosts
+                        echo "35.186.195.40 nexus-dock.k8s.playpit.by" >> /etc/hosts
                         echo "${Dockerfile}" > Dockerfile
                         docker build -t nexus-service.jenkins.svc.cluster.local:50001/helloworld-ykachatkou:rc-$BUILD_NUMBER .
                         docker login -u admin -p admin nexus-service.jenkins.svc.cluster.local:50001

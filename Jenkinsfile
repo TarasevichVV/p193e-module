@@ -72,7 +72,7 @@ node {
                     sh 'echo "Create Docker Image"'
                 },
                 'Create tar.gz': {
-                    sh 'tar -xvzf script.tar.gz; tar -czf "pipeline-ayanchuk-$BUILD_NUMBER.tar.gz" output.txt -C helloworld-project/helloworld-ws/target helloworld-ws.war'
+                    sh 'tar -xvzf script.tar.gz; tar -czf "pipeline-ayanchuk-$BUILD_NUMBER.tar.gz" Jenkinsfile output.txt -C helloworld-project/helloworld-ws/target helloworld-ws.war'
                     sh 'echo "Create Artifact Archive"'
                     sh 'curl -v -u admin:admin --upload-file "pipeline-ayanchuk-$BUILD_NUMBER.tar.gz" "http://nexus-service.jenkins.svc.cluster.local:8081/repository/releases/pipeline-ayanchuk-$BUILD_NUMBER.tar.gz"'
                 }

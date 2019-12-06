@@ -96,7 +96,6 @@ node {
                                         container('docker') {
                                             unstash "targz"
                                             sh """
-                        cp /home/helloworld-project/helloworld-ws/target/helloworld-ws.war .
                         echo "192.168.56.240    nexus3" >> /etc/hosts
                         cat /etc/hosts
                         echo "${Dockerfile}" > Dockerfile

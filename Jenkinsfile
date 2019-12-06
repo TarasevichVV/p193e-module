@@ -8,7 +8,7 @@ podTemplate(label: label,
             ],
             volumes: [
                 hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                hostPathVolume(hostPath: "${WORKSPACE}", mountPath: "${WORKSPACE}"),
+                hostPathVolume(hostPath: "${env.WORKSPACE}", mountPath: "${env.WORKSPACE}"),
             ]
         ) {
     node(label) {

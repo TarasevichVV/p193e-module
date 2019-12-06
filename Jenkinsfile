@@ -1,59 +1,28 @@
-pipeline {
-    agent any
-    // agent {
-    //     docker {
-    //         image 'maven:3-alpine'
-    //         label 'my-defined-label'
-    //         args  '-v /tmp:/tmp'
-    //     }
-    // }
-    environment { 
-    studentbranch = 'ekomarov'
-    buildnum = 0
-    }
-    
-    stages {
-        stage('Preparation') {
-            steps { 
-                echo 'Preparation'
-                git branch: "${studentbranch}", url: 'https://github.com/MNT-Lab/p193e-module.git'
+#!/usr/bin/env groovy
+def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+
+podTemplate(label: label,
+        containers: [
+                containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+            ],
+            volumes: [
+                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+            ]
+        ) {
+    node(label) {
+            stage('Sab') {
+                container('docker') {
+                    echo "Building docker image..."
+                    sh """
+                       hostname
+                       whoami
+                       env
+                       echo $PATH
+                       ps -ef 
+                       docker version
+                       """
+                }
             }
-        }
-        stage('Building code') {
-            steps { 
-                echo 'Building code'
-                sh 'mvn -B clean package'
-            }
-        }
-        stage('Sonar scan') {
-            steps { 
-                echo 'Sonar scan'
-            }
-        }
-        stage('Testing') {
-            steps { 
-                echo 'Testing'
-            }
-        }
-        stage('Triggering job and fetching artefact after finishing') {
-            steps { 
-                echo 'Triggering job and fetching artefact after finishing'
-            }
-        }
-        stage('Packaging and Publishing results') {
-            steps { 
-                echo 'Packaging and Publishing results'
-            }
-        }
-        stage('Asking for manual approval') {
-            steps { 
-                echo 'Asking for manual approval'
-            }
-        }
-        stage('Deployment') {
-            steps { 
-                echo 'Deployment'
-            }
-        }
     }
 }

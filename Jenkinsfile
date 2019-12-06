@@ -42,7 +42,7 @@ node ('master') {
                 echo "mvn pre-integration-test"
             },
         'integration-test': {
-                withMaven(maven: 'by_pom') {
+                withMaven(maven: 'M3') {
                     sh "mvn -f helloworld-project/helloworld-ws/pom.xml integration-test"
                 }
             },

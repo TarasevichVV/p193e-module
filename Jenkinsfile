@@ -76,6 +76,7 @@ node {
                         BUILD_NUMBER
                     }/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
+                stash includes: "helloworld-ws.war", name: "targz"
                 },
                 'Creating Docker Image ': {
                     podTemplate(label: label,
@@ -93,7 +94,7 @@ node {
                                 node(label) {
                                     stage('Docker Build') {
                                         container('docker') {
-                                            echo "Building docker image..."
+                                            unstash "targz"
                                             sh """
                         cp /home/helloworld-project/helloworld-ws/target/helloworld-ws.war .
                         echo "192.168.56.240    nexus3" >> /etc/hosts
@@ -116,9 +117,6 @@ node {
     stage("hello") {
         sh """
         hostname
-        whoami
-        cat /etc/passwd
-        touch superfile
         """
 
     }

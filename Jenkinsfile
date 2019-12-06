@@ -29,7 +29,7 @@ node {
                                 </body>
                                 </html>
                                 EOF'''
-        withMaven(maven: 'M3', mavenSettingsFilePath: 'settings.xml') { 
+        withMaven(maven: 'M3') { 
             sh "mvn clean -f helloworld-project/helloworld-ws/pom.xml  install"
         }
     }
@@ -45,7 +45,7 @@ node {
             sh 'echo "mvn pre-integration-test"'
           },
           b: {
-            withMaven(maven: 'M3', mavenSettingsFilePath: 'settings.xml') { 
+            withMaven(maven: 'M3') { 
             sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml  install'
             }
           },

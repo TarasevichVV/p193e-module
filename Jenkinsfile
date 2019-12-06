@@ -1,28 +1,46 @@
 #!/usr/bin/env groovy
-def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-
-podTemplate(label: label,
-        containers: [
-                containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-            ],
-            volumes: [
-                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-            ]
-        ) {
-    node(label) {
-            stage('Sab') {
-                container('docker') {
-                    echo "Building docker image..."
-                    sh """
-                      hostname
-                      whoami
-                      env
-                      echo $PATH
-                      ps -ef 
-                      docker version
-                      """
-                }
-            }
+node {
+  stages {
+    stage('01 git checkout') {
+      steps {//‘Preparation (Checking out)’
+        //git checkout scm
+        checkout scm
+        stash 'source'
+//            git branch: 'master', credentialsId: '12345-1234-4696-af25-123455',
+//                url: 'ssh://git@bitbucket.org:company/repo.git'
+      }
     }
+  }
+  stage('02 Building code') {
+    steps {
+    }
+  }
+  stage('Sonar scan') {
+    steps {
+    }
+  }
+  stage('Testing’') {
+    steps {
+    }
+  }
+  stage('Triggering job and fetching artefact') {//after finishing
+    steps {
+    }
+  }
+  stage('Packaging and Publishing results') {
+    steps {
+//  sh 'make'
+//  archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+    }
+  }
+  stage('Asking for manual approval') {
+    steps {
+    }
+  }
+  stage('Deployment') {//(rolling update, zero downtime)
+    steps {
+    }
+  }
 }
+
+

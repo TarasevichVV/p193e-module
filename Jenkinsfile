@@ -4,10 +4,10 @@ def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 podTemplate(label: label,
         containers: [
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)],
-                   // envVars: [containerEnvVar(key: 'DOCKER_CONFIG', value: '/tmp/'),])],
+                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true,
+                    envVars: [containerEnvVar(key: 'DOCKER_CONFIG', value: '${env.WORKSPACE}/.docker.json'),])],
                 volumes: [
-                   // secretVolume(secretName: 'docker-config-json', mountPath: '/tmp'),
+                    secretVolume(secretName: 'docker-config-json', mountPath: '${env.WORKSPACE}/.docker.json'),
                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
                     hostPathVolume(hostPath: "${env.WORKSPACE}", mountPath: "${env.WORKSPACE}"),
             ]

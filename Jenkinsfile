@@ -78,6 +78,7 @@ node {
                             stage('Docker Build') {
                                 container('docker') {
                                 unstash "war"
+                                sh 'ls'
                                 sh """
                                 echo "${Dockerfile}" > Dockerfile
                                 docker build -t vtarasevich/app .

@@ -83,7 +83,7 @@ node {
 //                    sh 'tar -rf "pipeline-ayanchuk-${currentBuild.number}.tar" -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-dsl Jenkinsfile'
 //                    sh 'tar -rf "pipeline-ayanchuk-${currentBuild.number}.tar" output.txt ; gzip "pipeline-ayanchuk-${currentBuild.number}.tar"'
                     sh 'echo "create gz"'
-                    sh "tar -cvzf pipeline-ayanchuk-${currentBuild.number}.tar.gz output.txt -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-dsl/ Jenkinsfile -C ${WORKSPACE}/helloworld-project/helloworld-ws/target/ helloworld-ws.war" 
+                    sh "tar -cvzf pipeline-ayanchuk-${currentBuild.number}.tar.gz output.txt -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-dsl@script/ Jenkinsfile -C ${WORKSPACE}/helloworld-project/helloworld-ws/target/ helloworld-ws.war" 
 //                    -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-dsl/ Jenkinsfile'
                     sh 'echo "deplpoy Artifact Archive"'
                     sh "curl -v -u admin:admin --upload-file pipeline-ayanchuk-${currentBuild.number}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/ayanchuk/${currentBuild.number}/pipeline-ayanchuk-${currentBuild.number}.tar.gz"

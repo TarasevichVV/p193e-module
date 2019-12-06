@@ -12,31 +12,33 @@ podTemplate(label: label,
             ]
         ) {
     node(label) {
-            stage ('Checkout&Build'){
-                checkout scm
-                sh '''
-                    ls -la
-                    pwd
-                    '''
-                withMaven(maven: 'M3') { 
-                   sh "mvn clean install"
+            dir('helloworld-ws'){
+                stage ('Checkout&Build'){
+                    checkout scm
+                    sh '''
+                        ls -la
+                        pwd
+                        '''
+                    withMaven(maven: 'M3') {
+                       sh "cd helloworld-ws && mvn clean install"
+                    }
                 }
-            }
 
-            stage('Docker Build') {
-                container('docker') {
-                    echo "Building docker image..."
-                    sh """
-                       pwd
-                       ls -la
-                       hostname
-                       whoami
-                       env
-                       echo $PATH
-                       ps -ef 
-                       docker version
-                       
-                       """
+                stage('Docker Build') {
+                    container('docker') {
+                        echo "Building docker image..."
+                        sh """
+                           pwd
+                           ls -la
+                           hostname
+                           whoami
+                           env
+                           echo $PATH
+                           ps -ef
+                           docker version
+
+                           """
+                    }
                 }
             }
     }

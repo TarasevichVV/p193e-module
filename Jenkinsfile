@@ -86,7 +86,7 @@ node {
                     sh "tar -cvzf pipeline-ayanchuk-${currentBuild.number}.tar.gz output.txt -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-dsl/ Jenkinsfile -C ${WORKSPACE}/helloworld-project/helloworld-ws/target/ helloworld-ws.war" 
 //                    -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-dsl/ Jenkinsfile'
                     sh 'echo "deplpoy Artifact Archive"'
-                    sh "curl -v -u admin:admin --upload-file pipeline-ayanchuk-${currentBuild.number}.tar.gz http://nexus-service.jenkins.svc.cluster.local:8081/repository/artifacts/pipeline-ayanchuk-${currentBuild.number}.tar.gz"
+                    sh "curl -v -u admin:admin --upload-file pipeline-ayanchuk-${currentBuild.number}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/ayanchuk/${currentBuild.number}/pipeline-ayanchuk-${currentBuild.number}.tar.gz"
                 }
             )
         }

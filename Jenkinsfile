@@ -36,7 +36,7 @@ node {
         }
 
         stage ('Sonar scan') {
-            def scannerHome = tool 'SonarScanner';
+            def scannerHome = tool 'Sonar';
             withSonarQubeEnv('Sonar'){
                 sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=ayanchuk:helloworld -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
             }

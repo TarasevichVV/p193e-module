@@ -32,6 +32,7 @@ node {
                                 EOF'''
         withMaven(maven: 'M3') { 
             sh "mvn clean -f helloworld-project/helloworld-ws/pom.xml  install"
+            stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
         }
     }
     stage('Sonar scan'){
@@ -71,15 +72,13 @@ node {
                         containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
                     ],
                     volumes: [
-                        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                        hostPathVolume(hostPath: '???/workspace/EPBYMINW6229/mntlab-ci-pipeline', mountPath: '/tmp')
+                        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
                     ]){
                         node(label) {
                             stage('Docker Build') {
                                 container('docker') {
+                                unstash "war"
                                 sh """
-                                cp /tmp/helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                                echo "35.186.195.40 nexus-dock.k8s.playpit.by"
                                 echo "${Dockerfile}" > Dockerfile
                                 docker build -t vtarasevich/app .
                                 docker tag vtarasevich/app:latest nexus-dock.k8s.playpit.by:80/vtarasevich/app:${BUILD_NUMBER}

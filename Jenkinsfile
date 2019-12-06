@@ -12,7 +12,6 @@ podTemplate(label: label,
             ]
         ) {
     node(label) {
-            dir('helloworld-ws'){
                 stage ('Checkout&Build'){
                     checkout scm
                     sh """
@@ -31,10 +30,20 @@ podTemplate(label: label,
                         sh """
                            pwd
                            ls -la
-                           cd helloworld-ws && docker build -t helloworld:${env.BUILD_NUMBER} .
+                           cd helloworld-ws && docker build -t nexus-dock.k8s.playpit.by:80/vpupkin/app:${env.BUILD_NUMBER} .
                            """
                     }
                 }
-            }
+                stage('Docker Push') {
+                    container('docker') {
+                        echo "Building docker image..."
+                        sh """
+                           docker ps
+                           docker images
+                           docker login -u admin -p admin nexus-dock.k8s.playpit.by
+                           dokcer push nexus-dock.k8s.playpit.by:80/vpupkin/app:${env.BUILD_NUMBER}
+                           """
+                    }
+                }                
     }
 }

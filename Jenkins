@@ -1,0 +1,5 @@
+node {
+    stage('Preparation (Checking out)') {
+        sh 'echo "Hello, world!"'
+    }
+}

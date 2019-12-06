@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
+
 node {
-  stages {
     stage('01 git checkout') {
       steps {//‘Preparation (Checking out)’
         //git checkout scm
@@ -13,6 +13,8 @@ node {
   }
   stage('02 Building code') {
     steps {
+      unstash 'source'
+
     }
   }
   stage('Sonar scan') {
@@ -40,7 +42,7 @@ node {
   stage('Deployment') {//(rolling update, zero downtime)
     steps {
     }
-  }
+
 }
 
 

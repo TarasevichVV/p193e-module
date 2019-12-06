@@ -18,6 +18,8 @@ node {
     }
     stage('Building code'){
         git branch: 'vtarasevich', url: 'https://github.com/MNT-Lab/build-t00ls'
+        pwd
+        ls
         sh label: '', script: '''TimeStamp=$(date)
                                 cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
                                 <!DOCTYPE html>
@@ -71,13 +73,12 @@ node {
                     ],
                     volumes: [
                         hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                        hostPathVolume(hostPath: '/home/workspace/TOPIC11/', mountPath: '/tmp')
-                        
                     ]){
                         node(label) {
                             stage('Docker Build') {
                                 container('docker') {
                                 sh """
+                                pwd
                                 cp /tmp/helloworld-project/helloworld-ws/target/helloworld-ws.war .
                                 echo "35.186.195.40 nexus-dock.k8s.playpit.by"
                                 echo "${Dockerfile}" > Dockerfile

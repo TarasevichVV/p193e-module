@@ -5,10 +5,12 @@ podTemplate(label: label,
         containers: [
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-            ],
-            volumes: [
-                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                hostPathVolume(hostPath: "${env.WORKSPACE}", mountPath: "${env.WORKSPACE}"),
+                ],
+                envVars: [containerEnvVar(key: 'DOCKER_CONFIG', value: '/tmp/'),])],
+                volumes: [
+                    secretVolume(secretName: 'docker-config-json', mountPath: '/tmp'),
+                    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                    hostPathVolume(hostPath: "${env.WORKSPACE}", mountPath: "${env.WORKSPACE}"),
             ]
         ) {
     node(label) {
@@ -44,6 +46,6 @@ podTemplate(label: label,
                            dokcer push nexus-dock.k8s.playpit.by:80/vpupkin/app:${env.BUILD_NUMBER}
                            """
                     }
-                }                
+                }
     }
 }

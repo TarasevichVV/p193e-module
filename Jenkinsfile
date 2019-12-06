@@ -25,9 +25,10 @@ node ('master') {
     stage ('Building code') {
       git branch: "${student}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
       withMaven(maven: 'M3') {
-      sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
-      sh "ll helloworld-project/helloworld-ws/target/"
+      sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install" 
      }
+      sh "ls -l helloworld-project/helloworld-ws/target/"  
+      sh "pwd"
     }
 
     stage('Sonar scan'){

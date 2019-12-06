@@ -64,6 +64,7 @@ node {
             'Creating tar gz': {
                 sh "tar xvzf  ${student}_dsl_script.tar.gz"
                 sh "tar cvzf pipeline-${student}-${currentBuild.number}.tar.gz output.txt Jenkinsfile helloworld-project/helloworld-ws/target/helloworld-ws.war"
+                sh "curl -v -u admin:admin --upload-file pipeline-${student}-${currentBuild.number}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${currentBuild.number}/pipeline-${student}-${currentBuild.number}.tar.gz"
                 },
             'Creating Docker Image':  {
                 podTemplate(label: label,
@@ -82,9 +83,9 @@ node {
                                 sh """
                                 echo "${Dockerfile}" > Dockerfile
                                 docker build -t vtarasevich/app .
-                                docker tag vtarasevich/app:latest nexus-dock.k8s.playpit.by:80/vtarasevich/app:${BUILD_NUMBER}
+                                docker tag vtarasevich/app:latest nexus-dock.k8s.playpit.by:80/vtarasevich/app:${currentBuild.number}
                                 docker login -u admin -p admin nexus-dock.k8s.playpit.by
-                                docker push nexus-dock.k8s.playpit.by:80/vtarasevich/app:${BUILD_NUMBER}
+                                docker push nexus-dock.k8s.playpit.by:80/vtarasevich/app:${currentBuild.number}
                                 """
                                 }
                             }

@@ -33,4 +33,4 @@ node {
 
   stage('Deployment') {//(rolling update, zero downtime)
   }
-
+}

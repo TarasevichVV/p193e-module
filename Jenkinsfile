@@ -67,6 +67,7 @@ node ('master') {
         'Archiving artifact': {
                 git branch: "${student}", url: 'https://github.com/MNT-Lab/p193e-module.git'
                 sh """
+                ls -l
                 cp Jenkinsfile copy
                 cp helloworld-ws.war copy
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz -C copy .

@@ -69,7 +69,7 @@ node {
                 tar xzf ${student}_dsl_script.tar.gz
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt
-                curl -v -u admin:123_qwe --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus-svc.nexus.svc.cluster.local/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
+                curl -v -u admin:123_qwe --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus3:8111/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
                 stash includes: "helloworld-ws.war", name: "targz"
             },
@@ -80,8 +80,7 @@ node {
                 containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
             ],
             volumes: [
-                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                //hostPathVolume(hostPath: '/data/workspace/pipe', mountPath: '/home')
+                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
                 
             ])
             
@@ -93,9 +92,9 @@ node {
                      sh """
                         echo "192.168.56.240    nexus3" >> /etc/hosts
                         echo "${Dockerfile}" > Dockerfile
-                        docker build -t nexus3:8111/helloworld-ykachatkou:rc-$BUILD_NUMBER .
-                        docker login -u admin -p 123_qwe nexus3:8111
-                        docker push nexus3:8111/helloworld-ykachatkou:rc-$BUILD_NUMBER
+                        docker build -t nexus-dock.k8s.playpit.by/helloworld-ykachatkou:rc-$BUILD_NUMBER .
+                        docker login -u admin -p admin nexus-dock.k8s.playpit.by
+                        docker push nexus-dock.k8s.playpit.by/helloworld-ykachatkou:rc-$BUILD_NUMBER
                         """
                   }
                 }

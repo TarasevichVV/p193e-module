@@ -69,14 +69,8 @@ node ('master') {
         'Archiving artifact': {
                 git branch: "${student}", url: 'https://github.com/MNT-Lab/p193e-module.git'
                 sh """
-                ls -l
-                ls -l helloworld-project/helloworld-ws/target/ 
-                ls -l helloworld-project/
-                ls -l helloworld-project/helloworld-ws/
-                ls -l copy
                 cp Jenkinsfile copy
-                ls -l copy
-                cp helloworld-project/helloworld-ws/target/helloworld-ws.war copy
+                cp helloworld-ws.war copy
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz -C copy .
                 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """

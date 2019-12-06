@@ -76,7 +76,7 @@ node {
                     sh 'echo "Create Docker Image"'
                 },
                 'Create tar.gz': {
-                    sh 'tar -xvzf script.tar.gz; tar -czf "pipeline-ayanchuk-$BUILD_NUMBER.tar.gz" "$JENKINS_HOME/workspace/EPBYMINW9146/mntlab-ci-dsl/Jenkinsfile" output.txt -C helloworld-project/helloworld-ws/target helloworld-ws.war'
+                    sh 'tar -xvzf script.tar.gz; tar -czf "pipeline-ayanchuk-$BUILD_NUMBER.tar.gz" -C "$JENKINS_HOME/workspace/EPBYMINW9146/mntlab-ci-dsl" Jenkinsfile output.txt -C helloworld-project/helloworld-ws/target helloworld-ws.war'
                     sh 'echo "Create Artifact Archive"'
                     sh 'curl -v -u admin:admin --upload-file "pipeline-ayanchuk-${currentBuild.number}.tar.gz" "http://nexus-service.jenkins.svc.cluster.local:8081/repository/artifacts/pipeline-ayanchuk-$BUILD_NUMBER.tar.gz"'
                 }

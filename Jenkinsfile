@@ -17,9 +17,10 @@ def Dockerfile = """
 
 node {
     stage('Preparation (Checking out)') {
-        git branch: 'ykachatkou', credentialsId: '6d32c01d-6f1a-4a3f-9402-f9a133852eb2', url: 'https://github.com/MNT-Lab/build-t00ls'
+        checkout scm
     }
     stage('Build') {
+        git branch: 'ykachatkou', credentialsId: '6d32c01d-6f1a-4a3f-9402-f9a133852eb2', url: 'https://github.com/MNT-Lab/build-t00ls'
         sh '''
       cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
       <p>commitId: $GIT_COMMIT </p>

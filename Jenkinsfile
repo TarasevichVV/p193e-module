@@ -14,21 +14,21 @@ node {
         }
     }
     stage('parallel testing') {
-        step {
-            parallel (
-                    'kind-pre-integration-test': {
-                        echo 'mvn pre-integration-test -f clear_project/helloworld-ws/pom.xml'
-                    },
-                    'integration-test': {
-                        withSonarQubeEnv('Sonar') {
-                            'mvn integration-test -f clear_project/helloworld-ws/pom.xml'
-                        }
-                    },
-                    'kind-post-integration-test' : {
-                        'mvn post-integration-test -f clear_project/helloworld-ws/pom.xml'
+
+        parallel(
+                'kind-pre-integration-test': {
+                    echo 'mvn pre-integration-test -f clear_project/helloworld-ws/pom.xml'
+                },
+                'integration-test': {
+                    withSonarQubeEnv('Sonar') {
+                        'mvn integration-test -f clear_project/helloworld-ws/pom.xml'
                     }
-            )
-        }
+                },
+                'kind-post-integration-test': {
+                    'mvn post-integration-test -f clear_project/helloworld-ws/pom.xml'
+                }
+        )
     }
 }
+
 

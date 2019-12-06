@@ -29,15 +29,14 @@ node {
       <p>version: 1. $BUILD_NUMBER</p>
       EOF
       '''
-        withMaven(maven: "Maven-3.6.3") {
+        withMaven(maven: "M3") {
             sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
         }
     }
 
     stage('Sonar scanner') {
-        def scannerHome = tool name: 'sonarscanner1'
-        //def scannerHome = tool 'sonarscanner1'
-        withSonarQubeEnv(installationName: 'sonar') {
+        def scannerHome = tool name: 'Sonar'
+        withSonarQubeEnv(installationName: 'Sonar') {
             sh "${scannerHome}/bin/sonar-scanner  -e -Dsonar.projectKey=${student}-maven -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
         }
 
@@ -48,7 +47,7 @@ node {
                     echo "mvn pre-integration-test"
                 },
                 'integration-test': {
-                    withMaven(maven: "Maven-3.6.3") {
+                    withMaven(maven: "M3") {
                         sh "mvn -f helloworld-project/helloworld-ws/pom.xml integration-test"
                     }
                 },

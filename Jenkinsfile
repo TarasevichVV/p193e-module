@@ -32,7 +32,7 @@ node {
             withMaven(
                 maven: 'M3'){
             sh "pwd"
-            sh "ls -ahl"
+            sh "ls"
             sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
             }
         }

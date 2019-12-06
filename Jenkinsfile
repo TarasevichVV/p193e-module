@@ -29,7 +29,7 @@ node ('master') {
      }
       sh "ls -l helloworld-project/helloworld-ws/target/"  
       sh "pwd"
-      sh "helloworld-project/helloworld-ws/target/helloworld-ws.war ."
+      sh "cp helloworld-project/helloworld-ws/target/helloworld-ws.war ."
     }
 
     stage('Sonar scan'){

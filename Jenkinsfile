@@ -6,7 +6,7 @@ podTemplate(label: label,
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
                 ],
-                envVars: [containerEnvVar(key: 'DOCKER_CONFIG', value: '/tmp/'),])],
+                envVars: [containerEnvVar(key: 'DOCKER_CONFIG', value: '/tmp/')],
                 volumes: [
                     secretVolume(secretName: 'docker-config-json', mountPath: '/tmp'),
                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),

@@ -69,9 +69,9 @@ node {
                 tar xzf ${student}_dsl_script.tar.gz
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile
-                curl -v -u admin:123_qwe --upload-file pipeline-${student}-${
+                curl -v -u admin:admin --upload-file pipeline-${student}-${
                         BUILD_NUMBER
-                    }.tar.gz http://nexus-svc.nexus.svc.cluster.local/repository/maven-releases/app/${student}/${
+                    }.tar.gz nexus-dock.k8s.playpit.by/repository/maven-releases/app/${student}/${
                         BUILD_NUMBER
                     }/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
@@ -95,12 +95,12 @@ node {
                                         container('docker') {
                                             unstash "targz"
                                             sh """
-                        echo "192.168.56.240    nexus3" >> /etc/hosts
+                        echo "35.186.195.40 nexus-dock.k8s.playpit.by" >> /etc/hosts
                         cat /etc/hosts
                         echo "${Dockerfile}" > Dockerfile
-                        docker build -t nexus3:8111/helloworld-ykachatkou:rc-$BUILD_NUMBER .
+                        docker build -t nexus-dock.k8s.playpit.by/helloworld-ykachatkou:rc-$BUILD_NUMBER .
                         docker login -u admin -p 123_qwe nexus3:8111
-                        docker push nexus3:8111/helloworld-ykachatkou:rc-$BUILD_NUMBER
+                        docker push nexus-dock.k8s.playpit.by/helloworld-ykachatkou:rc-$BUILD_NUMBER
                         """
                                         }
                                     }

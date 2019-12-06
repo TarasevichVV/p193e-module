@@ -20,7 +20,9 @@ node {
                         echo 'mvn pre-integration-test -f clear_project/helloworld-ws/pom.xml'
                     },
                     'integration-test': {
-                        'mvn integration-test -f clear_project/helloworld-ws/pom.xml'
+                        withSonarQubeEnv('Sonar') {
+                            'mvn integration-test -f clear_project/helloworld-ws/pom.xml'
+                        }
                     },
                     'kind-post-integration-test' : {
                         'mvn post-integration-test -f clear_project/helloworld-ws/pom.xml'

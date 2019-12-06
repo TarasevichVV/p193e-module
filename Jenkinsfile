@@ -33,7 +33,8 @@ node {
                 maven: 'M3'){
             sh "pwd"
             sh "ls"
-            sh "ls $JENKINS_HOME/workspace/mntlab-ci-pipeline/EPBYMINW9146"
+            sh "find $JENKINS_HOME -name Jenkinsfile"
+//            sh "ls $JENKINS_HOME/workspace/mntlab-ci-pipeline/EPBYMINW9146"
             sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
             }
         }

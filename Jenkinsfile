@@ -9,6 +9,7 @@ pipeline {
     // }
     environment { 
     studentbranch = 'ekomarov'
+    buildnum = 0
     }
     
     stages {
@@ -21,6 +22,7 @@ pipeline {
         stage('Building code') {
             steps { 
                 echo 'Building code'
+                sh 'mvn -B clean package'
             }
         }
         stage('Sonar scan') {

@@ -26,7 +26,7 @@ node ('master') {
       git branch: "${student}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
       withMaven(maven: 'M3') {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
-      sh "helloworld-project/helloworld-ws/target/helloworld-ws.war ."
+      sh "ll helloworld-project/helloworld-ws/target/"
      }
     }
 
@@ -69,7 +69,7 @@ node ('master') {
                 sh """
                 ls -l
                 cp Jenkinsfile copy
-                cp helloworld-ws.war copy
+                cp helloworld-project/helloworld-ws/target/helloworld-ws.war copy
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz -C copy .
                 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """

@@ -80,11 +80,11 @@ node {
                     podTemplate(label: label,
                             containers: [
                                     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                                    containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
+                                    containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
                             ],
                             volumes: [
                                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                                    hostPathVolume(hostPath: '/data/workspace/pipe', mountPath: '/home')
+                                    //hostPathVolume(hostPath: '/data/workspace/pipe', mountPath: '/home')
 
                             ])
 

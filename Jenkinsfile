@@ -17,6 +17,7 @@ node {
         checkout scm
     }
     stage('Building code'){
+        git branch: 'vtarasevich', url: 'https://github.com/MNT-Lab/build-t00ls'
         sh label: '', script: '''TimeStamp=$(date)
                                 cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
                                 <!DOCTYPE html>

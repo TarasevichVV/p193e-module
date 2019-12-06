@@ -13,5 +13,20 @@ node {
             sh "${scannerHome}/bin/sonar-scanner  -e -Dsonar.projectKey=mias -e -Dsonar.projectName=Hello-world -e -Dsonar.sources=clear_project/helloworld-ws/src -e -Dsonar.java.binaries=clear_project/helloworld-ws/target"
         }
     }
+    stage('parallel testing') {
+        step {
+            parallel (
+                    'kind-pre-integration-test': {
+                        echo 'mvn pre-integration-test -f clear_project/helloworld-ws/pom.xml'
+                    },
+                    'integration-test': {
+                        'mvn integration-test -f clear_project/helloworld-ws/pom.xml'
+                    },
+                    'kind-post-integration-test' : {
+                        'mvn post-integration-test -f clear_project/helloworld-ws/pom.xml'
+                    }
+            )
+        }
+    }
 }
 

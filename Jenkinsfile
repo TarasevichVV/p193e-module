@@ -54,8 +54,8 @@ node {
           })
     }
     stage('Triggering job and fetching artefact after finishing'){
-        build job: "MNTLAB-${student}-child1-job", parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
-        copyArtifacts(projectName: "MNTLAB-${student}-child1-job");
+        build job: "MNTLAB-${student}-child1-build-job", parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
+        copyArtifacts(projectName: "MNTLAB-${student}-child1-build-job");
     }
     stage('Packaging and Publishing results'){
         parallel(
@@ -79,12 +79,12 @@ node {
                                 container('docker') {
                                 sh """
                                 cp /tmp/helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                                echo "nexus-dock.k8s.playpit.by  "
+                                echo "35.186.195.40 nexus-dock.k8s.playpit.by"
                                 echo "${Dockerfile}" > Dockerfile
                                 docker build -t vtarasevich/app .
-                                docker tag vtarasevich/app:latest 192.168.56.100:32133/vtarasevich/app:${BUILD_NUMBER}
-                                docker login -u admin -p admin 192.168.56.100:32133
-                                docker push 192.168.56.100:32133/vtarasevich/app:${BUILD_NUMBER}
+                                docker tag vtarasevich/app:latest nexus-dock.k8s.playpit.by:80/vtarasevich/app:${BUILD_NUMBER}
+                                docker login -u admin -p admin nexus-dock.k8s.playpit.by
+                                docker push nexus-dock.k8s.playpit.by:80/vtarasevich/app:${BUILD_NUMBER}
                                 """
                                 }
                             }

@@ -8,7 +8,7 @@ def Dockerfile='''  From alpine
                         mkdir /opt/tomcat && \
                         mv apache-tomcat*/* /opt/tomcat/
                                 
-                        COPY helloworld-ws.war /opt/tomcat/webapps
+                        COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /opt/tomcat/webapps
                                 
                         EXPOSE 8080
                         CMD ["/opt/tomcat/bin/catalina.sh", "run"]'''

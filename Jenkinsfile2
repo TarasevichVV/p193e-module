@@ -69,7 +69,7 @@ node {
                 tar xzf ${student}_dsl_script.tar.gz
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt
-                
+                curl -v -u admin:123_qwe --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus3:8111/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
                 stash includes: "helloworld-ws.war", name: "targz"
             },
@@ -79,6 +79,10 @@ node {
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                 containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
             ],
+            envVars: [
+            envVar(key: "DOCKER_OPTS", value: "--insecure-registry nexus-dock.k8s.playpit.by -H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock")
+                     
+        ],
             volumes: [
                 hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
                 

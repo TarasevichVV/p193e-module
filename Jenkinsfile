@@ -68,9 +68,6 @@ node ('master') {
                 sh """
                 pwd
                 ls -la
-                cp Jenkinsfile copy
-                tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz -C copy .
-                curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
         },
         'Creating Docker Image  with naming convention': {

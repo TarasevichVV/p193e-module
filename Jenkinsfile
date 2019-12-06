@@ -21,9 +21,8 @@ podTemplate(label: label,
                 withMaven(maven: 'M3') { 
                    sh "mvn clean install"
                 }
-        }
-                
             }
+
             stage('Docker Build') {
                 container('docker') {
                     echo "Building docker image..."

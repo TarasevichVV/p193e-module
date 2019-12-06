@@ -15,13 +15,13 @@ podTemplate(label: label,
                 container('docker') {
                     echo "Building docker image..."
                     sh """
-                       hostname
-                       whoami
-                       env
-                       echo $PATH
-                       ps -ef 
-                       docker version
-                       """
+                      hostname
+                      whoami
+                      env
+                      echo $PATH
+                      ps -ef 
+                      docker version
+                      """
                 }
             }
     }

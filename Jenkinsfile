@@ -9,7 +9,7 @@ node {
     }
     stage('sonar scaner') {
         scannerHome = tool 'Sonar'
-        withSonarQubeEnv('sonar') {
+        withSonarQubeEnv('Sonar') {
             sh "${scannerHome}/bin/sonar-scanner  -e -Dsonar.projectKey=mias -e -Dsonar.projectName=Hello-world -e -Dsonar.sources=clear_project/helloworld-ws/src -e -Dsonar.java.binaries=clear_project/helloworld-ws/target"
         }
     }

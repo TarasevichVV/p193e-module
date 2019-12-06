@@ -15,10 +15,11 @@ podTemplate(label: label,
             dir('helloworld-ws'){
                 stage ('Checkout&Build'){
                     checkout scm
-                    sh '''
+                    sh """
+                        echo "${env.WORKSPACE}"
                         ls -la
                         pwd
-                        '''
+                        """
                     withMaven(maven: 'M3') {
                        sh "cd helloworld-ws && mvn clean install"
                     }
@@ -30,13 +31,7 @@ podTemplate(label: label,
                         sh """
                            pwd
                            ls -la
-                           hostname
-                           whoami
-                           env
-                           echo $PATH
-                           ps -ef
-                           docker version
-
+                           cd helloworld-ws && docker build -t helloworld:${env.BUILD_NUMBER} .
                            """
                     }
                 }

@@ -78,7 +78,7 @@ node {
                 'Create tar.gz': {
                     sh 'echo "unzip"'
                     sh 'tar -xvzf script.tar.gz; ls'
-
+                    sh "find ./ -name helloworld-ws.war"
 //                    sh 'tar -cvf "pipeline-ayanchuk-${currentBuild.number}.tar" -C helloworld-project/helloworld-ws/target helloworld-ws.war'
 //                    sh 'tar -rf "pipeline-ayanchuk-${currentBuild.number}.tar" -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-dsl Jenkinsfile'
 //                    sh 'tar -rf "pipeline-ayanchuk-${currentBuild.number}.tar" output.txt ; gzip "pipeline-ayanchuk-${currentBuild.number}.tar"'

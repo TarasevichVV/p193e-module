@@ -32,8 +32,8 @@ node {
             withMaven(
                 maven: 'M3'){
             sh "pwd"
-            sh "ls"
-            sh "find $JENKINS_HOME -name Jenkinsfile"
+            sh "ls -ahl"
+            sh "find $JENKINS_HOME -name *Jenkinsfile*"
 //            sh "ls $JENKINS_HOME/workspace/mntlab-ci-pipeline/EPBYMINW9146"
             sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
             }
@@ -77,7 +77,7 @@ node {
                 },
                 'Create tar.gz': {
                     sh 'echo "unzip"'
-                    sh 'tar -xvzf script.tar.gz; ls'
+                    sh 'tar -xvzf script.tar.gz; ls -ahl'
                     sh "find ./ -name helloworld-ws.war"
 //                    sh 'tar -cvf "pipeline-ayanchuk-${currentBuild.number}.tar" -C helloworld-project/helloworld-ws/target helloworld-ws.war'
 //                    sh 'tar -rf "pipeline-ayanchuk-${currentBuild.number}.tar" -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-dsl Jenkinsfile'

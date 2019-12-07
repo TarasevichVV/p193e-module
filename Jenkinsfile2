@@ -22,7 +22,7 @@ node {
       git branch: "ykachatkou", url: "https://github.com/MNT-Lab/build-t00ls"
       def commit = env.GIT_COMMIT
       sh '''
-      cp /var/jenkins_home/workspace/new-pipe@script/index.html index.html helloworld-project/helloworld-ws/src/main/webapp/index.html -f
+      cp /var/jenkins_home/workspace/new-pipe@script/index.html helloworld-project/helloworld-ws/src/main/webapp/index.html -f
       '''
       withMaven(maven: "Maven-3.6.3"){
         sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install" 

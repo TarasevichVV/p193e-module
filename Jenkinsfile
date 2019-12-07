@@ -1,32 +1,20 @@
 #!/usr/bin/env groovy
 def student = "ykachatkou"
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-def Dockerfile = """
-                       From alpine
-                       
-                       RUN apk update && apk add wget tar openjdk8 && \
-                       wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz && \
-                       tar -xvf apache-tomcat-8.5.20.tar.gz && \
-                       mkdir /opt/tomcat && \
-                       mv apache-tomcat*/* /opt/tomcat/
-                       COPY helloworld-ws.war /opt/tomcat/webapps/
-                       EXPOSE 8080
-                       CMD ["/opt/tomcat/bin/catalina.sh", "run"]
-                       
-"""
+def label2 = "centos-jenkins-${UUID.randomUUID().toString()}"
 
 node {
    stage('Preparation (Checking out)'){
        checkout scm
    }
    stage('Build') { 
-      git branch: 'ykachatkou', url: 'https://github.com/MNT-Lab/build-t00ls'
+      git branch: "ykachatkou", url: "https://github.com/MNT-Lab/build-t00ls"
       sh '''
       cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
-      <p>commitId: $GIT_COMMIT </p>
-      <p>triggeredBy: $(git show -s --pretty=%an)</p>
-      <p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>
-      <p>version: 1. $BUILD_NUMBER</p>
+      <p>commitId: "$GIT_COMMIT" </p>
+      <p>triggeredBy: "$(git show -s --pretty=%an)"</p>
+      <p>buildtime: "$(date +'%Y-%m-%d_%H-%M-%S')"</p>
+      <p>version: 1."$BUILD_NUMBER"</p>
       EOF
       '''
       
@@ -68,12 +56,14 @@ node {
            'Archiving artifact':  {
                 sh """
                 tar xzf ${student}_dsl_script.tar.gz
-                cp /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/Jenkinsfile .
+                cp /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/* .
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile 
                 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
                 stash includes: "helloworld-ws.war", name: "targz"
+		stash includes: "Dockerfile", name: "docker"
+                stash includes: "*.yml", name: "yml"
             },
             'Creating Docker Image ':  {
                 podTemplate(label: label,
@@ -92,8 +82,8 @@ node {
                stage('Docker Build') {
                  container('docker') {
                      unstash "targz"
+		     unstash "docker"
                      sh """
-                        echo "${Dockerfile}" > Dockerfile
                         docker build -t nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:$BUILD_NUMBER .
                         docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
                         docker push nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:$BUILD_NUMBER
@@ -110,10 +100,42 @@ node {
             
         )
     }
-    stage("hello"){
-        sh """
-        hostname
-        """
+    stage("Asking for manual approval"){
+        timeout(time: 10, unit: "MINUTES") {
+            input message: 'Approve Deploy?', ok: 'Yes'
+
+        }
+
         
     }
+    stage('Deployment (rolling update, zero downtime)'){
+        
+                podTemplate(label: label2,
+                    containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true),
+                ]
+                ) 
+            
+            {
+              node(label2) {
+               stage('Docker Build') {
+                 container('centos') {
+                    unstash "yml"
+                    sh """
+                    curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                    chmod +x ./kubectl
+                    mv ./kubectl /usr/local/bin/kubectl
+                    sed -i "s|helloworld-ykachatkou|helloworld-ykachatkou-$BUILD_NUMBER|" docker-deploy.yml
+                    kubectl apply -f docker-deploy.yml
+                    """
+                
+                  }
+                }
+              }
+            }
+        
+        
+    }   
+    
 }

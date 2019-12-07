@@ -22,7 +22,7 @@ sonar.sources=helloworld-project/helloworld-ws/src
 sonar.java.binaries=helloworld-project/helloworld-ws/target
 sonar.login=admin
 sonar.password=admin */
-    def scannerHome = tool 'SonarScanner 4.0';
+    def scannerHome = tool 'Sonar';
     withSonarQubeEnv('My SonarQube Server') {
       sh "${scannerHome}/bin/sonar-scanner"
     }

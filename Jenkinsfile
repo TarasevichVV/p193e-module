@@ -1,37 +1,33 @@
 //#parse("File Header.java")
 node {
     stage('Checkout') {
-        steps {
-            scm {
-                git {
-                    remote {
-                        url('https://github.com/MNT-Lab/build-t00ls.git')
-                    }
-                    branch('melizarov')
+        scm {
+            git {
+                remote {
+                    url('https://github.com/MNT-Lab/build-t00ls.git')
                 }
-                echo "checkout from dev branch"
+                branch('melizarov')
             }
+            echo "checkout from dev branch"
+
         }
     }
     stage('Build') {
-        steps {
-            withMaven(maven: "M3") { //maven3-6-3
-                sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
-            }
+        withMaven(maven: "M3") { //maven3-6-3
+        sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
         }
     }
     stage('Sonar'){
         environment {
             scannerHome = tool 'Sonar'
         }
-        steps {
-            withSonarQubeEnv('Sonar') {
-                sh "${scannerHome}/bin/sonar-scanner"
-            }
-            timeout(time: 10, unit: 'MINUTES') {
-                waitForQualityGate abortPipeline: true
-            }
+        withSonarQubeEnv('Sonar') {
+            sh "${scannerHome}/bin/sonar-scanner"
         }
+        timeout(time: 10, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: true
+
+    }
     }
     stage('Test') {
         parallel(
@@ -46,28 +42,27 @@ node {
         )
     }
     stage('Triggering') {
-        steps {
-            sh "echo trigering"
-        }
+
+        sh "echo trigering"
     }
     stage('Packeging') {
-        steps {
-            sh "echo Packeging"
-        }
+
+        sh "echo Packeging"
+
     }
     stage('Asking approval') {
-        steps {
-            sh "echo Asking"
-        }
+
+       sh "echo Asking"
+
     }
     stage('Deploy') {
-        steps {
-            sh "echo deploy"
-        }
+
+        sh "echo deploy"
+
     }
     stage('Sending status') {
-        steps {
-            sh "echo Sending status"
-        }
+
+        sh "echo Sending status"
+
     }
 }

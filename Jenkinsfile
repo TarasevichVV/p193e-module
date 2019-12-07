@@ -2,7 +2,6 @@
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def ws = "${env.WORKSPACE}"
 podTemplate(label: label,
-        containers: [
                 yaml """
                 kind: Pod
                 metadata:
@@ -21,7 +20,8 @@ podTemplate(label: label,
                       items:
                       - key: .dockerconfigjson
                         path: config.json
-"""
+""",
+        containers: [
                 //containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
                    // envVars: [secretEnvVar(key: 'DOCKER_CONFIG', secretName: 'docker-config-json', secretKey: '.dockerconfigjson'), ])],

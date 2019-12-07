@@ -110,28 +110,23 @@ node {
     }
     stage('Deployment (rolling update, zero downtime)'){
         
-                podTemplate(label: label,
+                podTemplate(label: label2,
                     containers: [
                         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                        containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
-            ],
-            volumes: [
-                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
-                
-            ])
-            
+                        containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true),
+                ]
+                ) 
             
             {
-              node(label) {
-               stage('Deployment') {
-                 container('docker') {
+              node(label2) {
+               stage('Docker Build') {
+                 container('centos') {
                     unstash "yml"
                     sh """
                     curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
                     chmod +x ./kubectl
                     mv ./kubectl /usr/local/bin/kubectl
-                    sed -i "s|helloworld-ykachatkou|helloworld-ykachatkou-$BUILD_NUMBER|" docker-deploy.yml
-                    docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                    sed -i "s|helloworld-ykachatkou|helloworld-ykachatkou:$BUILD_NUMBER|" docker-deploy.yml
                     kubectl apply -f docker-deploy.yml
                     """
                 

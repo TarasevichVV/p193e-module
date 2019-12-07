@@ -68,7 +68,7 @@ node {
            'Archiving artifact':  {
                 sh """
                 tar xzf ${student}_dsl_script.tar.gz
-                cp /var/jenkins_home/workspace/new-pipe@script/Jenkinsfile2 .
+                cp /var/jenkins_home/workspace/new-pipe@script/* . -f
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile2
                 curl -v -u admin:admin--upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus-svc.nexus.svc.cluster.local/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz

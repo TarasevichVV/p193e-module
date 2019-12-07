@@ -140,11 +140,8 @@ node {
                     curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
                     chmod +x ./kubectl
                     mv ./kubectl /usr/local/bin/kubectl
-                    kubectl create namespace ykachatkou
-                    kubectl create secret docker-registry docker-secret --docker-server=nexus3:8111 --docker-username=admin --docker-password=admin -n ykachatkou
                     sed -i "s|helloworld-ykachatkou|helloworld-ykachatkou-$BUILD_NUMBER|" docker-deploy.yml
                     kubectl apply -f docker-deploy.yml
-                    kubectl apply -f docker-svc.yml
                     """
                 
                   }

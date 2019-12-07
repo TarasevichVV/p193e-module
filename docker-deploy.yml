@@ -1,3 +1,17 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ykachatkou
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJuZXh1czM6ODExMSI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiIsImF1dGgiOiJZV1J0YVc0NllXUnRhVzQ9In19fQ==
+kind: Secret
+metadata:
+  name: docker-secret
+  namespace: ykachatkou
+type: kubernetes.io/dockerconfigjson
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -12,11 +26,11 @@ spec:
       maxUnavailable: 25%
   selector:
     matchLabels:
-      app: tomcat
+      app: ykachatkou-tomcat
   template:
     metadata:
       labels:
-        app: helloworld
+        app: ykachatkou-tomcat
     spec:
       containers:
       - name: ykachatkou-tomcat
@@ -33,6 +47,22 @@ spec:
           timeoutSeconds: 5
       imagePullSecrets:
       - name: docker-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ykachatkou-tomcat-svc
+  namespace: ykachatkou
+  labels:
+    app: ykachatkou-tomcat
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 32111
+  type: NodePort
+  selector:
+    app: ykachatkou-tomcat
 
 
 

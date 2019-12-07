@@ -7,7 +7,7 @@ podTemplate(yaml: """
                 kind: Pod
                 metadata:
                   labels:
-                    name: "docker-dind"
+                    name: "docker"
                 spec:
                   containers:
                   - name: docker

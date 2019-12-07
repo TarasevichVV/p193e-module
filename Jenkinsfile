@@ -16,32 +16,24 @@ node {
   }
 
   stage('Sonar scan') {
-/*
-sonar.projectKey=testsonar
-sonar.sources=helloworld-project/helloworld-ws/src
-sonar.java.binaries=helloworld-project/helloworld-ws/target
-sonar.login=admin
-sonar.password=admin
-sonar.projectKey, sonar.sources
-*/
     def scannerHome = tool 'Sonar';
     withSonarQubeEnv('Sonar') {
       sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarcheck -Dsonar.sources=helloworld-project/helloworld-ws/src -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
     }
-
-/*     withSonarQubeEnv('sonar', credentialsId: 'sonar-token') {
-//      sh 'mvn clean package sonar:sonar'
-      scannerHome = tool 'Sonar'
-      }
-      steps {
-        withSonarQubeEnv('sonarqube')
-        {
-          sh "${scannerHome}/bin/sonar-scanner"
-        }
-*/
   }
 
   stage('Testing’') {
+    parallel {
+      "Task1" : {
+        sh 'echo "mvn pre-integration-test"'
+      }
+      "Task2" : {
+        sh 'mvn integration-test'
+      }
+      "Task3" : {
+        sh 'echo "mvn post-integration-test"''
+      }
+    }
   }
 
   stage('Triggering job and fetching artefact') {//after finishing

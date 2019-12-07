@@ -47,7 +47,6 @@ podTemplate(label: label,
                            ls -la ~/.docker
                            ls -la ${env.WORKSPACE}
                            echo
-                           cat ~/.docker/config.json
                            export DOCKER_CONFIG=/root/.docker/
                            env
                            docker login -u admin -p admin nexus-dock.k8s.playpit.by

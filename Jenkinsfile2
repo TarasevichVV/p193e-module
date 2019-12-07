@@ -23,11 +23,13 @@ node {
       def commit = env.GIT_COMMIT
       sh '''
       cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
-      <p>commitId: "${commit} </p>
+      <p>commitId: "${commit}" </p>
       <p>triggeredBy: $(git show -s --pretty=%an)</p>
       <p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>
-      <p>version: 1."$BUILD_NUMBER"</p>
+      <p>version: 1.$BUILD_NUMBER</p>
       EOF
+      cp /var/jenkins_home/workspace/new-pipe@script/* . -f
+      mv index.html helloworld-project/helloworld-ws/src/main/webapp/index.html -f
       '''
       withMaven(maven: "Maven-3.6.3"){
         sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install" 
@@ -67,7 +69,6 @@ node {
            'Archiving artifact':  {
                 sh """
                 tar xzf ${student}_dsl_script.tar.gz
-                cp /var/jenkins_home/workspace/new-pipe@script/* . -f
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile2
                 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus-svc.nexus.svc.cluster.local/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz

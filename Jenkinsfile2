@@ -69,7 +69,7 @@ node {
                 cp /var/jenkins_home/workspace/new-pipe@script/* . -f
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile2
-                curl -v -u admin:admin--upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus-svc.nexus.svc.cluster.local:8111/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
+                curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus-svc.nexus.svc.cluster.local/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
                 stash includes: "helloworld-ws.war", name: "targz"
 		stash includes: "Dockerfile", name: "docker"

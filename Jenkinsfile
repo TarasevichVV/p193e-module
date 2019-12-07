@@ -1,7 +1,5 @@
 #!/usr/bin/env groovy
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-def ws = "${env.WORKSPACE}"
-
 
 podTemplate(label: label,
             yaml: """
@@ -91,5 +89,17 @@ podTemplate(label: label,
                            """
                     }
                 }
+
+                stage('Docker Pull') {
+                    container('docker') {
+                        echo "Pull docker image..."
+                        sh """
+                           docker rmi nexus-dock.k8s.playpit.by:80/vpupkin/app:${env.BUILD_NUMBER}
+                           docker pull nexus-dock.k8s.playpit.by:80/vpupkin/app:${env.BUILD_NUMBER}
+                           """
+                    }
+                }
+
+
     }
 }

@@ -18,6 +18,9 @@ def Dockerfile = """
 node {
    stage('Preparation (Checking out)'){
        checkout scm
+       sh "cp /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/Jenkinsfile ."
+       cat Jenkinsfile
+       sh "pause 20"
    }
    stage('Build') { 
       git branch: 'ykachatkou', credentialsId: '6d32c01d-6f1a-4a3f-9402-f9a133852eb2', url: 'https://github.com/MNT-Lab/build-t00ls'
@@ -28,7 +31,6 @@ node {
       <p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>
       <p>version: 1. $BUILD_NUMBER</p>
       EOF
-      cp /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/Jenkinsfile .
       '''
       
       withMaven(maven: "M3"){

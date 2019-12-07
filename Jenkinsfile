@@ -28,8 +28,10 @@ node {
         sh 'echo "mvn pre-integration-test"'
       },
       "Task2" : {
-        sh 'mvn integration-test'
-      },
+        withMaven(maven: 'M3') {
+          "sh 'mvn integration-test'"
+        }
+      }
       "Task3" : {
         sh 'echo "mvn post-integration-test"'
       }

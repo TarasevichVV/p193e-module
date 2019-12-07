@@ -23,7 +23,7 @@ podTemplate(yaml: """
                   volumes:
                   - name: docker-config-json-volume
                     secret:
-                      secretName: 'docker-config-json
+                      secretName: docker-config-json
                       items:
                       - key: .dockerconfigjson
                         path: config.json

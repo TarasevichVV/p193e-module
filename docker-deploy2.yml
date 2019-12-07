@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: ykachatkou-tomcat
-        image: nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou
+        image: nexus3:8111/helloworld-ykachatkou
         ports:
         - containerPort: 8080
         readinessProbe:
@@ -79,9 +79,6 @@ spec:
         backend:
           serviceName: ykachatkou-tomcat-svc
           servicePort: 80
-
-
-
 
 
 

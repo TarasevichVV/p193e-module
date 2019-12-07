@@ -18,13 +18,14 @@ node {
    stage('Preparation (Checking out)'){
        checkout scm
    }
-   stage('Build') { 
+   stage('Build') {
       git branch: "ykachatkou", url: "https://github.com/MNT-Lab/build-t00ls"
+      def commit = env.GIT_COMMIT
       sh '''
       cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
-      <p>commitId: "$GIT_COMMIT" </p>
-      <p>triggeredBy: "$(git show -s --pretty=%an)"</p>
-      <p>buildtime: "$(date +'%Y-%m-%d_%H-%M-%S')"</p>
+      <p>commitId: "${commit} </p>
+      <p>triggeredBy: $(git show -s --pretty=%an)</p>
+      <p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>
       <p>version: 1."$BUILD_NUMBER"</p>
       EOF
       '''

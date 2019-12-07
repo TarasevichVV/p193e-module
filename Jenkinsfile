@@ -22,11 +22,21 @@ sonar.sources=helloworld-project/helloworld-ws/src
 sonar.java.binaries=helloworld-project/helloworld-ws/target
 sonar.login=admin
 sonar.password=admin */
-
-    withSonarQubeEnv('sonar', credentialsId: 'sonar-token') {
-      sh 'mvn clean package sonar:sonar'
+    def scannerHome = tool 'SonarScanner 4.0';
+    withSonarQubeEnv('My SonarQube Server') {
+      sh "${scannerHome}/bin/sonar-scanner"
     }
 
+/*     withSonarQubeEnv('sonar', credentialsId: 'sonar-token') {
+//      sh 'mvn clean package sonar:sonar'
+      scannerHome = tool 'Sonar'
+      }
+      steps {
+        withSonarQubeEnv('sonarqube')
+        {
+          sh "${scannerHome}/bin/sonar-scanner"
+        }
+*/
   }
 
   stage('Testing’') {

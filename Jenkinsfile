@@ -26,7 +26,7 @@ sonar.projectKey, sonar.sources
 */
     def scannerHome = tool 'Sonar';
     withSonarQubeEnv('Sonar') {
-      sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarcheck -Dsonar.sources=helloworld-project/helloworld-ws/src"
+      sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarcheck -Dsonar.sources=helloworld-project/helloworld-ws/src -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
     }
 
 /*     withSonarQubeEnv('sonar', credentialsId: 'sonar-token') {

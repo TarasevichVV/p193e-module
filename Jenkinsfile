@@ -20,17 +20,17 @@ podTemplate(label: label,
                       - cat
                     tty: true
                     volumeMounts:
-                      - name: docker-config-json-volume
-                        mountPath: /root/.docker
+#                      - name: docker-config-json-volume
+#                        mountPath: /root/.docker
                       - name: docker-sock-volume
                         mountPath: /var/run/docker.sock
                   volumes:
-                  - name: docker-config-json-volume
-                    secret:
-                      secretName: docker-config-json
-                      items:
-                      - key: .dockerconfigjson
-                        path: config.json
+#                  - name: docker-config-json-volume
+#                    secret:
+#                      secretName: docker-config-json
+#                      items:
+#                      - key: .dockerconfigjson
+#                        path: config.json
                   - name: docker-sock-volume
                     hostPath:
                         path: /var/run/docker.sock
@@ -89,6 +89,7 @@ podTemplate(label: label,
                            ls -la ~/
                            ls -la ~/.docker
                            ls -la ${env.WORKSPACE}
+
                            echo
                            env
                            cat ~/.docker/config.json

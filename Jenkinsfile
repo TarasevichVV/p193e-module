@@ -1,5 +1,5 @@
 //#parse("File Header.java")
-sudent='melizarov'
+student='melizarov'
 node {
     stage('Checkout') {
         checkout scm

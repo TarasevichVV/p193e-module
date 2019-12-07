@@ -12,12 +12,14 @@ node {
                 echo "checkout from dev branch"
             }
         }
+    }
     stage('Build') {
         steps {
             withMaven(maven: "M3") { //maven3-6-3
                 sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
             }
         }
+    }
     stage('Sonar'){
         environment {
             scannerHome = tool 'Sonar'
@@ -68,5 +70,4 @@ node {
             sh "echo Sending status"
         }
     }
-}
 }

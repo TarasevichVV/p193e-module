@@ -20,10 +20,10 @@ node {
             }
         stage('Sonar'){
             environment {
-                scannerHome = tool 'SonarQubeScanner'
+                scannerHome = tool 'Sonar'
             }
             steps {
-                withSonarQubeEnv('sonarqube') {
+                withSonarQubeEnv('Sonar') {
                     sh "${scannerHome}/bin/sonar-scanner"
                 }
                 timeout(time: 10, unit: 'MINUTES') {
@@ -34,15 +34,13 @@ node {
         stage('Test') {
                 parallel(
                     Pre-integration: {
-                        sh "echo 'mvn pre-integration-test'"
-                    },
+                        sh 'echo \'mvn pre-integration-test\''},
                     Integration-test: {
                         echo 'This is integration-test'
                         sh 'mvn integration-test -f helloworld-ws/pom.xml'
                     },
                     Post-integration: {
-                        sh "echo 'mvn post-integration-test'"
-                    }
+                        sh "echo 'mvn post-integration-test'"}
                 )
             }
 

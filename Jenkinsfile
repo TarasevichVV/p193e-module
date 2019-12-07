@@ -85,14 +85,7 @@ podTemplate(label: label,
                            id
 
                            pwd
-                           echo
-                           ls -la ~/
-                           ls -la ~/.docker
-                           ls -la ${env.WORKSPACE}
-
-                           echo
                            env
-                           cat ~/.docker/config.json
                            docker login -u admin -p admin http://nexus-dock.k8s.playpit.by
                            docker push nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER}
                            """

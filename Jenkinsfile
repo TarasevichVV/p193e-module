@@ -12,6 +12,12 @@ node {
     }
     stage ('sonar_scan') {
     def scannerHome = tool 'Sonar-scanner'
-        sh "${scannerHome}/bin/sonar-scanner"
+    withSonarQubeEnv('My SonarQube Server') {"""
+        sh "${scannerHome}/bin/sonar-scanner" 
+        -e -Dsonar.host.url=http://sonar.default.svc.cluster.local/sonar
+        -e -Dsonar.projectKey=number${BUILD_NUMBER}
+        -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target 
+        -e -Dsonar.sources=helloworld-project/helloworld-ws/src 
+        """}
     }
 }

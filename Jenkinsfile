@@ -23,17 +23,17 @@ node {
   }
 
   stage('Testing’') {
-    parallel {
+    parallel (
       "Task1" : {
         sh 'echo "mvn pre-integration-test"'
-      }
+      },
       "Task2" : {
         sh 'mvn integration-test'
-      }
+      },
       "Task3" : {
-        sh 'echo "mvn post-integration-test"''
+        sh 'echo "mvn post-integration-test"'
       }
-    }
+    )
   }
 
   stage('Triggering job and fetching artefact') {//after finishing

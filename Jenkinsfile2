@@ -113,8 +113,9 @@ node {
     stage("Asking for manual approval"){
         timeout(time: 10, unit: "MINUTES") {
             input message: 'Approve Deploy?', ok: 'Yes'
-            stash includes: /var/jenkins_home/workspace/EPBYMINW9138/new-pipeline@script/*.yml, name: "targz"
+
         }
+        stash includes: /var/jenkins_home/workspace/EPBYMINW9138/new-pipeline@script/*.yml, name: "yml"
     }
     stage('Deployment (rolling update, zero downtime)'){
         

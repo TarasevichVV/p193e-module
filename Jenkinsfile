@@ -14,6 +14,7 @@ podTemplate(label: label,
         ) {
     node(label) {
                 stage ('Checkout&Build'){
+                /*
                     checkout scm
                     sh """
                         echo "${env.WORKSPACE}"
@@ -35,12 +36,18 @@ podTemplate(label: label,
                            """
                     }
                 }
+                */
                 stage('Docker Push') {
                     container('docker') {
                         echo "Building docker image..."
                         sh """
-                           docker ps
-                           docker images
+                           echo
+                           ls -la
+                           echo
+
+                           env
+                           ls -la  $DOCKER_CONFIG
+                           cat $DOCKER_CONFIG/config.json
                            docker login -u admin -p admin nexus-dock.k8s.playpit.by
                            dokcer push nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER}
                            """

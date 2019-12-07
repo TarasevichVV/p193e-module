@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: helloworld-ykachatkou
+  name: ykachatkou-tomcat
   namespace: ykachatkou
 spec:
   replicas: 3
@@ -16,11 +16,11 @@ spec:
   template:
     metadata:
       labels:
-        app: helloworld-ykachatkou
+        app: helloworld
     spec:
       containers:
-      - name: helloworld-ykachatkou
-        image: nexus3:31111/helloworld-ykachatkou:rc
+      - name: ykachatkou-tomcat
+        image: nexus3:8111/helloworld-ykachatkou
         ports:
         - containerPort: 8080
         readinessProbe:

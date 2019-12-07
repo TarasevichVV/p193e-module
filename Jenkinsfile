@@ -3,7 +3,7 @@ def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def ws = "${env.WORKSPACE}"
 
 
-podTemplate(yaml """
+podTemplate(yaml: """
                 kind: Pod
                 metadata:
                   labels:

@@ -92,9 +92,8 @@ podTemplate(label: label,
                            echo
                            env
                            cat ~/.docker/config.json
-                           sleep 3000
-                           docker --config=~/.docker/ login -u admin -p admin nexus-dock.k8s.playpit.by
-                           dokcer push nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER}
+                           docker login -u admin -p admin http://nexus-dock.k8s.playpit.by
+                           docker push nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER}
                            """
                     }
                 }

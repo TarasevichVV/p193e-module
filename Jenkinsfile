@@ -8,9 +8,10 @@ podTemplate(label: label,
                     envVars: [secretEnvVar(key: 'DOCKER_CONFIG', secretName: 'docker-config-json', secretKey: '.dockerconfigjson'),
                     ])],
                 volumes: [
-                    secretVolume(secretName: 'docker-config-json', mountPath: "/root/.docker"),
+                    secretVolume(secretName: 'docker-config-json', mountPath: "/root/.docker", items: [key: '.dockerconfigjson', path: 'config.json']),
                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-            ]
+            ],
+            imagePullSecrets: [ 'docker-config-json' ]
         ) {
     node(label) {
     /*

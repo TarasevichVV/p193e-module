@@ -5,6 +5,6 @@ RUN apk update && apk add wget tar openjdk8 && \
  	mkdir /opt/tomcat && \
  	mv apache-tomcat*/* /opt/tomcat/
 
-COPY target/helloworld-ws.war /opt/tomcat/webapps/
+COPY helloworld-ws.war /opt/tomcat/webapps/
 EXPOSE 8080
 CMD ["/opt/tomcat/bin/catalina.sh", "run"]

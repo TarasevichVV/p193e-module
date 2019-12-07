@@ -93,9 +93,9 @@ node {
                      sh """
                         echo "35.186.195.40 nexus-dock.k8s.playpit.by" >> /etc/hosts
                         echo "${Dockerfile}" > Dockerfile
-                        docker build -t nexus-service.jenkins.svc.cluster.local:50001/helloworld-ykachatkou:rc-$BUILD_NUMBER .
-                        docker login -u admin -p admin nexus-service.jenkins.svc.cluster.local:50001
-                        docker push nnexus-service.jenkins.svc.cluster.local:50001/helloworld-ykachatkou:rc-$BUILD_NUMBER
+                        docker build -t nexus-dock.k8s.playpit.by/helloworld-ykachatkou:rc-$BUILD_NUMBER .
+                        docker login -u admin -p admin nexus-dock.k8s.playpit.by
+                        docker push nexus-dock.k8s.playpit.by/helloworld-ykachatkou:rc-$BUILD_NUMBER
                         """
                   }
                 }

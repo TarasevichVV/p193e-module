@@ -77,10 +77,9 @@ node {
                 podTemplate(label: label,
             containers: [
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                containerTemplate(name: 'docker', image: 'docker:18-dind', execArgs: 'some --command', ttyEnabled: true),
+                containerTemplate(name: 'docker', image: 'docker:dind', command: "--insecure-registry=nexus-dock.k8s.playpit.by", ttyEnabled: true),
             ],
             envVars: [
-            envVar(key: "DOCKER_OPTS", value: "--insecure-registry nexus-dock.k8s.playpit.by -H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock")
                      
         ],
             volumes: [

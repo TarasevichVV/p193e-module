@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker
+  template:
+    metadata:
+      labels:
+        app: docker
+    spec:
+      containers:
+      - name: docker
+        image: nexus3:8111/helloworld-ykachatkou
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: docker-secret
+
+

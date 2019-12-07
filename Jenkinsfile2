@@ -1,6 +1,7 @@
 #!/usr/bin/env groovy
 def student = "ykachatkou"
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+def label2 = "docker-centos-${UUID.randomUUID().toString()}"
 def Dockerfile = """
                        From alpine
                        
@@ -20,7 +21,6 @@ node {
        checkout scm
    }
    stage('Build') { 
-      git branch: 'ykachatkou', credentialsId: '6d32c01d-6f1a-4a3f-9402-f9a133852eb2', url: 'https://github.com/MNT-Lab/build-t00ls'
       sh '''
       cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
       <p>commitId: $GIT_COMMIT </p>
@@ -66,10 +66,11 @@ node {
         parallel(
            'Archiving artifact':  {
                 sh """
+                touch Jenkinsfile
                 tar xzf ${student}_dsl_script.tar.gz
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt
-                curl -v -u admin:123_qwe --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus3:8111/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
+                tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile
+                curl -v -u admin:admin--upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus-svc.nexus.svc.cluster.local/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
                 stash includes: "helloworld-ws.war", name: "targz"
             },
@@ -77,13 +78,11 @@ node {
                 podTemplate(label: label,
             containers: [
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                containerTemplate(name: 'docker', image: 'docker:dind', command: "--insecure-registry=nexus-dock.k8s.playpit.by", ttyEnabled: true),
+                containerTemplate(name: 'docker', image: 'docker', command: "cat", ttyEnabled: true),
             ],
-            envVars: [
-                     
-        ],
             volumes: [
-                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
+                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+
                 
             ])
             
@@ -95,9 +94,9 @@ node {
                      sh """
                         echo "192.168.56.240    nexus3" >> /etc/hosts
                         echo "${Dockerfile}" > Dockerfile
-                        docker build -t nexus-dock.k8s.playpit.by/helloworld-ykachatkou:rc-$BUILD_NUMBER .
-                        docker login -u admin -p admin nexus-dock.k8s.playpit.by
-                        docker push nexus-dock.k8s.playpit.by/helloworld-ykachatkou:rc-$BUILD_NUMBER
+                        docker build -t nexus3:8111/helloworld-ykachatkou-$BUILD_NUMBER .
+                        docker login -u admin -p admin nexus3:8111
+                        docker push nexus3:8111/helloworld-ykachatkou-$BUILD_NUMBER
                         """
                   }
                 }
@@ -111,13 +110,43 @@ node {
             
         )
     }
-    stage("hello"){
-        sh """
-        hostname
-        whoami
-        cat /etc/passwd
-        touch superfile
-        """
-        
+    stage("Asking for manual approval"){
+        timeout(time: 10, unit: "MINUTES") {
+            input message: 'Approve Deploy?', ok: 'Yes'
+            stash includes: /var/jenkins_home/workspace/EPBYMINW9138/new-pipeline@script/*.yml, name: "targz"
+        }
     }
+    stage('Deployment (rolling update, zero downtime)'){
+        
+                podTemplate(label: label,
+                    containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true),
+                ]
+                ) 
+            
+            {
+              node(label) {
+               stage('Docker Build') {
+                 container('centos') {
+                    unstash "yml"
+                    sh """
+                    curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                    chmod +x ./kubectl
+                    mv ./kubectl /usr/local/bin/kubectl
+                    kubectl create namespace ykachatkou
+                    kubectl create secret docker-registry docker-secret --docker-server=nexus3:8111 --docker-username=admin --docker-password=admin -n ykachatkou
+                    sed -i "s|helloworld-ykachatkou|helloworld-ykachatkou-$BUILD_NUMBER|" docker-deploy.yml
+                    kubectl apply -f docker-deploy.yml
+                    kubectl apply -f docker-svc.yml
+                    """
+                
+                  }
+                }
+              }
+            }
+        
+        
+    }   
+    
 }

@@ -1,24 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: docker
+  name: helloworld-ykachatkou
   namespace: ykachatkou
 spec:
-  replicas: 1
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%
   selector:
     matchLabels:
-      app: docker
+      app: tomcat
   template:
     metadata:
       labels:
-        app: docker
+        app: helloworld-ykachatkou
     spec:
       containers:
-      - name: docker
-        image: nexus3:8111/helloworld-ykachatkou
+      - name: helloworld-ykachatkou
+        image: nexus3:31111/helloworld-ykachatkou:rc
         ports:
         - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 24
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 5
       imagePullSecrets:
       - name: docker-secret
+
 
 

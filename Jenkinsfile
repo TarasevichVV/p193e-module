@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #!/usr/bin/env groovy
 def student = "ykachatkou"
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
@@ -117,17 +116,4 @@ node {
         """
         
     }
-=======
-node {
-   checkout scm
-   sh 'pwd'
-    step([
-        $class: 'ExecuteDslScripts',
-        targets: ['jobs.groovy'].join('\n'),
-        removedJobAction: 'DELETE',
-        removedViewAction: 'DELETE',
-        lookupStrategy: 'SEED_JOB'
-    ])
-
->>>>>>> 0d98674180b7d058cfdb0d33961142bb445564cd
 }

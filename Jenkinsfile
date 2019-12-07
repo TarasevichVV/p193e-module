@@ -11,8 +11,8 @@ node {
     }
     }
     stage ('sonar_scan') {
-    def scannerHome = tool 'SonarQube scanner 4.2.0.1873'
-    withSonarQubeEnv('Sonar-scanner') {"""
+    def scannerHome = tool 'Sonar-scanner'
+    withSonarQubeEnv() {"""
         sh "${scannerHome}/bin/sonar-scanner" 
         -e -Dsonar.host.url=http://sonar.default.svc.cluster.local/sonar
         -e -Dsonar.projectKey=number${BUILD_NUMBER}

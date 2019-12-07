@@ -44,10 +44,10 @@ podTemplate(label: label,
                            pwd
                            echo
                            ls -la ~/
-                           ls -la ~/docker
+                           ls -la ~/.docker
                            ls -la ${env.WORKSPACE}
                            echo
-                           cat ~/docker/.dockerconfigjson
+                           cat ~/.docker/config.json
                            env
                            docker login -u admin -p admin nexus-dock.k8s.playpit.by
                            dokcer push nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER}

@@ -13,8 +13,9 @@ podTemplate(label: label,
             ]
         ) {
     node(label) {
+    /*
                 stage ('Checkout&Build'){
-                /*
+
                     checkout scm
                     sh """
                         echo "${env.WORKSPACE}"

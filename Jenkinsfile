@@ -10,6 +10,9 @@ podTemplate(yaml: """
                     name: "docker"
                 spec:
                   containers:
+                  - name: jnlp
+                    workingDir: /home/jenkins/agent
+                    image: 'jenkins/jnlp-slave:alpine'
                   - name: docker
                     image: docker
                     command:

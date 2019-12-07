@@ -1,18 +1,24 @@
 #!/usr/bin/env groovy
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def ws = "${env.WORKSPACE}"
-podTemplate(label: label,
-                yaml """
+
+
+podTemplate(yaml """
                 kind: Pod
                 metadata:
                   labels:
-                    name: "docker"
+                    name: "docker-dind"
                 spec:
                   containers:
-                  - name: jnlp
+                  - name: docker
+                    image: 'docker'
+                    command: 'cat'
+                    ttyEnabled: true
                     volumeMounts:
                       - name: docker-config-json-volume
                         mountPath: /root/.docker
+                      - name: docker-sock-volume
+                        mountPath: /var/run/docker.sock
                   volumes:
                   - name: docker-config-json-volume
                     secret:
@@ -20,7 +26,17 @@ podTemplate(label: label,
                       items:
                       - key: .dockerconfigjson
                         path: config.json
-""",
+                  - name: docker-sock-volume
+                    hostPath:
+                        path: /var/run/docker.sock
+                        type: File
+
+
+"""
+{
+
+/*
+podTemplate(label: label,
         containers: [
                 //containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
@@ -31,6 +47,7 @@ podTemplate(label: label,
                 ],
                 imagePullSecrets: [ 'docker-config-json' ]
         ) {
+*/
     node(label) {
     /*
                 stage ('Checkout&Build'){

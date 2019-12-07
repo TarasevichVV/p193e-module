@@ -32,7 +32,6 @@ node {
             }
         }
         stage('Test') {
-            steps {
                 parallel(
                     Pre-integration: {
                         sh "echo 'mvn pre-integration-test'"
@@ -47,7 +46,7 @@ node {
                 )
             }
 
-        }
+
         stage('Triggering') {
             steps {
                 sh "echo trigering"

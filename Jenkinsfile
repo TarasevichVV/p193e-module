@@ -5,9 +5,9 @@ podTemplate(label: label,
         containers: [
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true,
-                    envVars: [containerEnvVar(key: 'DOCKER_CONFIG', value: "~/docker/"),])],
+                    envVars: [containerEnvVar(key: 'DOCKER_CONFIG', value: "/root/docker/"),])],
                 volumes: [
-                    secretVolume(secretName: 'docker-config-json', mountPath: "~/docker"),
+                    secretVolume(secretName: 'docker-config-json', mountPath: "/root/docker"),
                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
             ]
         ) {
@@ -41,6 +41,7 @@ podTemplate(label: label,
                     container('docker') {
                         echo "Building docker image..."
                         sh """
+                           pwd
                            echo
                            ls -la ~/
                            ls -la ~/docker

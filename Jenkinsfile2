@@ -69,9 +69,10 @@ node {
                 cp /var/jenkins_home/workspace/new-pipe@script/* . -f
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile2
-                curl -v -u admin:admin--upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus-svc.nexus.svc.cluster.local/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
+                curl -v -u admin:admin--upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus-svc.nexus.svc.cluster.local:8111/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
                 stash includes: "helloworld-ws.war", name: "targz"
+		stash includes: "Dockerfile", name: "docker"
                 stash includes: "*.yml", name: "yml"
            
             },
@@ -92,10 +93,9 @@ node {
                stage('Docker Build') {
                  container('docker') {
                      unstash "targz"
+                     unstash "docker"
                      sh """
-                        
                         echo "192.168.56.240    nexus3" >> /etc/hosts
-                        echo "${Dockerfile}" > Dockerfile
                         docker build -t nexus3:8111/helloworld-ykachatkou-$BUILD_NUMBER .
                         docker login -u admin -p admin nexus3:8111
                         docker push nexus3:8111/helloworld-ykachatkou-$BUILD_NUMBER
@@ -122,7 +122,7 @@ node {
     }
     stage('Deployment (rolling update, zero downtime)'){
         
-                podTemplate(label: label,
+                podTemplate(label: label2,
                     containers: [
                         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                         containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true),
@@ -130,7 +130,7 @@ node {
                 ) 
             
             {
-              node(label) {
+              node(label2) {
                stage('Docker Build') {
                  container('centos') {
                     unstash "yml"

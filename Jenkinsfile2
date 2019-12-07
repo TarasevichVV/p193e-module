@@ -74,7 +74,7 @@ node {
                 curl -v -u admin:admin--upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus-svc.nexus.svc.cluster.local/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
                 stash includes: "helloworld-ws.war", name: "targz"
-                stash includes: "/var/jenkins_home/workspace/new-pipe@script/*.yml", name: "yml"
+                stash includes: "/var/jenkins_home/workspace/new-pipe@script/*", name: "yml"
            
             },
             'Creating Docker Image ':  {

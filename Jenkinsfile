@@ -3,15 +3,33 @@ def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def ws = "${env.WORKSPACE}"
 podTemplate(label: label,
         containers: [
-                containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true,
-                    envVars: [secretEnvVar(key: 'DOCKER_CONFIG', secretName: 'docker-config-json', secretKey: '.dockerconfigjson'),
-                    ])],
+                yaml """
+                kind: Pod
+                metadata:
+                  labels:
+                    name: "docker"
+                spec:
+                  containers:
+                  - name: jnlp
+                    volumeMounts:
+                      - name: docker-config-json-volume
+                        mountPath: /root/.docker
+                  volumes:
+                  - name: docker-config-json-volume
+                    secret:
+                      secretName: 'docker-config-json
+                      items:
+                      - key: .dockerconfigjson
+                        path: config.json
+                        """,
+                //containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+                   // envVars: [secretEnvVar(key: 'DOCKER_CONFIG', secretName: 'docker-config-json', secretKey: '.dockerconfigjson'), ])],
                 volumes: [
-                    secretVolume(secretName: 'docker-config-json', mountPath: "/root/.docker", items: [key: '.dockerconfigjson', path: 'config.json']),
+                    //secretVolume(secretName: 'docker-config-json', mountPath: "/root/.docker", items: [key: '.dockerconfigjson', path: 'config.json']),
                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-            ],
-            imagePullSecrets: [ 'docker-config-json' ]
+                ],
+                imagePullSecrets: [ 'docker-config-json' ]
         ) {
     node(label) {
     /*

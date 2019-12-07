@@ -14,5 +14,4 @@ node {
     def scannerHome = tool 'Sonar-scanner'
         sh "${scannerHome}/bin/sonar-scanner"
     }
-  }
 }

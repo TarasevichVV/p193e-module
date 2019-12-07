@@ -31,7 +31,7 @@ podTemplate(label: label,
                         sh """
                            pwd
                            ls -la
-                           cd helloworld-ws && docker build -t nexus-dock.k8s.playpit.by:80/vpupkin/app:${env.BUILD_NUMBER} .
+                           cd helloworld-ws && docker build -t nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER} .
                            """
                     }
                 }
@@ -42,7 +42,7 @@ podTemplate(label: label,
                            docker ps
                            docker images
                            docker login -u admin -p admin nexus-dock.k8s.playpit.by
-                           dokcer push nexus-dock.k8s.playpit.by:80/vpupkin/app:${env.BUILD_NUMBER}
+                           dokcer push nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER}
                            """
                     }
                 }

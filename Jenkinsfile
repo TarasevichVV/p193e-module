@@ -11,7 +11,7 @@ node {
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
     ])
     withMaven(maven: 'M3') {
-      mvn -f helloworld-project/helloworld-ws/pom.xml package
+      sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
     }
   }
 

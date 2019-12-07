@@ -20,7 +20,7 @@ node {
        checkout scm
    }
    stage('Build') { 
-      git branch: 'ykachatkou', credentialsId: '6d32c01d-6f1a-4a3f-9402-f9a133852eb2', url: 'https://github.com/MNT-Lab/build-t00ls'
+      git branch: 'ykachatkou', url: 'https://github.com/MNT-Lab/build-t00ls'
       sh '''
       cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
       <p>commitId: $GIT_COMMIT </p>
@@ -29,6 +29,7 @@ node {
       <p>version: 1. $BUILD_NUMBER</p>
       EOF
       '''
+      
       withMaven(maven: "M3"){
         sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install" 
       }
@@ -67,8 +68,9 @@ node {
            'Archiving artifact':  {
                 sh """
                 tar xzf ${student}_dsl_script.tar.gz
+                cp /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/Jenkinsfile .
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt
+                tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile 
                 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
                 stash includes: "helloworld-ws.war", name: "targz"
@@ -91,11 +93,10 @@ node {
                  container('docker') {
                      unstash "targz"
                      sh """
-                        echo "35.186.195.40 nexus-dock.k8s.playpit.by" >> /etc/hosts
                         echo "${Dockerfile}" > Dockerfile
-                        docker build -t nexus-service.jenkins.svc.cluster.local:50001/helloworld-ykachatkou:rc-$BUILD_NUMBER .
-                        docker login -u admin -p admin nexus-service.jenkins.svc.cluster.local:50001
-                        docker push nnexus-service.jenkins.svc.cluster.local:50001/helloworld-ykachatkou:rc-$BUILD_NUMBER
+                        docker build -t nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:$BUILD_NUMBER .
+                        docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                        docker push nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:$BUILD_NUMBER
                         """
                   }
                 }

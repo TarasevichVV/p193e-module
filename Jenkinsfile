@@ -9,7 +9,6 @@ podTemplate(label: label,
                 volumes: [
                     secretVolume(secretName: 'docker-config-json', mountPath: "~/docker"),
                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                    hostPathVolume(hostPath: "$ws", mountPath: "$ws"),
             ]
         ) {
     node(label) {
@@ -43,7 +42,8 @@ podTemplate(label: label,
                         echo "Building docker image..."
                         sh """
                            echo
-                           ls -la
+                           ls -la ~/
+                           ls -la ~/docker
                            ls -la ${env.WORKSPACE}/docker
                            echo
 

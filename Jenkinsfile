@@ -1,8 +1,8 @@
 //#parse("File Header.java")
 node {
     stage('Checkout') {
-
-    echo "checkout from dev branch"
+        checkout scm
+        echo "checkout from dev branch"
 
         }
 

@@ -32,8 +32,7 @@ podTemplate(yaml: """
                         type: File
 
 
-"""
-{
+"""){
 
 /*
 podTemplate(label: label,

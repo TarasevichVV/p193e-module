@@ -53,7 +53,7 @@ podTemplate(label: label,
         ) {
 */
     node(label) {
-    /*
+    
                 stage ('Checkout&Build'){
 
                     checkout scm
@@ -77,7 +77,7 @@ podTemplate(label: label,
                            """
                     }
                 }
-                */
+
                 stage('Docker Push') {
                     container('docker') {
                         echo "Building docker image..."

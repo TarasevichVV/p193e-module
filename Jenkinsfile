@@ -82,6 +82,8 @@ podTemplate(label: label,
                     container('docker') {
                         echo "Building docker image..."
                         sh """
+                           id
+
                            pwd
                            echo
                            ls -la ~/
@@ -89,6 +91,7 @@ podTemplate(label: label,
                            ls -la ${env.WORKSPACE}
                            echo
                            env
+                           cat ~/.docker/config.json
                            docker login -u admin -p admin nexus-dock.k8s.playpit.by
                            dokcer push nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER}
                            """

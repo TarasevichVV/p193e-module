@@ -21,7 +21,7 @@ podTemplate(label: label,
                       items:
                       - key: .dockerconfigjson
                         path: config.json
-                        """,
+"""
                 //containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
                    // envVars: [secretEnvVar(key: 'DOCKER_CONFIG', secretName: 'docker-config-json', secretKey: '.dockerconfigjson'), ])],

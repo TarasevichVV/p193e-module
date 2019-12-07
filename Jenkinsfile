@@ -11,9 +11,10 @@ podTemplate(yaml: """
                 spec:
                   containers:
                   - name: docker
-                    image: 'docker'
-                    command: 'cat'
-                    ttyEnabled: true
+                    image: docker
+                    command:
+                      - cat
+                    tty: true
                     volumeMounts:
                       - name: docker-config-json-volume
                         mountPath: /root/.docker

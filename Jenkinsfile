@@ -18,7 +18,7 @@ def Dockerfile = """
 node {
    stage('Preparation (Checking out)'){
        checkout scm
-       sh "ls /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script ; sleep 30"
+       sh "cp /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/Jenkinsfile ."
    }
    stage('Build') { 
       git branch: 'ykachatkou', credentialsId: '6d32c01d-6f1a-4a3f-9402-f9a133852eb2', url: 'https://github.com/MNT-Lab/build-t00ls'

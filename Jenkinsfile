@@ -16,6 +16,17 @@ node {
   }
 
   stage('Sonar scan') {
+/*
+sonar.projectKey=testsonar
+sonar.sources=helloworld-project/helloworld-ws/src
+sonar.java.binaries=helloworld-project/helloworld-ws/target
+sonar.login=admin
+sonar.password=admin */
+
+    withSonarQubeEnv('sonar', credentialsId: 'sonar-token') {
+      sh 'mvn clean package sonar:sonar'
+    }
+
   }
 
   stage('Testing’') {

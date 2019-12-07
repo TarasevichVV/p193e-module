@@ -139,7 +139,7 @@ node {
                     chmod +x ./kubectl
                     mv ./kubectl /usr/local/bin/kubectl
                     sed -i "s|helloworld-ykachatkou|helloworld-ykachatkou-$BUILD_NUMBER|" docker-deploy2.yml
-                    kubectl apply -f docker-deploy.yml
+                    kubectl apply -f docker-deploy2.yml
                     """
                 
                   }

@@ -1,14 +1,15 @@
 //#parse("File Header.java")
+sudent='melizarov'
 node {
     stage('Checkout') {
         checkout scm
         echo "checkout from dev branch"
-
         }
 
     stage('Build') {
+        git branch: "${student}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
         withMaven(maven: "M3") { //maven3-6-3
-        sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
+        sh "mvn -f helloworld-project/helloworld-ws/pom.xml  package"
         }
     }
     stage('Sonar'){

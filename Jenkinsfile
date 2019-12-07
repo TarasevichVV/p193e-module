@@ -7,7 +7,7 @@ node {
     stage ('building_code') {
         git url: 'https://github.com/MNT-Lab/build-t00ls.git'
         withMaven(maven: 'M3') {
-        sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
+            sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
     }
 }
 }

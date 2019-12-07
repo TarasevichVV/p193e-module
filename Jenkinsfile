@@ -5,9 +5,10 @@ podTemplate(label: label,
         containers: [
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true,
-                    envVars: [containerEnvVar(key: 'DOCKER_CONFIG', value: "/root/.docker/"),])],
+                    envVars: [secretEnvVar(key: 'DOCKER_CONFIG', secretName: 'docker-config-json', secretKey: '.dockerconfigjson'),
+                    ])],
                 volumes: [
-                    secretVolume(secretName: 'docker-config-json', mountPath: "/root/.docker", subPath: "config.json"),
+                    secretVolume(secretName: 'docker-config-json', mountPath: "/root/.docker"),
                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
             ]
         ) {
@@ -47,7 +48,6 @@ podTemplate(label: label,
                            ls -la ~/.docker
                            ls -la ${env.WORKSPACE}
                            echo
-                           export DOCKER_CONFIG=/root/.docker/
                            env
                            docker login -u admin -p admin nexus-dock.k8s.playpit.by
                            dokcer push nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER}

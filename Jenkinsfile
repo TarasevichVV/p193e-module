@@ -38,7 +38,11 @@ node {
     )
   }
 
-  stage('Triggering job and fetching artefact') {//after finishing
+  stage('Triggering job and fetching artefact') {
+    build job: 'MNTLAB-ibletsko-child1-job ', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'ibletsko']]
+
+//after finishing
+// fetch bletsko_dsl_script.tar.gz
   }
 
   stage('Packaging and Publishing results') {

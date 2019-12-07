@@ -94,9 +94,9 @@ node {
                      unstash "targz"
                      sh """
                         echo "${Dockerfile}" > Dockerfile
-                        docker build -t nexus-dock.k8s.playpit.by:80/ykachatkou/helloworld:rc-$BUILD_NUMBER .
+                        docker build -t nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:$BUILD_NUMBER .
                         docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
-                        docker push nexus-dock.k8s.playpit.by:80/ykachatkou/helloworld:rc-$BUILD_NUMBER
+                        docker push nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:$BUILD_NUMBER
                         """
                   }
                 }

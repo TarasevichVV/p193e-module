@@ -53,7 +53,7 @@ podTemplate(label: label,
         ) {
 */
     node(label) {
-    
+
                 stage ('Checkout&Build'){
 
                     checkout scm
@@ -73,7 +73,7 @@ podTemplate(label: label,
                         sh """
                            pwd
                            ls -la
-                           cd helloworld-ws && docker build -t nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER} .
+                           cd helloworld-ws && docker build -t nexus-dock.k8s.playpit.by:80/vpupkin/app:${env.BUILD_NUMBER} .
                            """
                     }
                 }
@@ -86,8 +86,8 @@ podTemplate(label: label,
 
                            pwd
                            env
-                           docker login -u admin -p admin http://nexus-dock.k8s.playpit.by
-                           docker push nexus-dock.k8s.playpit.by/vpupkin/app:${env.BUILD_NUMBER}
+                           docker login -u admin -p admin http://nexus-dock.k8s.playpit.by:80
+                           docker push nexus-dock.k8s.playpit.by:80/vpupkin/app:${env.BUILD_NUMBER}
                            """
                     }
                 }

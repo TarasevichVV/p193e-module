@@ -28,7 +28,9 @@ node {
       <p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>
       <p>version: 1. $BUILD_NUMBER</p>
       EOF
+      cp /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/Jenkinsfile .
       '''
+      
       withMaven(maven: "M3"){
         sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install" 
       }
@@ -91,11 +93,10 @@ node {
                  container('docker') {
                      unstash "targz"
                      sh """
-                        echo "35.186.195.40 nexus-dock.k8s.playpit.by" >> /etc/hosts
                         echo "${Dockerfile}" > Dockerfile
-                        docker build -t nexus-dock.k8s.playpit.by/helloworld-ykachatkou:rc-$BUILD_NUMBER .
-                        docker login -u admin -p admin nexus-dock.k8s.playpit.by
-                        docker push nexus-dock.k8s.playpit.by/helloworld-ykachatkou:rc-$BUILD_NUMBER
+                        docker build -t nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:rc-$BUILD_NUMBER .
+                        docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                        docker push nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:rc-$BUILD_NUMBER
                         """
                   }
                 }

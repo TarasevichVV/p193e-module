@@ -73,7 +73,7 @@ node {
                 curl -v -u admin:admin--upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus-svc.nexus.svc.cluster.local/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
                 stash includes: "helloworld-ws.war", name: "targz"
-                stash includes: /var/jenkins_home/workspace/EPBYMINW9138/new-pipeline@script/*.yml, name: "yml"
+                
            
             },
             'Creating Docker Image ':  {
@@ -117,6 +117,7 @@ node {
             input message: 'Approve Deploy?', ok: 'Yes'
 
         }
+        stash includes: "/var/jenkins_home/workspace/EPBYMINW9138/new-pipeline@script/*.yml", name: "yml"
         
     }
     stage('Deployment (rolling update, zero downtime)'){

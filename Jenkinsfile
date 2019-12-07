@@ -1,17 +1,11 @@
 //#parse("File Header.java")
 node {
     stage('Checkout') {
-        scm {
-            git {
-                remote {
-                    url('https://github.com/MNT-Lab/build-t00ls.git')
-                }
-                branch('melizarov')
-            }
-            echo "checkout from dev branch"
+
+    echo "checkout from dev branch"
 
         }
-    }
+
     stage('Build') {
         withMaven(maven: "M3") { //maven3-6-3
         sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"

@@ -2,16 +2,17 @@
 
 node {
   stage('01 git checkout') {
+    checkout scm
+  }
+
+  stage('02 Building code') {
     checkout([$class: 'GitSCM',
       branches: [[name: 'origin/ibletsko']],
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
     ])
-    stash 'source'
-  }
-
-  stage('02 Building code') {
-      unstash 'source'
+    withMaven(maven: 'M3') {
       mvn -f helloworld-project/helloworld-ws/pom.xml package
+    }
   }
 
   stage('Sonar scan') {

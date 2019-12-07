@@ -18,10 +18,10 @@ def Dockerfile = """
 node {
    stage('Preparation (Checking out)'){
        checkout scm
-       sh "cp /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/Jenkinsfile ."
+       sh "cp /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/Jenkinsfile .; cat Jenkinsfile; sleep 60"
    }
    stage('Build') { 
-      git branch: 'ykachatkou', credentialsId: '6d32c01d-6f1a-4a3f-9402-f9a133852eb2', url: 'https://github.com/MNT-Lab/build-t00ls'
+      git branch: 'ykachatkou', url: 'https://github.com/MNT-Lab/build-t00ls'
       sh '''
       cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
       <p>commitId: $GIT_COMMIT </p>
@@ -70,7 +70,7 @@ node {
                 sh """
                 tar xzf ${student}_dsl_script.tar.gz
                 cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile
+                tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile 
                 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
                 stash includes: "helloworld-ws.war", name: "targz"

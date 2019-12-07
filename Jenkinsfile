@@ -9,5 +9,10 @@ node {
         withMaven(maven: 'Maven-1') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
     }
-}
+    }
+    stage('sonar_scan') {
+    def scannerHome = tool 'Sonar-scanner'
+        sh "${scannerHome}/bin/sonar-scanner"
+    }
+  }
 }

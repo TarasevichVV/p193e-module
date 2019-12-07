@@ -31,7 +31,7 @@ node {
         withMaven(maven: 'M3') {
           "sh 'mvn integration-test'"
         }
-      }
+      },
       "Task3" : {
         sh 'echo "mvn post-integration-test"'
       }

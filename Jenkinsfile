@@ -45,9 +45,9 @@ podTemplate(label: label,
                            echo
                            ls -la ~/
                            ls -la ~/docker
-                           ls -la ${env.WORKSPACE}/docker
+                           ls -la ${env.WORKSPACE}
                            echo
-
+                           cat ~/docker/.dockerconfigjson
                            env
                            ls -la  ${env.DOCKER_CONFIG}
                            cat ${env.DOCKER_CONFIG}/config.json

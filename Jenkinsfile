@@ -33,7 +33,7 @@ node {
       },
       "parallel 2" : {
         withMaven(maven: 'M3') {
-          "sh 'mvn integration-test'"
+//          "sh 'mvn integration-test'"
         }
       },
       "parallel 3" : {
@@ -62,14 +62,12 @@ node {
     COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
     EOF
     """
-    agent {
-      dockerfile {
-        filename 'Dockerfile.1'
-      }
+    dockerfile {
+      filename 'Dockerfile.1'
+    }
     steps {
     }
     sh "ls -la"
-    }
     //push archive to nexus
   }
 

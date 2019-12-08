@@ -76,7 +76,7 @@ node {
         stage('build image') {
           container('docker') {
             sh """
-            docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER
+            docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
             docker images
             """
           }

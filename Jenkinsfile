@@ -48,7 +48,7 @@ node {
     stage ('archiving_artifact') {
                     sh """
                     tar zxvf phardzeyeu_dsl_script.tar.gz
-                    cp /helloworld-project/helloworld-ws/target/helloworld-ws.war .
+                    cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                     tar czf pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
                     """
                 }

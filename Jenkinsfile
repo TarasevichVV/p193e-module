@@ -26,16 +26,16 @@ node {
 
             }*/
         }
-        stage('4-Test') {
+        stage('4-Tests') {
             parallel(
-                    preintegration: {
+                    '4-1-preintegration': {
                         sh 'echo \'mvn pre-integration-test\''
                     },
-                    integrationtest: {
+                    '4-2-integrationtest': {
                         sh 'echo \'This is integration-test\''
-                        sh 'mvn integration-test -f helloworld-ws/pom.xml'
+                        sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
                     },
-                    postintegration: {
+                    '4-3-postintegration': {
                         sh "echo \'mvn post-integration-test\'"
                     }
             )

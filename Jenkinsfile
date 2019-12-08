@@ -73,16 +73,11 @@ node {
     node(nodelabel) {
       stage('Create Docker images') {
         container('docker') {
-          withCredentials([[$class: 'UsernamePasswordMultiBinding',
-            credentialsId: 'dockerhub',
-            usernameVariable: 'admin',
-            passwordVariable: 'admin']]) {
-            sh """
-              docker images
-              docker ps -a
-              hostname
-              """
-          }
+          sh """
+            docker images
+            docker ps -a
+            hostname
+            """
         }
       }
     }

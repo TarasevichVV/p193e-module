@@ -34,7 +34,7 @@ node {
                     '4-2-integrationtest': {
                         sh 'echo \'This is integration-test\''
                         withMaven(maven: "M3") {
-                            sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml
+                            sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
                         }
                     },
                     '4-3-postintegration': {

@@ -52,9 +52,9 @@ node {
 
   stage('06 Packaging and Publishing results') {
 // Jenkinsfile
-    sh "ls helloworld-project/helloworld-ws/target/"
-
-    sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt"
+//    sh "ls helloworld-project/helloworld-ws/target/"
+    writeFile file: "Jenkinsfile", text: "For testing purposes."
+    sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile"
     //create docker image 'helloworld-{student}:{buildNumber}'
     sh """
     cat > Dockerfile.1 << EOF
@@ -66,6 +66,7 @@ node {
       filename 'Dockerfile.1'
     }
     sh "ls -la"
+    sh "docker images"
     //push archive to nexus
   }
 

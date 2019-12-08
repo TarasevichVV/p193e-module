@@ -12,6 +12,7 @@ node {
             git branch: "${student}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
             withMaven(maven: "M3") { //maven3-6-3
                 sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
+                sh "echo --------------------final 1---------------------------"
             }
         }
 /*        stage('3-Sonar') {
@@ -43,8 +44,9 @@ node {
             )
         }*/
         stage('5-Triggering') {
+            sh "echo --------------------start 5---------------------------"
             //build job: 'MNTLAB-${student}-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
-            build job: 'MNTLAB-melizarov-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
+            build job: 'MNTLAB-melizarov-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]]//, wait: true
             //MNTLAB-melizarov-child1-build-job
             copyArtifacts fingerprintArtifacts: true, projectName: 'MNTLAB-${student}-child1-build-job', selector: lastSuccessful()
             //sh 'find / -name output.txt'

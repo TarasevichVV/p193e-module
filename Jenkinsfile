@@ -25,4 +25,19 @@ node {
         sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=phardzeyeu -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -e -Dsonar.sources=helloworld-project/helloworld-ws/src" 
         }
     }
+    stage ('testing') {
+        parallel (
+                pre-integration-test: { 
+                    sh "echo 'mvn pre-integration-test'"
+                },
+                integration-test: {
+                    withMaven(maven: 'Maven-1') {
+                        sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
+                        }
+                    },
+                post-integration-test: { 
+                    sh "echo 'mvn post-integration-test'"
+                }
+            )
+        }
 }

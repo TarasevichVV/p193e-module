@@ -77,7 +77,8 @@ node {
                     EXPOSE 8080
                     CMD ["/opt/tomcat/bin/catalina.sh", "run"]
                     EOF
-
+                    """;
+                    sh """
                     docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
                     docker tag helloworld-phardzeyeu:${BUILD_NUMBER} 192.168.56.66:32389/phardzeyeu/tomcat:$BUILD_NUMBER
                     docker login -u admin -p admin123 192.168.56.66:32389

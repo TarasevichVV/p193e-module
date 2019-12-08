@@ -69,6 +69,7 @@ node {
     steps {
     }
     sh "ls -la"
+    }
     //push archive to nexus
   }
 

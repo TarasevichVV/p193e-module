@@ -45,8 +45,8 @@ node {
 //after finishing
 // fetch bletsko_dsl_script.tar.gz
   //step([$class: 'CopyArtifact', filter: 'build/test.js', fingerprintArtifacts: true, flatten: true, projectName: 'echo-develop-js-pipeline', selector: [$class: 'SpecificBuildSelector', buildNumber: '${BUILD_NUMBER}'], target: './client/public/vendor/echo/'])
-    copyArtifacts projectName: "Testing", selector: lastCompleted()
-    archiveArtifacts 'ibletsko_dsl_script.tar.gz'
+    copyArtifacts projectName: "MNTLAB-ibletsko-child1-build-job", selector: lastCompleted()
+    archiveArtifacts '*'
   }
 
   stage('Packaging and Publishing results') {

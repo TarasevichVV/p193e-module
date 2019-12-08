@@ -69,7 +69,7 @@ node {
     volumes: [
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
     ])
-    node('test') {
+    node('master') {
       stage('Create Docker images') {
         container('docker') {
           withCredentials([[$class: 'UsernamePasswordMultiBinding',

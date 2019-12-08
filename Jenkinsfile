@@ -64,7 +64,7 @@ node {
             sh "echo Sending status"
 
         }
-    } catch(e) {
+    } catch (e) {
         String error = "${e}";
         // Make the string with job info, example:
         // ${env.JOB_NAME}
@@ -81,4 +81,5 @@ node {
                 to: "${mails_to_notify}",
                 body: "<b>${pivote}</b><br>\n\nError mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}";
         error "${error}"
+    }
 }

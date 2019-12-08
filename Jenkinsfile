@@ -65,8 +65,6 @@ node {
     dockerfile {
       filename 'Dockerfile.1'
     }
-    steps {
-    }
     sh "ls -la"
     //push archive to nexus
   }

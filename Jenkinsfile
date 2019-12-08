@@ -50,11 +50,16 @@ node {
             //sh 'find / -name output.txt'
             sh "echo trigering"
         }
-        stage('6-Packeging') {
-            sh 'find / -name Jenkinsfile -type f -exec ls -al {} '
-            sh 'find / -name output.txt'
-            sh 'find / -name *.war'
-
+        stage('6-Archiving') {
+            //sh 'find / -name Jenkinsfile -type f -exec ls -al {} '
+            //sh 'find / -name output.txt'
+            //sh 'find / -name *.war'
+            sh """
+                    tar zxvf ${student}_dsl_script.tar.gz
+                    cp /var/jenkins_home/workspace/EPBYMINW6852/mntlab-ci-pipeline@script/Jenkinsfile ./
+                    cp helloworld-project/helloworld-ws/target/helloworld-ws.war ./
+                    tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile
+                    """
 
             sh "echo Packeging"
 

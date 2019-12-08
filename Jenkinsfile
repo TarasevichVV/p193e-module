@@ -55,12 +55,21 @@ node {
     sh "ls helloworld-project/helloworld-ws/target/"
 
     sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt"
-    sh "ls -la"
     //create docker image 'helloworld-{student}:{buildNumber}'
+    sh """
+    cat > Dockerfile.1 << EOF
+    FROM tomcat:8.0
+    COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
+    EOF
+    """
+    agent {
+      dockerfile {
+        filename 'Dockerfile.1'
+      }
+    steps {
+    }
+    sh "ls -la"
     //push archive to nexus
-    
-  //  sh 'make'
-  //  archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
   }
 
   stage('07 Asking for manual approval') {

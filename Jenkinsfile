@@ -63,15 +63,15 @@ node {
     EOF
     """
 
-    docker {
+    wrappers {
       buildInDocker {
         dockerfile {
           filename 'Dockerfile.1'
         }
-//      volume('/dev/urandom', '/dev/random')
         verbose()
         }
     }
+//      volume('/dev/urandom', '/dev/random')
 
     sh "ls -la"
     archiveArtifacts '*'

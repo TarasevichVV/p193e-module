@@ -26,7 +26,7 @@ node {
 
             }*/
         }
-        stage('4-Tests') {
+/*        stage('4-Tests') {
             parallel(
                     '4-1-preintegration': {
                         sh 'echo \'mvn pre-integration-test\''
@@ -34,14 +34,14 @@ node {
                     '4-2-integrationtest': {
                         sh 'echo \'This is integration-test\''
                         withMaven(maven: "M3") {
-                            "sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'"
+                            sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
                         }
                     },
                     '4-3-postintegration': {
                         sh 'echo \'mvn post-integration-test\''
                     }
             )
-        }
+        }*/
         stage('5-Triggering') {
             //build job: 'MNTLAB-${student}-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
             //copyArtifacts fingerprintArtifacts: true, projectName: 'MNTLAB-${student}-child1-build-job', selector: lastSuccessful()

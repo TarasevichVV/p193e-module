@@ -71,7 +71,7 @@ node {
     ],
     volumes: [
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-      hostPathVolume(mountPath: "${WORKSPACE}", hostPath: "${WORKSPACE}")
+      hostPathVolume(mountPath: "/home/jenkins/agent/workspace/EPBYMINW9141/mntlab-ci-pipeline", hostPath: "${WORKSPACE}")
     ]) {
       node(nodelabel) {
         stage('build image') {

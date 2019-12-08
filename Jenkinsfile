@@ -52,4 +52,38 @@ node {
                     tar czf pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
                     """
                 }
+    stage ('packaging_and_publishing_results'){
+        parallel (
+                'archiving_artifact' : {
+                    sh """
+                    tar zxvf phardzeyeu_dsl_script.tar.gz
+                    cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
+                    tar czf pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
+                    """
+                },
+                'creating_docker_image' : {
+                    sh """
+                    cat << EOF > Dockerfile
+                    FROM alpine
+
+                    RUN apk update && apk add wget tar openjdk8 && \
+                    wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz && \
+                    tar -xvf apache-tomcat-8.5.20.tar.gz && \
+                    mkdir /opt/tomcat && \
+                    mv apache-tomcat*/* /opt/tomcat/
+
+                    COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /opt/tomcat/webapps
+
+                    EXPOSE 8080
+                    CMD ["/opt/tomcat/bin/catalina.sh", "run"]
+                    EOF
+
+                    docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
+                    docker tag helloworld-phardzeyeu:${BUILD_NUMBER} 192.168.56.66:32389/phardzeyeu/tomcat:$BUILD_NUMBER
+                    docker login -u admin -p admin123 192.168.56.66:32389
+                    docker push 192.168.56.66:32389/phardzeyeu/tomcat:$BUILD_NUMBER
+                    """
+                }
+        )
+    }
 }

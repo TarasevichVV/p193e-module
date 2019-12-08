@@ -6,16 +6,15 @@ def label2 = "centos-jenkins-${UUID.randomUUID().toString()}"
 node {
    stage('Preparation (Checking out)'){
        checkout scm
-       def index = '''
+   }
+   stage('Build') { 
+      git branch: "ykachatkou", url: "https://github.com/MNT-Lab/build-t00ls"
+      def index = '''
       <p>commitId: $(git log -n 1 --pretty=format:%H)</p>
       <p>triggeredBy: $(git show -s --pretty=%an)</p>
       <p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>
       <p>version: 1.$BUILD_NUMBER</p>
       '''
-   }
-   stage('Build') { 
-      git branch: "ykachatkou", url: "https://github.com/MNT-Lab/build-t00ls"
-      
       sh """
       echo "${index}" > helloworld-project/helloworld-ws/src/main/webapp/index.html
       """.stripIndent()

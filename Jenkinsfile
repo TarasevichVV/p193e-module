@@ -44,6 +44,7 @@ node {
         }
         stage('5-Triggering') {
             build job: 'MNTLAB-${student}-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
+            copyArtifacts fingerprintArtifacts: true, projectName: 'MNTLAB-${student}-child1-build-job', selector: lastSuccessful()
             sh 'find / -name output.txt'
             sh "echo trigering"
         }

@@ -69,7 +69,7 @@ metadata:
   name: ykachatkou-tomcat-ingress
   namespace: ykachatkou
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /helloworld-ws/
+    nginx.org/rewrites: serviceName=ykachatkou-tomcat-svc rewrite=/helloworld-ws/
 spec:
   rules:
   - host: ykachatkou.k8s.playpit.by

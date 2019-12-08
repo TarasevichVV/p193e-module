@@ -41,7 +41,7 @@ node {
 
   stage('05 Triggering job and fetching artefact') {
     build job: 'MNTLAB-ibletsko-child1-build-job', parameters: [
-      [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'ibletsko'], wait: true
+      [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'ibletsko']//, wait: true
     ]
     copyArtifacts projectName: "MNTLAB-ibletsko-child1-build-job", selector: lastCompleted()
     archiveArtifacts '*'

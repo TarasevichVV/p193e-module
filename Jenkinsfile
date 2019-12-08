@@ -78,7 +78,6 @@ node {
                                 ],
                                 volumes: [
                                         hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
-                                        //hostPathVolume(hostPath: '/data/workspace/pipe', mountPath: '/home')
 
                                 ])
 
@@ -127,12 +126,12 @@ node {
                             container('centos') {
                                 unstash "yml"
                                 sh """
-                    curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-                    chmod +x ./kubectl
-                    mv ./kubectl /usr/local/bin/kubectl
-                    sed -i "s|helloworld-ykachatkou|helloworld-ykachatkou:$BUILD_NUMBER|" docker-deploy.yml
-                    kubectl apply -f docker-deploy.yml
-                    """
+                                curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                                chmod +x ./kubectl
+                                mv ./kubectl /usr/local/bin/kubectl
+                                sed -i "s|helloworld-ykachatkou|helloworld-ykachatkou:$BUILD_NUMBER|" docker-deploy.yml
+                                kubectl apply -f docker-deploy.yml
+                                """
 
                             }
 

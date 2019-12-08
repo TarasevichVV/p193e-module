@@ -62,6 +62,7 @@ node {
     COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
     EOF
     """
+    stash includes: "Dockerfile.1", name: "dfile"
 
     //def label = "worker-${UUID.randomUUID().toString()}"
     def nodelabel = "buildnode"
@@ -77,6 +78,7 @@ node {
         stage('build image') {
           container('docker') {
             sh """
+              unstash 'dfile'
               ls -la /home/jenkins/agent/workspace/EPBYMINW9141/mntlab-ci-pipeline/test
               find / -iname 'Dockerfile*'
               pwd

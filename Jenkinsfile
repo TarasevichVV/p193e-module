@@ -2,7 +2,7 @@
 def student = "ykachatkou"
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def label2 = "centos-jenkins-${UUID.randomUUID().toString()}"
-
+def nexus = "nexus-dock.k8s.playpit.by:80"
 node {
     try {
         stage('Preparation (Checking out)') {
@@ -88,10 +88,10 @@ node {
                                             unstash "targz"
                                             unstash "docker"
                                             sh """
-                                            docker build -t nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:$BUILD_NUMBER .
-                                            docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
-                                            docker push nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:$BUILD_NUMBER
-                                            docker rmi nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:$BUILD_NUMBER
+                                            docker build -t ${nexus}/helloworld-ykachatkou:$BUILD_NUMBER .
+                                            docker login -u admin -p admin ${nexus}
+                                            docker push ${nexus}/helloworld-ykachatkou:$BUILD_NUMBER
+                                            docker rmi ${nexus}/helloworld-ykachatkou:$BUILD_NUMBER
                                             """
                                         }
 

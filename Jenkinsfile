@@ -71,7 +71,7 @@ node {
     ],
     volumes: [
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-      hostPathVolume(mountPath: ${WORKSPACE}, hostPath: ${WORKSPACE})
+      hostPathVolume(mountPath: "${WORKSPACE}", hostPath: "${WORKSPACE}")
     ]) {
       node(nodelabel) {
         stage('build image') {

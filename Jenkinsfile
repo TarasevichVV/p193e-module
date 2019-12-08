@@ -62,7 +62,8 @@ node {
     COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
     EOF
     """
-    stash includes: "Dockerfile.1", name: "dfile"
+    stash includes: "Dockerfile.1", name: "file1"
+    stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"
 
     //def label = "worker-${UUID.randomUUID().toString()}"
     def nodelabel = "buildnode"
@@ -77,12 +78,12 @@ node {
       node(nodelabel) {
         stage('build image') {
           container('docker') {
-            unstash 'dfile'
+            unstash 'file1'
+            unstash 'file2'
             sh """
               ls -la
               find / -iname 'Dockerfile*'
-              pwd
-              echo $WORKSPACE
+              docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER Dockerfile.1
               echo "-----"
               echo "-----"
               """
@@ -91,7 +92,6 @@ node {
       }
     }
 //              docker images
-//            docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
 //             docker login -u admin -p admin $nexusaddr
 
 /*     wrappers {

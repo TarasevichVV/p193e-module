@@ -40,5 +40,6 @@ node {
 //        script {
 //            step([$class: 'CopyArtifact', projectNAme: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', filter: 'output.txt', target: 'Child_job'])
 //        }
+
     }
 }

@@ -29,18 +29,18 @@ node {
         }*/
 /*        stage('4-Tests') {
             parallel(
-                    '4-1-preintegration': {
-                        sh 'echo \'mvn pre-integration-test\''
-                    },
-                    '4-2-integrationtest': {
-                        sh 'echo \'This is integration-test\''
-                        withMaven(maven: "M3") {
-                            sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
-                        }
-                    },
-                    '4-3-postintegration': {
-                        sh 'echo \'mvn post-integration-test\''
+                '4-1-preintegration': {
+                    sh 'echo \'mvn pre-integration-test\''
+                },
+                '4-2-integrationtest': {
+                    sh 'echo \'This is integration-test\''
+                    withMaven(maven: "M3") {
+                        sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
                     }
+                },
+                '4-3-postintegration': {
+                    sh 'echo \'mvn post-integration-test\''
+                }
             )
         }*/
         stage('5-Triggering') {
@@ -55,14 +55,27 @@ node {
             //sh 'find / -name output.txt'
             //sh 'find / -name *.war'
             sh """
-                    tar zxvf ${student}_dsl_script.tar.gz
-                    cp /var/jenkins_home/workspace/EPBYMINW6852/mntlab-ci-pipeline@script/Jenkinsfile ./
-                    cp helloworld-project/helloworld-ws/target/helloworld-ws.war ./
-                    tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile
-                    """
-
-            sh "echo Packeging"
-
+                tar zxvf ${student}_dsl_script.tar.gz
+                cp /var/jenkins_home/workspace/EPBYMINW6852/mntlab-ci-pipeline@script/Jenkinsfile ./
+                cp helloworld-project/helloworld-ws/target/helloworld-ws.war ./
+                tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile
+                """
+            nexusArtifactUploader {
+                nexusVersion('nexus2')
+                protocol('http')
+                nexusUrl('nexus.k8s.playpit.by')
+                groupId("{$student}")
+                version('2.4')
+                repository("maven-releases/app/${student}/${BUILD_NUMBER}")
+                credentialsId('nexus-cred')
+                artifact {
+                    artifactId('GZIP')
+                    type('gzip')
+                    classifier('')
+                    file('pipeline-${student}-${BUILD_NUMBER}.tar.gz')
+                }
+                //nexusArtifactUploader artifacts: [[artifactId: 'GZIP', classifier: '', file: 'pipeline-${student}-${BUILD_NUMBER}.tar.gz', type: 'tar.gz']], credentialsId: 'nexus-cred', groupId: 'Hllo_ws', nexusUrl: 'nexus.k8s.playpit.by', nexusVersion: 'nexus2', protocol: 'http', repository: 'maven-releases/app/${student}/${BUILD_NUMBER}/', version: '0.1'}
+            }
         }
         stage('7-Asking approval') {
 

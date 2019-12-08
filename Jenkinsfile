@@ -63,16 +63,18 @@ node {
     EOF
     """
 
-
-    buildInDocker {
-      dockerfile {
-        filename 'Dockerfile.1'
-      }
-//            volume('/dev/urandom', '/dev/random')
-      verbose()
-      }
+    docker {
+      buildInDocker {
+        dockerfile {
+          filename 'Dockerfile.1'
+        }
+//      volume('/dev/urandom', '/dev/random')
+        verbose()
+        }
+    }
 
     sh "ls -la"
+    archiveArtifacts '*'
 
     //push archive to nexus
   }

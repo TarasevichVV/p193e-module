@@ -45,7 +45,7 @@ node {
         stage('5-Triggering') {
             build job: 'MNTLAB-${student}-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
             copyArtifacts fingerprintArtifacts: true, projectName: 'MNTLAB-${student}-child1-build-job', selector: lastSuccessful()
-            sh 'find / -name output.txt'
+            //sh 'find / -name output.txt'
             sh "echo trigering"
         }
         stage('6-Packeging') {
@@ -81,10 +81,10 @@ node {
                 from: '',
                 mimeType: 'text/html',
                 replyTo: '',
-                subject: "ERROR CI: Project name -> ${env.JOB_NAME}",
+                subject: "ERROR CI: Project name -> ${JOB_NAME}",
                 to: "${mails_to_notify}",
                 //body: "<b>${pivote}</b><br>\n\nError mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}";
                 body: "<br>\n\nError mesage: ${error}\n\n<br>Project: ${JOB_NAME} <br>Build Number: ${BUILD_NUMBER} <br> URL de build: ${BUILD_URL}";
-        error "${error}"
+        //error "${error}"
     }
 }

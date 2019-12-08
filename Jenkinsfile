@@ -43,7 +43,9 @@ node {
             )
         }*/
         stage('5-Triggering') {
-            build job: 'MNTLAB-${student}-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
+            //build job: 'MNTLAB-${student}-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
+            build job: 'MNTLAB-melizarov-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
+            //MNTLAB-melizarov-child1-build-job
             copyArtifacts fingerprintArtifacts: true, projectName: 'MNTLAB-${student}-child1-build-job', selector: lastSuccessful()
             //sh 'find / -name output.txt'
             sh "echo trigering"

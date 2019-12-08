@@ -33,5 +33,8 @@ node {
         build job: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', parameters: [
                 string(name: 'BRANCH_NAME', value: 'amiasnikovich')
         ], wait: true
+        script {
+            step([$class: 'CopyArtifact', projectNAme: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', filter: 'output.txt', target: 'Child_job'])
+        }
     }
 }

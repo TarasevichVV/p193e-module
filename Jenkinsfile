@@ -87,6 +87,8 @@ node {
             pwd
             echo $WORKSPACE
             docker images
+            echo "-----"
+            echo "-----"
             """
           }
         }
@@ -105,8 +107,8 @@ node {
     } */
 //      volume('/dev/urandom', '/dev/random')
 
-    sh "ls -la"
-    archiveArtifacts '*'
+//    sh "ls -la"
+//    archiveArtifacts '*'
 
     //push archive to nexus
   }

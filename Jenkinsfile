@@ -9,13 +9,14 @@ node {
 
   stage('02 Building code') {
     checkout([$class: 'GitSCM',
-      branches: [[name: "origin/${student}"]],
+      branches: [[name: "origin/ibletsko"]],
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
     ])
     withMaven(maven: 'M3') {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
     }
     sh "ls -la"
+    sh "ls helloworld-project/helloworld-ws/"
   }
 
   stage('03 Sonar scan') {

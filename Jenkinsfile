@@ -15,6 +15,8 @@ node {
     withMaven(maven: 'M3') {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
     }
+    sh "ls -la"
+    sh "tree"
   }
 
   stage('03 Sonar scan') {

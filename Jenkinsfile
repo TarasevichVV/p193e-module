@@ -63,14 +63,37 @@ node {
     EOF
     """
 
-    wrappers {
+    podTemplate (label: label, containers: [
+      containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
+    ],
+    volumes: [
+      hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
+    ])
+    node('test') {
+      stage('Create Docker images') {
+        container('docker') {
+          withCredentials([[$class: 'UsernamePasswordMultiBinding',
+            credentialsId: 'dockerhub',
+            usernameVariable: 'admin',
+            passwordVariable: 'admin']]) {
+            sh """
+              docker images
+              docker ps -a
+              hostname
+              """
+          }
+        }
+      }
+    }
+
+/*     wrappers {
       buildInDocker {
         dockerfile {
           filename 'Dockerfile.1'
         }
         verbose()
         }
-    }
+    } */
 //      volume('/dev/urandom', '/dev/random')
 
     sh "ls -la"

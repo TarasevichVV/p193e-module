@@ -6,6 +6,16 @@ node {
     }
     stage ('building_code') {
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
+        sh """
+        cat << EOF >> helloworld-project/helloworld-ws/src/main/webapp/index.html
+        <p> AUTHOR = phardzeyeu </p>
+        <p> JOB_NAME = $JOB_NAME </p>
+        <p> COMMIT_ID = $GIT_COMMIT </p>
+        <p> BUILD_TIME = $(date) </p>
+        <p> ARTIFACT_VERSION = 1.0.$BUILD_NUMBER </p>
+        EOF
+        """
+        
         withMaven(maven: 'Maven-1') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
     }

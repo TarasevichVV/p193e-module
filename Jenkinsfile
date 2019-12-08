@@ -33,7 +33,7 @@ node {
       },
       "Task2" : {
         withMaven(maven: 'M3') {
-          sh 'echo "PARALLEL 2: mvn integration-test"'
+//          sh 'echo "PARALLEL 2: mvn integration-test"'
           sh 'mvn integration-test'
         }
       },

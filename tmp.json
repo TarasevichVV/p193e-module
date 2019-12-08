@@ -1,0 +1,23 @@
+{
+    "apiVersion": "v1",
+    "kind": "Namespace",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Namespace\",\"metadata\":{\"annotations\":{},\"name\":\"ykachatkou\"}}\n"
+        },
+        "creationTimestamp": "2019-12-07T23:33:37Z",
+        "deletionTimestamp": "2019-12-07T23:36:43Z",
+        "name": "ykachatkou",
+        "resourceVersion": "1780320",
+        "selfLink": "/api/v1/namespaces/ykachatkou",
+        "uid": "fe17c916-1949-11ea-91b2-42010a800012"
+    },
+    "spec": {
+        "finalizers": [
+
+        ]
+    },
+    "status": {
+        "phase": "Terminating"
+    }
+}

@@ -79,7 +79,6 @@ node {
             
             {
               node(label) {
-               stage('Docker Build') {
                  container('docker') {
                      unstash "targz"
 		     unstash "docker"
@@ -89,7 +88,7 @@ node {
                         docker push nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou:$BUILD_NUMBER
                         """
                   }
-                }
+                
               }
             }
                 
@@ -119,7 +118,7 @@ node {
             
             {
               node(label2) {
-               stage('Docker Build') {
+
                  container('centos') {
                     unstash "yml"
                     sh """
@@ -131,7 +130,7 @@ node {
                     """
                 
                   }
-                }
+                
               }
             }
         

@@ -77,11 +77,10 @@ node {
         stage('build image') {
           container('docker') {
             sh """
-            cat > Dockerfile.1 << EOF
+            cat > Dockerfile.2 << EOF
             FROM tomcat:8.0
             COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
             EOF
-
             ls -la
             find / -iname 'Dockerfile*'
             pwd

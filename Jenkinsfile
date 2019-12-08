@@ -63,24 +63,26 @@ node {
     EOF
     """
 
-    def nodelabel = "worker-${UUID.randomUUID().toString()}"
-    podTemplate (label: nodelabel, containers: [
+    def label = "worker-${UUID.randomUUID().toString()}"
+    podTemplate (label: label, containers: [
       containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
     ],
     volumes: [
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
-    ])
-    node(nodelabel) {
-      stage('Create Docker images') {
-        container('docker') {
-          sh """
-            docker images
-            docker ps -a
-            hostname
-            """
+    ]) {
+      node(label) {
+        stage('Create Docker images') {
+          container('docker') {
+            sh """
+              docker images
+              docker ps -a
+              hostname
+              """
+          }
         }
       }
     }
+
 
 /*     wrappers {
       buildInDocker {

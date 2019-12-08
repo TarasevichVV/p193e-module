@@ -28,16 +28,16 @@ node {
 
   stage('04 Testing') {
     parallel (
-      "Task1" : {
+      "parallel 1" : {
         sh 'echo "PARALLEL 1: mvn pre-integration-test"'
       },
-      "Task2" : {
+      "parallel 2" : {
         withMaven(maven: 'M3') {
 //          sh 'echo "PARALLEL 2: mvn integration-test"'
-          sh 'mvn integration-test'
+          "sh 'mvn integration-test'"
         }
       },
-      "Task3" : {
+      "parallel 3" : {
         sh 'echo "PARALLEL 3: mvn post-integration-test"'
       }
     )

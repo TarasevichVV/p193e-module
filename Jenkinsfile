@@ -13,7 +13,7 @@ node {
     stage ('sonar_scan') {
     def scannerHome = tool 'Sonar-scanner'
     withSonarQubeEnv() {
-        sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=Hello_world -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -e -Dsonar.sources=helloworld-project/helloworld-ws/src" 
+        sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=phardzeyeu -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -e -Dsonar.sources=helloworld-project/helloworld-ws/src" 
         }
     }
 }

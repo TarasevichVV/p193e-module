@@ -27,15 +27,15 @@ node {
     }
     stage ('testing') {
         parallel (
-                (pre-integration-test) : { 
+                (pre_integration_test) : { 
                     sh "echo 'mvn pre-integration-test'"
                 },
-                (integration-test) : {
+                (integration_test) : {
                     withMaven(maven: 'Maven-1') {
                         sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
                         }
                     },
-                (post-integration-test) : { 
+                (post_integration_test) : { 
                     sh "echo 'mvn post-integration-test'"
                 }
             )

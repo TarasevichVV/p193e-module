@@ -16,7 +16,7 @@ node {
         <p> ARTIFACT_VERSION = 1.0."$BUILD_NUMBER" </p>
         EOF
         '''
-        withMaven(maven: 'Maven-1') {
+        withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
     }
     }
@@ -32,7 +32,7 @@ node {
                     sh "echo 'mvn pre-integration-test'"
                 },
                 'integration_test' : {
-                    withMaven(maven: 'Maven-1') {
+                    withMaven(maven: 'M3') {
                         sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
                         }
                     },

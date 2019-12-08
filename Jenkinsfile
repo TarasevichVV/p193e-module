@@ -62,9 +62,16 @@ node {
     COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
     EOF
     """
-    dockerfile {
-      filename 'Dockerfile.1'
+    wrappers {
+        buildInDocker {
+          dockerfile {
+            filename 'Dockerfile.1'
+          }
+  //            volume('/dev/urandom', '/dev/random')
+              verbose()
+          }
     }
+
     sh "ls -la"
     sh "docker images"
     //push archive to nexus

@@ -9,14 +9,15 @@ node {
    }
    stage('Build') { 
       git branch: "ykachatkou", url: "https://github.com/MNT-Lab/build-t00ls"
-      sh '''
-      cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
-      <p>commitId: "$GIT_COMMIT" </p>
-      <p>triggeredBy: "$(git show -s --pretty=%an)"</p>
-      <p>buildtime: "$(date +'%Y-%m-%d_%H-%M-%S')"</p>
-      <p>version: 1."$BUILD_NUMBER"</p>
-      EOF
+      def index = '''
+      <p>commitId: $(git log -n 1 --pretty=format:%h)</p>
+      <p>triggeredBy: $(git show -s --pretty=%an)</p>
+      <p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>
+      <p>version: 1.$BUILD_NUMBER</p>
       '''
+      sh """
+      echo "${index}" > helloworld-project/helloworld-ws/src/main/webapp/index.html
+      """.stripIndent()
       
       withMaven(maven: "M3"){
         sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install" 
@@ -25,7 +26,6 @@ node {
    
    stage('Sonar scanner'){
      def scannerHome= tool name: 'Sonar'
-     //def scannerHome = tool 'Sonar'
      withSonarQubeEnv(installationName: 'Sonar') { 
        sh "${scannerHome}/bin/sonar-scanner  -e -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
      }

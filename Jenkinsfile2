@@ -20,15 +20,15 @@ node {
    }
    stage('Build') {
       git branch: "ykachatkou", url: "https://github.com/MNT-Lab/build-t00ls"
-      def commit = env.GIT_COMMIT
-      sh '''
-      cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
-      <p>commitId: "${commit}" </p>
+      def index = '''
+      <p>commitId: $(git log -n 1 --pretty=format:%h)</p>
       <p>triggeredBy: $(git show -s --pretty=%an)</p>
       <p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>
       <p>version: 1.$BUILD_NUMBER</p>
-      EOF 
-      '''.stripIndent()
+      '''
+      sh """
+      echo "${index}" > helloworld-project/helloworld-ws/src/main/webapp/index.html
+      """.stripIndent()
       withMaven(maven: "Maven-3.6.3"){
         sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install" 
       }
@@ -36,7 +36,6 @@ node {
    
    stage('Sonar scanner'){
      def scannerHome= tool name: 'sonarscanner1'
-     //def scannerHome = tool 'sonarscanner1'
      withSonarQubeEnv(installationName: 'sonar') { 
        sh "${scannerHome}/bin/sonar-scanner  -e -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
      }

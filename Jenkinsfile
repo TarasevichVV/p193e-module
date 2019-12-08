@@ -38,12 +38,12 @@ node {
                         }
                     },
                     '4-3-postintegration': {
-                        sh "echo \'mvn post-integration-test\'"
+                        sh 'echo \'mvn post-integration-test\''
                     }
             )
         }
         stage('5-Triggering') {
-            build job: 'MNTLAB-${student}-child1-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: ${student}]], wait: true
+            build job: 'MNTLAB-melizarov-child1-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: ${student}]], wait: true
             //sh 'find / -name output.txt'
             sh "echo trigering"
         }

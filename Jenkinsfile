@@ -63,26 +63,27 @@ node {
     EOF
     """
 
-    def label = "worker-${UUID.randomUUID().toString()}"
-    podTemplate (label: label, containers: [
+    //def label = "worker-${UUID.randomUUID().toString()}"
+    def nodelabel = "buildnode"
+    def nexusaddr = "nexus-service.jenkins.svc.cluster.local:50001"
+    podTemplate (label: nodelabel, containers: [
       containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
     ],
     volumes: [
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
     ]) {
-      node(label) {
-        stage('Create Docker images') {
+      node(nodelabel) {
+        stage('build image') {
           container('docker') {
             sh """
-              docker images
-              docker ps -a
-              hostname
-              """
+            docker build -t $nexusaddr/helloworld-$student:$buildNumber
+            docker images
+            """
           }
         }
       }
     }
-
+//             docker login -u admin -p admin $nexusaddr
 
 /*     wrappers {
       buildInDocker {

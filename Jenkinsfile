@@ -19,10 +19,10 @@ node {
         withSonarQubeEnv('Sonar') {
             sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
         }
-        timeout(time: 10, unit: 'MINUTES') {
+/*        timeout(time: 10, unit: 'MINUTES') {
             waitForQualityGate abortPipeline: true
 
-    }
+        }*/
     }
     stage('Test') {
         parallel(

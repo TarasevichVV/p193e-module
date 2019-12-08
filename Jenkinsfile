@@ -9,7 +9,7 @@ node {
     stage('Build') {
         git branch: "${student}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
         withMaven(maven: "M3") { //maven3-6-3
-        sh "mvn -f helloworld-project/helloworld-ws/pom.xml  package"
+        sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
         }
     }
     stage('Sonar'){
@@ -17,7 +17,7 @@ node {
             scannerHome = tool 'Sonar'
         }
         withSonarQubeEnv('Sonar') {
-            sh "${scannerHome}/bin/sonar-scanner"
+            sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
         }
         timeout(time: 10, unit: 'MINUTES') {
             waitForQualityGate abortPipeline: true

@@ -27,24 +27,25 @@ node {
   stage('04 Testing') {
     parallel (
       "Task1" : {
-        sh 'echo "mvn pre-integration-test"'
+        sh 'echo "PARALLEL 1: mvn pre-integration-test"'
       },
       "Task2" : {
         withMaven(maven: 'M3') {
-          "sh 'mvn integration-test'"
+          sh 'echo "PARALLEL 2: mvn integration-test"'
+          sh 'mvn integration-test'
         }
       },
       "Task3" : {
-        sh 'echo "mvn post-integration-test"'
+        sh 'echo "PARALLEL 3: mvn post-integration-test"'
       }
     )
   }
 
   stage('05 Triggering job and fetching artefact') {
-    build job: ${job_to_use}, parameters: [
-      [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: ${student}]//, wait: true by default
+    build job: "${job_to_use}", parameters: [
+      [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]//, wait: true by default
     ]
-    copyArtifacts projectName: ${job_to_use}, selector: lastCompleted()
+    copyArtifacts projectName: "${job_to_use}", selector: lastCompleted()
     archiveArtifacts '*'
   }
 

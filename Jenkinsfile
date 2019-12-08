@@ -77,11 +77,10 @@ node {
         stage('build image') {
           container('docker') {
             sh """
-              ls -la
+              ls -la /home/jenkins/agent/workspace/EPBYMINW9141/mntlab-ci-pipeline/test
               find / -iname 'Dockerfile*'
               pwd
               echo $WORKSPACE
-              docker images
               echo "-----"
               echo "-----"
               """
@@ -89,6 +88,7 @@ node {
         }
       }
     }
+//              docker images
 //            docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
 //             docker login -u admin -p admin $nexusaddr
 

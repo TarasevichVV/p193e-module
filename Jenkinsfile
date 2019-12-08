@@ -14,7 +14,7 @@ node {
     def scannerHome = tool 'Sonar-scanner'
     withSonarQubeEnv('sonar') {"""
         sh "${scannerHome}/bin/sonar-scanner" 
-        // -e -Dsonar.host.url=http://sonar.default.svc.cluster.local/sonar
+        -e -Dsonar.host.url=http://sonar.default.svc.cluster.local/sonar
         -e -Dsonar.projectKey=Hello_world
         -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target 
         -e -Dsonar.sources=helloworld-project/helloworld-ws/src 

@@ -16,13 +16,13 @@ node {
   }
 
   stage('Sonar scan') {
-    def scannerHome = tool 'Sonar';
+/*     def scannerHome = tool 'Sonar';
     withSonarQubeEnv('Sonar') {
       sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarcheck -Dsonar.sources=helloworld-project/helloworld-ws/src -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
     }
-  }
+ */  }
 
-  stage('Testing’') {
+  stage('Testing') {
     parallel (
       "Task1" : {
         sh 'echo "mvn pre-integration-test"'
@@ -39,10 +39,14 @@ node {
   }
 
   stage('Triggering job and fetching artefact') {
-    build job: 'MNTLAB-ibletsko-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'ibletsko']]
-
+    build job: 'MNTLAB-ibletsko-child1-build-job', parameters: [
+      [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'ibletsko']
+    ]
 //after finishing
 // fetch bletsko_dsl_script.tar.gz
+  //step([$class: 'CopyArtifact', filter: 'build/test.js', fingerprintArtifacts: true, flatten: true, projectName: 'echo-develop-js-pipeline', selector: [$class: 'SpecificBuildSelector', buildNumber: '${BUILD_NUMBER}'], target: './client/public/vendor/echo/'])
+    copyArtifacts projectName: "Testing", selector: lastCompleted()
+    archiveArtifacts 'ibletsko_dsl_script.tar.gz'
   }
 
   stage('Packaging and Publishing results') {

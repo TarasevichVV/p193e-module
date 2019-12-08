@@ -76,13 +76,17 @@ node {
         stage('build image') {
           container('docker') {
             sh """
-            docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
+            find / -iname 'Dockerfile'
+            pwd
+            echo $WORKSPACE
+
             docker images
             """
           }
         }
       }
     }
+//            docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
 //             docker login -u admin -p admin $nexusaddr
 
 /*     wrappers {

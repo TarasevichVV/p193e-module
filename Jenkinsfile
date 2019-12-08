@@ -29,6 +29,9 @@ node {
                 }
         )
     }
+    stage('build_child_job') {
+        build job: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', parameters: [
+                string(BRANCH_NAME: 'amiasnikovich')
+        ], wait: true
+    }
 }
-
-

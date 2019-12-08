@@ -1,4 +1,4 @@
-//#parse("File Header.java")
+#!/usr/bin/env groovy
 student='melizarov'
 node {
     stage('Checkout') {

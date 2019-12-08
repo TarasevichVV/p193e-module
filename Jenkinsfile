@@ -9,7 +9,7 @@ node {
 
   stage('02 Building code') {
     checkout([$class: 'GitSCM',
-      branches: [[name: "origin/ibletsko"]],
+      branches: [[name: "origin/${student}"]],
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
     ])
     withMaven(maven: 'M3') {
@@ -33,7 +33,8 @@ node {
       },
       "parallel 2" : {
         withMaven(maven: 'M3') {
-//          sh 'echo "PARALLEL 2: mvn integration-test"'
+          sh 'echo "PARALLEL 2: mvn integration-test"'
+          sh "ls -la"
           "sh 'mvn integration-test'"
         }
       },
@@ -53,7 +54,7 @@ node {
 
   stage('06 Packaging and Publishing results') {
 // Jenkinsfile
-    sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.tx"
+    sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt"
     sh "ls -la"
     //create docker image 'helloworld-{student}:{buildNumber}'
     //push archive to nexus

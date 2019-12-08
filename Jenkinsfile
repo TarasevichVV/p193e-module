@@ -1,18 +1,18 @@
 #!/usr/bin/env groovy
 student='melizarov'
 node {
-    stage('Checkout') {
+    stage('1-Checkout') {
         checkout scm
         echo "checkout from dev branch"
         }
 
-    stage('Build') {
+    stage('2-Build') {
         git branch: "${student}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
         withMaven(maven: "M3") { //maven3-6-3
         sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
         }
     }
-    stage('Sonar'){
+    stage('3-Sonar'){
         environment {
             scannerHome = tool 'Sonar'
         }
@@ -24,7 +24,7 @@ node {
 
         }*/
     }
-    stage('Test') {
+    stage('4-Test') {
         parallel(
             preintegration: {
                 sh 'echo \'mvn pre-integration-test\''},
@@ -36,26 +36,26 @@ node {
                 sh "echo \'mvn post-integration-test\'"}
         )
     }
-    stage('Triggering') {
+    stage('5-Triggering') {
 
         sh "echo trigering"
     }
-    stage('Packeging') {
+    stage('6-Packeging') {
 
         sh "echo Packeging"
 
     }
-    stage('Asking approval') {
+    stage('7-Asking approval') {
 
        sh "echo Asking"
 
     }
-    stage('Deploy') {
+    stage('8-Deploy') {
 
         sh "echo deploy"
 
     }
-    stage('Sending status') {
+    stage('9-Sending status') {
 
         sh "echo Sending status"
 

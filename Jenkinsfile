@@ -65,7 +65,7 @@ node {
                 protocol('http')
                 nexusUrl('nexus.k8s.playpit.by')
                 groupId("{$student}")
-                version('2.4')
+                version('0.1')
                 repository("maven-releases/app/${student}/${BUILD_NUMBER}")
                 credentialsId('nexus-cred')
                 artifact {

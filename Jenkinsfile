@@ -1,5 +1,6 @@
 #!/usr/bin/env groovy
 def student = "ibletsko"
+def job_to_use = "MNTLAB-ibletsko-child1-build-job"
 
 node {
   stage('01 git checkout') {
@@ -40,19 +41,20 @@ node {
   }
 
   stage('05 Triggering job and fetching artefact') {
-    build job: 'MNTLAB-ibletsko-child1-build-job', parameters: [
-      [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'ibletsko']//, wait: true bu default
+    build job: ${job_to_use}, parameters: [
+      [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: ${student}]//, wait: true by default
     ]
-    copyArtifacts projectName: "MNTLAB-ibletsko-child1-build-job", selector: lastCompleted()
+    copyArtifacts projectName: ${job_to_use}, selector: lastCompleted()
     archiveArtifacts '*'
   }
 
   stage('06 Packaging and Publishing results') {
     //archive to 'pipeline-{student}-{buildNumber}.tar.gz'
-/*     helloworld-ws.war
-    Jenkinsfile
-    output.txt */
-    sh "tar -czf pipeline-${student}-${BUILD_NUMBER} *"
+/*
+Jenkinsfile
+*/
+    sh "tar -czf pipeline-${student}-${BUILD_NUMBER} helloworld-ws.war output.tx"
+    sh "ls -la"
     //create docker image 'helloworld-{student}:{buildNumber}'
     //push archive to nexus
     

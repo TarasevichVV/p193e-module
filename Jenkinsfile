@@ -57,12 +57,12 @@ node {
     sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile"
     //create docker image 'helloworld-{student}:{buildNumber}'
     sh """
-    cat > Dockerfile.1 << EOF
+    cat > Dockerfile << EOF
     FROM tomcat:8.0
     COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
     EOF
     """
-    stash includes: "Dockerfile.1", name: "file1"
+    stash includes: "Dockerfile", name: "file1"
     stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"
 
     //def label = "worker-${UUID.randomUUID().toString()}"
@@ -83,7 +83,7 @@ node {
             sh """
               ls -la
               find / -iname 'Dockerfile*'
-              docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER Dockerfile.1
+              docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
               echo "-----"
               echo "-----"
               """

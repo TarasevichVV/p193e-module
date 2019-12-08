@@ -146,15 +146,17 @@ node {
         currentBuild.result = 'FAILURE'
     }
     finally {
-        def mailRecipients = "yury.kachatkou@gmail.com"
-        def jobName = currentBuild.fullDisplayName
+        stage('Sending status'){
+            def mailRecipients = "yury.kachatkou@gmail.com"
+            def jobName = currentBuild.fullDisplayName
 
-        emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                mimeType: 'text/html',
-                subject: "$currentBuild.result: Job '${env.JOB_NAME} ${env.BUILD_NUMBER}', Stage:'${stage}'",
-                to: "${mailRecipients}",
-                replyTo: "${mailRecipients}",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-    }
-
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+            mimeType: 'text/html',
+            subject: "$currentBuild.result: Job '${env.JOB_NAME} ${env.BUILD_NUMBER}' Stage:'${stage}'",
+            to: "${mailRecipients}",
+            replyTo: "${mailRecipients}",
+            recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+     }
+  }
+    
 }

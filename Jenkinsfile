@@ -19,7 +19,7 @@ node {
             def scannerHome = tool 'Sonar'
             //  }
             withSonarQubeEnv('Sonar') {
-                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${student} -e Dsonar.projectVersion=0.1 -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
             }
             /*        timeout(time: 10, unit: 'MINUTES') {
                 waitForQualityGate abortPipeline: true

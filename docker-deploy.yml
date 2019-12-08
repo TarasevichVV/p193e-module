@@ -72,7 +72,7 @@ metadata:
     nginx.org/rewrites: serviceName=ykachatkou-tomcat-svc rewrite=/helloworld-ws/
 spec:
   rules:
-  - host: ykachatkou.k8s.playpit.by
+  - host: ykachatkou-app.k8s.playpit.by
     http:
       paths:
       - path: /

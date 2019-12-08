@@ -51,7 +51,7 @@ node {
             sh "echo trigering"
         }
         stage('6-Packeging') {
-            sh 'find / -name Jenkinsfile'
+            sh 'find / -name Jenkinsfile -type f -exec ls -al {} '
             sh 'find / -name output.txt'
             sh 'find / -name *.war'
 

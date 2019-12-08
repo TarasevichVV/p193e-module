@@ -14,18 +14,18 @@ node {
                 sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
             }
         }
-        stage('3-Sonar') {
+/*        stage('3-Sonar') {
             //   environment {
             def scannerHome = tool 'Sonar'
             //  }
             withSonarQubeEnv('Sonar') {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${student} -e       -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
             }
-            /*        timeout(time: 10, unit: 'MINUTES') {
+            *//*        timeout(time: 10, unit: 'MINUTES') {
                 waitForQualityGate abortPipeline: true
 
-            }*/
-        }
+            }*//*
+        }*/
 /*        stage('4-Tests') {
             parallel(
                     '4-1-preintegration': {
@@ -43,8 +43,8 @@ node {
             )
         }*/
         stage('5-Triggering') {
-            //build job: 'MNTLAB-${student}-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
-            //copyArtifacts fingerprintArtifacts: true, projectName: 'MNTLAB-${student}-child1-build-job', selector: lastSuccessful()
+            build job: 'MNTLAB-${student}-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
+            copyArtifacts fingerprintArtifacts: true, projectName: 'MNTLAB-${student}-child1-build-job', selector: lastSuccessful()
             sh 'find / -name output.txt'
             sh "echo trigering"
         }
@@ -83,7 +83,8 @@ node {
                 replyTo: '',
                 subject: "ERROR CI: Project name -> ${env.JOB_NAME}",
                 to: "${mails_to_notify}",
-                body: "<b>${pivote}</b><br>\n\nError mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}";
+                //body: "<b>${pivote}</b><br>\n\nError mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}";
+                body: "<br>\n\nError mesage: ${error}\n\n<br>Project: ${JOB_NAME} <br>Build Number: ${BUILD_NUMBER} <br> URL de build: ${BUILD_URL}";
         error "${error}"
     }
 }

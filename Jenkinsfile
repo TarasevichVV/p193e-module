@@ -77,9 +77,9 @@ node {
       node(nodelabel) {
         stage('build image') {
           container('docker') {
+            unstash 'dfile'
             sh """
-              unstash 'dfile'
-              ls -la /home/jenkins/agent/workspace/EPBYMINW9141/mntlab-ci-pipeline/test
+              ls -la
               find / -iname 'Dockerfile*'
               pwd
               echo $WORKSPACE

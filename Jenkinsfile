@@ -43,7 +43,7 @@ node {
             )
         }
         stage('5-Triggering') {
-           // build job: 'MNTLAB-${student}-child1-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: ${student}]], wait: true
+            build job: 'MNTLAB-${student}-child1-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: ${student}]], wait: true
             //sh 'find / -name output.txt'
             sh "echo trigering"
         }

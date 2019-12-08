@@ -63,13 +63,14 @@ node {
     EOF
     """
 
-    podTemplate (label: label, containers: [
+    def nodelabel = "worker-${UUID.randomUUID().toString()}"
+    podTemplate (label: nodelabel, containers: [
       containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
     ],
     volumes: [
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
     ])
-    node('master') {
+    node(nodelabel) {
       stage('Create Docker images') {
         container('docker') {
           withCredentials([[$class: 'UsernamePasswordMultiBinding',

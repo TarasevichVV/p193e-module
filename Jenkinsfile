@@ -42,6 +42,6 @@ node {
         }
     stage ('triggering_job') {
         build job: 'MNTLAB-phardzeyeu-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'phardzeyeu']], wait: true;
-        copyArtifacts(projectName: 'MNTLAB-phardzeyeu-child1-build-job', selector: 'lastSuccessful')
+        copyArtifacts(projectName: 'MNTLAB-phardzeyeu-child1-build-job', selector: lastSuccessful())
     }
 }

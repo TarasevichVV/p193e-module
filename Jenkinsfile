@@ -43,5 +43,4 @@ node {
     stage ('triggering_job') {
         build job: 'MNTLAB-phardzeyeu-child1-build-job', parameters: [[ name: 'BRANCH_NAME', value: phardzeyeu]]
         }
-    }
 }

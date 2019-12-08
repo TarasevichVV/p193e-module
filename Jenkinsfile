@@ -71,17 +71,21 @@ node {
     ],
     volumes: [
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-      hostPathVolume(mountPath: "/home/jenkins/agent/workspace/EPBYMINW9141/mntlab-ci-pipeline/test", hostPath: "${WORKSPACE}")
+
     ]) {
       node(nodelabel) {
         stage('build image') {
           container('docker') {
             sh """
+            cat > Dockerfile.1 << EOF
+            FROM tomcat:8.0
+            COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
+            EOF
+
             ls -la
-            find / -iname 'Dockerfile'
+            find / -iname 'Dockerfile*'
             pwd
             echo $WORKSPACE
-
             docker images
             """
           }

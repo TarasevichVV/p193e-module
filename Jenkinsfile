@@ -2,7 +2,8 @@
 
 node {
     stage ('checking_out') {
-        git([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
+        // git([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
+        git([url: 'https://github.com/MNT-Lab/p193e-module.git', branch: 'phardzeyeu'])
     }
     stage ('building_code') {
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
@@ -44,4 +45,11 @@ node {
         build job: 'MNTLAB-phardzeyeu-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'phardzeyeu']], wait: true;
         copyArtifacts(projectName: 'MNTLAB-phardzeyeu-child1-build-job', selector: lastSuccessful())
     }
+    stage ('archiving_artifact') : {
+                    sh """
+                    tar zxvf phardzeyeu_dsl_script.tar.gz
+                    cp /helloworld-project/helloworld-ws/target/helloworld-ws.war .
+                    tar czf pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
+                    """
+                }
 }

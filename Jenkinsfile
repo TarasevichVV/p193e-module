@@ -16,7 +16,6 @@ node {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
     }
     sh "ls -la"
-    sh "tree"
   }
 
   stage('03 Sonar scan') {
@@ -52,11 +51,8 @@ node {
   }
 
   stage('06 Packaging and Publishing results') {
-    //archive to 'pipeline-{student}-{buildNumber}.tar.gz'
-/*
-Jenkinsfile
-*/
-    sh "tar -czf pipeline-${student}-${BUILD_NUMBER} helloworld-ws.war output.tx"
+// Jenkinsfile
+    sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.tx"
     sh "ls -la"
     //create docker image 'helloworld-{student}:{buildNumber}'
     //push archive to nexus

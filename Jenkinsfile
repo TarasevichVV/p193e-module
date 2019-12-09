@@ -71,6 +71,8 @@ node {
                     tar zxvf phardzeyeu_dsl_script.tar.gz
                     cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                     tar czf pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile
+                    curl -v -u admin:admin --upload-file pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz \
+                    nexus.k8s.playpit.by/repository/maven-releases/app/phardzeyeu/${BUILD_NUMBER}/pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz
                     """
                 },
                 'creating_docker_image' : {

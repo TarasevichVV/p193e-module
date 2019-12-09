@@ -60,10 +60,10 @@ node {
 // Jenkinsfile
     writeFile file: "Jenkinsfile", text: "For testing purposes."
     sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile"
-    sh """
+/*    sh """
     echo "FROM tomcat:8.0" > Dockerfile
     echo "COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/" >> Dockerfile
-    """
+    """ */
     stash includes: "Dockerfile", name: "file1"
     stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"
 
@@ -102,17 +102,16 @@ node {
   stage('08 Deployment') {
 //(rolling update, zero downtime)
 /*
-Namespase : {student}
+Namespace : {student}
 Deployment
 Service
 Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) */
-//    pipeline-ibletsko-91.tar.gz
     podTemplate (label: 'testnode', containers: [
         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
         containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true)
     ],
     volumes: [
-      hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
+//      hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
       ]) {
       node('testnode') {
         container('centos') {
@@ -120,6 +119,8 @@ Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) *
           curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
           chmod +x ./kubectl
           mv ./kubectl /usr/local/bin/kubectl
+          sed -i "s/_deploy_ver_/_deploy_ver_:$BUILD_NUMBER/" deploy-all.yml
+          kubectl apply -f deploy-all.yml
           kubectl get pod -A
           """
         }
@@ -128,6 +129,6 @@ Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) *
   }
 }
 
-/*           sed -i "s|helloworld-${student}|helloworld-${student}:$BUILD_NUMBER|" app-dpl.yml
-          kubectl apply -f app-dpl.yml */
+
+
 

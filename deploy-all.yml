@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ibletsko
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy1kb2NrLms4cy5wbGF5cGl0LmJ5OjgwIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
+kind: Secret
+metadata:
+  name: start_docker
+  namespace: ibletsko
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-ibletsko
+  namespace: ibletsko
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app: tomcat-ibletsko
+  template:
+    metadata:
+      labels:
+        app: tomcat-ibletsko
+    spec:
+      containers:
+      - name: tomcat-ibletsko
+        image: nexus-dock.k8s.playpit.by:80/helloworld-ibletsko:_deploy_ver_
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 24
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 5
+      imagePullSecrets:
+      - name: start_docker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-ibletsko
+  namespace: ibletsko
+  labels:
+    app: tomcat-ibletsko
+spec:
+  selector:
+    app: tomcat-ibletsko
+  ports:
+  - name: tomcat-port
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: tomcat-ibletsko
+  namespace: ibletsko
+  annotations:
+    nginx.org/rewrites: serviceName=tomcat-ibletsko rewrite=/helloworld-ws/
+spec:
+  rules:
+  - host: ibletsko-app.k8s.playpit.by
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: tomcat-ibletsko
+servicePort: 80
+

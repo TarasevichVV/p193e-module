@@ -83,8 +83,7 @@ COPY helloworld-ws.war /usr/local/tomcat/webapps/
       ]
     ) {
     node(label) {
-      def student = "dprusevich"
-      container('docker') {
+        container('docker') {
         echo "Building docker image..."
         sh """
 cat << "EOF" > Dockerfile
@@ -93,6 +92,7 @@ MAINTAINER Dzmitry Prusevich
 COPY helloworld-ws.war /usr/local/tomcat/webapps/
 """
         sh """
+          student="dprusevich"
           docker build -t helloworld-"{student}":"${BUILD_NUMBER}" .
           docker tag helloworld-"{student}":"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-"{student}":"${BUILD_NUMBER}"
           docker login -u admin -p admin nexus-dock.k8s.playpit.by:80

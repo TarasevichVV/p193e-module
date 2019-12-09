@@ -65,7 +65,7 @@ node {
 
 stage('Packaging and Publishing results'){
         parallel(
-            'Creating tar gz': {
+            'Creating tar': {
                 unstash "jkf"
                 sh '''
                 tar xvzf  skudrenko_dsl_script.tar.gz
@@ -83,7 +83,7 @@ stage('Packaging and Publishing results'){
                         hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
                     ]){
                         node(label) {
-                            stage('docker_build') {
+                            stage('Build Docker Container') {
                                 container('docker') {
                                     unstash "war"
                                     sh """
@@ -91,7 +91,7 @@ stage('Packaging and Publishing results'){
                                     docker build -t helloworld-skudrenko:${BUILD_NUMBER} .
                                     docker tag helloworld-skudrenko:${BUILD_NUMBER} nexus-dock.k8s.playpit.by:80/helloworld-skudrenko:${BUILD_NUMBER}
                                     docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
-                                    docker push nexus-dock.k8s.playpit.by:80/helloworld-skudrenko:${BUILD_NUMBER}                             
+                                    docker push nexus-dock.k8s.playpit.by:80/helloworld-skudrenko:${BUILD_NUMBER}
                                     """
                                 }
                             }
@@ -100,4 +100,9 @@ stage('Packaging and Publishing results'){
                 }
             )
         }
+  stage ('Asking for manual Approval') {
+        timeout(time: 5, unit: "MINUTES") {
+            input message: 'Send this deploy to production?', ok: 'Yes'
+        }
+    }
 }

@@ -4,11 +4,11 @@ def student = 'apavlovsky'
 
 node {
     stage('Preparation (Checking out)'){
-        git branch: 'apavlovsky', 
-            url: 'https://github.com/MNT-Lab/build-t00ls.git'
+        checkout scm
     }
 
     stage('Building') {
+        git branch: 'apavlovsky', url: 'https://github.com/MNT-Lab/build-t00ls.git'
         def index_html = """
     <html>
     <head><title>helloworld-ws Quickstart</title></head>
@@ -23,7 +23,6 @@ node {
          </div>
          <p>This URL will display the WSDL definition for the deployed Web Service endpoint.</p>
         <p><h1>Status values:</h1></p>
-        <p><b>CommitID</b>: $GIT_COMMIT </p>
         <p><b>BuildTime:</b> \$(date)</p>
         <p><b>TriggeredBy:</b> by SCM, every 10 minutes </p>
         <p><b>ArtifactBuild:</b> 1.0.$BUILD_NUMBER </p>

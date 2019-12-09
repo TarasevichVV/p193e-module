@@ -17,7 +17,7 @@ node {
    }
    stage('Build code') {
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'skudrenko'])
-        withEnv(maven: 'M3') {
+        withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
          }
       }

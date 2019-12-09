@@ -3,15 +3,6 @@ def student = "ashvedau"
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def label2 = "centos-jenkins-${UUID.randomUUID().toString()}"
 def nexus = "nexus-dock.k8s.playpit.by:80"
-library(
-  identifier: 'dockerpush@ashvedau',
-  retriever: modernSCM(
-    [
-      $class: 'GitSCMSource',
-      remote: 'https://github.com/MNT-Lab/p193e-module/'
-    ]
-  )
-)
 
 node {
     try {

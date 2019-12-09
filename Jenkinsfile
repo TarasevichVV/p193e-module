@@ -99,12 +99,13 @@ tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz && \
 #mv helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
 COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
 CMD bash /usr/local/tomcat/bin/catalina.sh run
+
 EOF
 
 #docker build . -t helloworld-${student}:${BUILD_NUMBER}
 #docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
 #docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
-"""
+""";
 
                                     sh "echo '6-2-1--a: dockerfile:'"
                                     sh "ls -al Dockerfile"

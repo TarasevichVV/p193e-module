@@ -33,17 +33,17 @@ node {
                 maven: 'M3'){
 //            sh "pwd"
 //            sh "ls -ahl"
-            sh "find $JENKINS_HOME -name *Jenkinsfile*"
+//            sh "find $JENKINS_HOME -name *Jenkinsfile*"
 //            sh "ls $JENKINS_HOME/workspace/mntlab-ci-pipeline/EPBYMINW9146"
             sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
             }
         }
 
         stage ('Sonar scan') {
-            def scannerHome = tool 'Sonar';
-            withSonarQubeEnv('Sonar'){
-                sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=ayanchuk:helloworld -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
-            }
+//            def scannerHome = tool 'Sonar';
+//            withSonarQubeEnv('Sonar'){
+//                sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=ayanchuk:helloworld -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+//            }
         }
 
         stage ('Testing') {
@@ -52,10 +52,10 @@ node {
                     sh 'echo "mvn pre-integration-test"'
                 },
                 'integration-test': {
-                    withMaven(
-                        maven: 'M3'){
-                            sh "mvn -f helloworld-project/helloworld-ws/pom.xml integration-test"
-                       }
+//                    withMaven(
+//                        maven: 'M3'){
+//                            sh "mvn -f helloworld-project/helloworld-ws/pom.xml integration-test"
+//                       }
                     
                     sh 'echo "mvn integration-test"'
                 },

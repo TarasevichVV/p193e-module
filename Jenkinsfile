@@ -114,7 +114,7 @@ stage('Packaging and Publishing results'){
                                 ],                                
                                ) {
             node(machine) {
-                stage('8.1.deployment') {
+                stage('Deployment container') {
                     container('centos') {
                         sh """
                         curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl

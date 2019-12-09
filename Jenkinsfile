@@ -45,12 +45,12 @@ node {
                     sh "cp /var/jenkins_home/workspace/EPBYMINW9149/mntlab-ci-pipeline@script/Jenkinsfile ."
                     sh "tar -czvf pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile"
                     sh "curl -v -u admin:admin --upload-file pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/amiasnikovich/${BUILD_NUMBER}/pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz"
-                    sh '''cat <<EOF > Dockerfile
-                            FROM tomcat:8.0
-                            COPY *.war /usr/local/tomcat/webapps/
-                            EXPOSE 8080
-                            CMD ["catalina.sh", "run"]
-                            EOF'''
+                    File file = new File('Dockerfile')
+                    file.write "FROM tomcat:8.0"
+                    file << "COPY *.war /usr/local/tomcat/webapps/"
+                    file << "EXPOSE 8080"
+                    file << 'CMD ["catalina.sh", "run"]'
+
                     stash includes: "helloworld-ws.war", name: "war"
                     stash includes: "Dockerfile", name: "docker"
                 },

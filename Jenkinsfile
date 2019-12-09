@@ -75,9 +75,7 @@ node {
                         node(label) {
                             stage('Docker Build') {
                                 container('docker') {
-                                    echo "Building docker image..."
-                                    sh """
-                                    ls
+                                    sh "ls"
                                     docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
                                     """
                                     // docker tag helloworld-phardzeyeu:${BUILD_NUMBER} 192.168.56.66:32389/phardzeyeu/tomcat:$BUILD_NUMBER

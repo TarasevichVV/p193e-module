@@ -21,7 +21,7 @@ node {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
 //            stash includes: "tomcat.yaml", name: "deploy"
-            stash includes: "Dockerfile", name: "Dockerfile"
+//            stash includes: "Dockerfile", name: "Dockerfile"
          }
       }
 

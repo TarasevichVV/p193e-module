@@ -59,7 +59,7 @@ node {
                     'Archiving artifact': {
                         sh """
                         tar xzf ${student}_dsl_script.tar.gz
-                        cp /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/* .
+                        cp -r /var/jenkins_home/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/* .
                         cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                         tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile 
                         curl -v -u admin:admin --upload-file pipeline-${student}-${

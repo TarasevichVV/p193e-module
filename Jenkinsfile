@@ -59,13 +59,14 @@ node {
     tar -zxvf "${student}"_dsl_script.tar.gz output.txt
     cp "${JENKINS_HOME}"/workspace/EPBYMINW8538/mntlab-ci-pipeline@script/Jenkinsfile .
     tar czf pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz output.txt Jenkinsfile helloworld-ws.war
-    cat << "EOF" > Dockerfile
-    ls
-    EOF
-
-    ls 
     """
-
+    sh """
+    cat << "EOF" > Dockerfile
+FROM tomcat:8.0
+MAINTAINER Dzmitry Prusevich
+COPY helloworld-ws.war /usr/local/tomcat/webapps/
+    """
+    sh "cat Dockerfile"
   }
 
 }

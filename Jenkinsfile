@@ -52,7 +52,7 @@ node {
     sh "ls"
 
   stage ('Packaging and Publishing results') {
-  'Archiving artifact': {
+  
     git branch: "${student}", url: 'https://github.com/MNT-Lab/p193e-module.git'
     sh """
     tar -zxvf "${student}"_dsl_script.tar.gz output.txt
@@ -61,7 +61,7 @@ node {
     cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
     ls 
     """
-      }
+
   }
 
 }

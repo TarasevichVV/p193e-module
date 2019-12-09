@@ -60,7 +60,8 @@ node ('master') {
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz -C copy .
                 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
-                stash name: "build_docker", includes: "Dockerfile", "helloworld-ws.war" 
+                stash name: "Dockerfile", includes: "Dockerfile"
+                stash name: "warka", includes: "helloworld-ws.war" 
         },
         'Creating Docker Image  with naming convention': {
                 echo "curl by docker image"
@@ -78,9 +79,10 @@ node ('master') {
                             stage('Sab') {
                                 container('docker') {
                                     echo "Building docker image..."
-                                    unstash "build_docker"
+                                    unstash "Dockerfile"
+                                    unstash "warka"
                                     sh """
-                                       docker   build -t nexus-dock.k8s.playpit.by:80/${student}:$BUILD_NUMBER .
+                                       docker build -t nexus-dock.k8s.playpit.by:80/${student}:$BUILD_NUMBER .
                                        docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
                                        docker push nexus-dock.k8s.playpit.by:80/${student}:$BUILD_NUMBER
                                        """
@@ -93,3 +95,4 @@ node ('master') {
     )
     }
 }
+

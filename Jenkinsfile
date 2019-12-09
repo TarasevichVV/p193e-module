@@ -113,7 +113,7 @@ EOF
                                     sh """
 echo "build in docker pod:  "
 pwd  
-ls -al Docker*"
+ls -al Docker*
 docker build . -t helloworld-${student}:${BUILD_NUMBER}
 docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
 docker login -u admin -p admin nexus-dock.k8s.playpit.by

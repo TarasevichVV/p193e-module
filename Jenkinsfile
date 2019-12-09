@@ -4,14 +4,13 @@ def mavenName = 'M3'//'Maven'
 def SonarTool = 'Sonar'//'Scanner-of-K8s-Sonar'
 def SonarName = 'Sonar'//'K8s-sonar'
 def nexusclusterurl = 'nexus.k8s.playpit.by:80'//'nexus-service.nexus.svc.cluster.local:8081'
-//def nexusurl = 'nexus.k8s.playpit.by:80'//'nexus:80'
 def nexusproto = 'http://'
 def nexusport = '50001'//'8123'
 def nexusmavenrepo = 'maven-releases' //'docker'
-def nexusdockerrepo = 'nexus-dock.k8s.playpit.by:80'//'docker-releases'
+def nexusdockerrepo = 'nexus-dock.k8s.playpit.by:80'//'nexus:80'
 def nexusdockercred = 'admin:admin'
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-def mail_to = "komarovea@gmail.com"
+def mail_to = "@gmail.com"
 def Dockerfiletemplate = '''  From alpine
 
                     RUN apk update && apk add wget tar openjdk8 && \
@@ -39,13 +38,13 @@ node('master') {
             }
         }
 
-        // stage('Sonar scan') {
-        //     echo 'Sonar scan'
-        //     def SH = tool "${SonarTool}";
-        //     withSonarQubeEnv("${SonarName}") {
-        //         sh "${SH}/bin/sonar-scanner -Dsonar.projectKey=ekomarov_task-11:helloworld-ws -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -Dsonar.sources=helloworld-project/helloworld-ws/src"
-        //     }
-        // }
+        stage('Sonar scan') {
+            echo 'Sonar scan'
+            def SH = tool "${SonarTool}";
+            withSonarQubeEnv("${SonarName}") {
+                sh "${SH}/bin/sonar-scanner -Dsonar.projectKey=ekomarov_task-11:helloworld-ws -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -Dsonar.sources=helloworld-project/helloworld-ws/src"
+            }
+        }
         stage('Testing') {
             echo 'Testing'
             parallel 'mvn pre-integration-test': {

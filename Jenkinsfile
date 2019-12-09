@@ -51,7 +51,7 @@ node {
                 sh '''
                     tar -zxf anikitsenka_dsl_script.tar.gz output.txt
                     tar -czf pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz output.txt helloworld-project/helloworld-ws/target/helloworld-ws.war
-                    ls -lha
+                    curl -v -u admin:admin --upload-file pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/anikitsenka/${BUILD_NUMBER}/pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz
                 '''
                 stash includes: "pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz", name: "artefact_targz"
             },

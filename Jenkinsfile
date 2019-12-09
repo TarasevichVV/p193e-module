@@ -92,12 +92,11 @@ MAINTAINER Dzmitry Prusevich
 COPY helloworld-ws.war /usr/local/tomcat/webapps/
 """
         sh """
-          student="dprusevich"
-          docker build -t helloworld-"{student}":"${BUILD_NUMBER}" .
-          docker tag helloworld-"{student}":"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-"{student}":"${BUILD_NUMBER}"
+          docker build -t helloworld-dprusevich:"${BUILD_NUMBER}" .
+          docker tag helloworld-dprusevich:"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:"${BUILD_NUMBER}"
           docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
-          docker push nexus-dock.k8s.playpit.by:80/helloworld-"{student}":"${BUILD_NUMBER}"
-          docker rmi helloworld-"{student}":"${BUILD_NUMBER}"
+          docker push nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:"${BUILD_NUMBER}"
+          docker rmi helloworld-dprusevich:"${BUILD_NUMBER}"
         """
         }
     }

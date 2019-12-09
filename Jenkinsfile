@@ -110,11 +110,11 @@ node {
 
   stage('07 Asking for manual approval') {
 // WORKING --
-    script {
+/*     script {
       timeout(time: 5, unit: 'MINUTES') {
         input(id: "Deploy Gate", message: "Deploy ${currentBuild.projectName}?", ok: '08 Deployment')
       }
-    }
+    } */
   }
 
   stage('08 Deployment') {

@@ -21,6 +21,13 @@ node {
     }
   }
 
+  stage ('Sonar scan') {
+    def scannerHome = tool 'Sonar'
+    withSonarQubeEnv('Sonar') {
+    sh "${scannerHome}/bin/sonar-scanner"
+    }
+  }
+
   stage ('Testing') {
     parallel(
       'mvn pre-integration-test': {

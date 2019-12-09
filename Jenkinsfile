@@ -9,6 +9,7 @@ node {
         withMaven(maven: 'M3'){
             sh 'mvn clean verify -f helloworld-project/helloworld-ws/pom.xml'
             sh 'mvn package -f helloworld-project/helloworld-ws/pom.xml'
+            stash includes "helloworld-project/helloworld-ws/target/helloworld-ws.war" name: "binary_webapp"
         }
     }
     stage('Sonar scan'){
@@ -61,6 +62,7 @@ node {
                             container('docker') {
                                 sh 'echo "Building docker image..."'
                                 unstash "Dockerfile"
+                                unstash "binary_webapp"
                                 sh '''
                                 ls -lha
                                 docker build -t anikitsenka/tomcat .

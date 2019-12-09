@@ -68,7 +68,7 @@ stage('Packaging and Publishing results'){
             'Creating tar gz': {
                 unstash "jkf"
                 sh '''
-                tar xvzf  skudrenko_dsl_script.tar.gz"
+                tar xvzf  skudrenko_dsl_script.tar.gz
                 tar cvzf pipeline-skudrenko-${BUILD_NUMBER}.tar.gz output.txt Jenkinsfile helloworld-project/helloworld-ws/target/helloworld-ws.war
                 curl -v -u admin:admin --upload-file pipeline-skudrenko-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/skudrenko/${BUILD_NUMBER}/pipeline-skudrenko-${BUILD_NUMBER}.tar.gz
                 '''

@@ -101,12 +101,12 @@ node {
                                         HEALTHCHECK CMD curl --fail http://localhost:8080/ || exit 1
                                         CMD ["/opt/tomcat/bin/catalina.sh", "run"]
                                         """
-//                                        sh "docker login -u admin -p admin nexus-dock.k8s.playpit.by:80"
-                                        sh "docker build -f /Dockerfile -t nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUMBER ."
-                                        sh "docker images"
-                                        sh "docker push nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUMBER"
-                                        sh "docker rmi nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUMBER"
-
+                                        sh """docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                                        docker build -f /Dockerfile -t nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUMBER .
+                                        docker images
+                                        docker push nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUMBER
+                                        docker rmi nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUMBER
+                                        """
                                     }
 
                                 }

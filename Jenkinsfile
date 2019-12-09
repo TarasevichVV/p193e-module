@@ -38,12 +38,12 @@ node('master') {
         }
     }
 
-    stage('Sonar scan') {
-        echo 'Sonar scan'
-        def SH = tool "${SonarTool}";
-        withSonarQubeEnv("${SonarName}") {
-            sh "${SH}/bin/sonar-scanner -Dsonar.projectKey=ekomarov_task-11:helloworld-ws -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -Dsonar.sources=helloworld-project/helloworld-ws/src"
-        }
+    // stage('Sonar scan') {
+    //     echo 'Sonar scan'
+    //     def SH = tool "${SonarTool}";
+    //     withSonarQubeEnv("${SonarName}") {
+    //         sh "${SH}/bin/sonar-scanner -Dsonar.projectKey=ekomarov_task-11:helloworld-ws -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -Dsonar.sources=helloworld-project/helloworld-ws/src"
+    //     }
     }
     stage('Testing') {
         echo 'Testing'

@@ -5,13 +5,14 @@ def job_to_use = "MNTLAB-ibletsko-child1-build-job"
 node {
   stage('01 git checkout') {
     checkout scm
+    checkout([$class: 'GitSCM',
+      branches: [[name: 'origin/ibletsko']],
+      userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
+    ])
+    stash 'mnt-source'
   }
 
   stage('02 Building code') {
-    checkout([$class: 'GitSCM',
-      branches: [[name: "origin/${student}"]],
-      userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
-    ])
     withMaven(maven: 'M3') {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
     }
@@ -53,20 +54,18 @@ node {
   }
 
   stage('06 Packaging and Publishing results') {
+// ! PARALLEL !
+// ------------
 // Jenkinsfile
-//    sh "ls helloworld-project/helloworld-ws/target/"
     writeFile file: "Jenkinsfile", text: "For testing purposes."
     sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile"
-    //create docker image 'helloworld-{student}:{buildNumber}'
     sh """
     echo "FROM tomcat:8.0" > Dockerfile
     echo "COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/" >> Dockerfile
     """
-
     stash includes: "Dockerfile", name: "file1"
     stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"
 
-    //def label = "worker-${UUID.randomUUID().toString()}"
     def nodelabel = "buildnode"
     def nexusaddr = "nexus-dock.k8s.playpit.by:80"
     podTemplate (label: nodelabel, containers: [
@@ -81,12 +80,7 @@ node {
             unstash 'file1'
             unstash 'file2'
             sh """
-              ls -la
-              find / -iname 'Dockerfile*'
               docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
-              echo "-----"
-              docker images
-              echo "-----"
               docker login -u admin -p admin $nexusaddr
               docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
               """
@@ -94,26 +88,18 @@ node {
         }
       }
     }
-
-//             docker login -u admin -p admin $nexusaddr
-
-/*     wrappers {
-      buildInDocker {
-        dockerfile {
-          filename 'Dockerfile.1'
-        }
-        verbose()
-        }
-    } */
-//      volume('/dev/urandom', '/dev/random')
-
-//    sh "ls -la"
-//    archiveArtifacts '*'
-
-    //push archive to nexus
   }
 
   stage('07 Asking for manual approval') {
+    steps {
+      sh  "echo test"
+      script {
+        timeout(time: 5, unit: 'MINUTES') {
+          input(id: "Deploy Gate", message: "Deploy ${params.project_name}?", ok: 'Deploy')
+        }
+      }
+    }
+
   }
 
   stage('08 Deployment') {

@@ -100,7 +100,11 @@ tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz && \
 COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
 CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF
-"""
+
+docker build . -t tomcat_${student}
+docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+"""/*
                                     echo "6-2-1--a: dockerfile:"
                                     sh "ls -al Dockerfile"
                                     echo "6-2-1--b:  Building docker image...---tomcat_${student}----"
@@ -112,7 +116,7 @@ EOF
                     sh "docker build . -t tomcat_${student}"
                     sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                     sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
-                   """
+                   """*/
                                 }
                             }
                         }

@@ -95,7 +95,7 @@ node {
     sh  "echo test"
     script {
       timeout(time: 5, unit: 'MINUTES') {
-        input(id: "Deploy Gate", message: "Deploy ${PROJECT_NAME}?", ok: 'Deploy')
+        input(id: "Deploy Gate", message: "Deploy ${currentBuild.projectName}? ${env.JOB_NAME} ${JOB_BASE_NAME} d= ${currentBuild.displayName} f= ${currentBuild.fullDisplayName} prev= ${currentBuild.previousBuild} dr= ${currentBuild.description} id= ${currentBuild.id} r= ${currentBuild.result} r2=${currentBuild.currentResult} ", ok: 'Deploy')
       }
     }
   }

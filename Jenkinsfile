@@ -92,16 +92,25 @@ node {
   }
 
   stage('07 Asking for manual approval') {
-    sh  "echo test"
-    script {
+/*     script {
       timeout(time: 5, unit: 'MINUTES') {
-        input(id: "Deploy Gate", message: "Deploy ${currentBuild.projectName}? ${env.JOB_NAME} ${JOB_BASE_NAME} d= ${currentBuild.displayName} f= ${currentBuild.fullDisplayName} prev= ${currentBuild.previousBuild} dr= ${currentBuild.description} id= ${currentBuild.id} r= ${currentBuild.result} r2=${currentBuild.currentResult} ", ok: 'Deploy')
+        input(id: "Deploy Gate", message: "Deploy ${currentBuild.projectName}?", ok: 'Deploy')
       }
-    }
+    } */
   }
 
   stage('08 Deployment') {
 //(rolling update, zero downtime)
-
+/*
+Namespase : {student}
+Deployment
+Service
+Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) */
+    sh """
+    set +e
+    kubectl create secret docker-registry nx-get-img --docker-server=http://192.168.56.177:32001 --docker-username=jenkins --docker-password=jenkins --docker-email=jenkins@kjenkins.com
+    set -e
+    """
+//    kubectl apply -f app-dpl.yml
   }
 }

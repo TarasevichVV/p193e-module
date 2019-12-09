@@ -12,7 +12,7 @@ def Dockerfile='''  From alpine
                                 
                         EXPOSE 8080
                         CMD ["/opt/tomcat/bin/catalina.sh", "run"]'''
-def label-deploy = "centos-jenkins-${UUID.randomUUID().toString()}"
+def labeldeploy = "centos-jenkins-${UUID.randomUUID().toString()}"
 node {
     stage('Preparation (Checking out)'){
         checkout scm
@@ -104,14 +104,14 @@ node {
      }
      stage('Deployment (rolling update, zero downtime)') {
         stage = env.STAGE_NAME
-            podTemplate(label: label2,
+            podTemplate(label: labeldeploy,
                 containers: [
                     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                     containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true)
                 ]
             )
             {
-                node(label-deploy) {
+                node(labeldeploy) {
                     container('centos') {
                         unstash "deploy"
                         sh """

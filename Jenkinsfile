@@ -62,7 +62,7 @@ node {
                         stage('Docker Build') {
                             container('docker') {
                                 echo "Building docker image..."
-                                unstash "Docker"
+                                //unstash "Docker"
                                 ls -lha
                                 // docker build -t anikitsenka/tomcat .
                                 // docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}

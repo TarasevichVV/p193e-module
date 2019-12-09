@@ -6,7 +6,7 @@ node {
     
     stage ('Preparation (Checking out)') {
       checkout scm
-      sh "echo -e 'BUILD NUMBER: $BUILD_NUMBER\nBuldTime: \\$(date)\nTriggeredBy: \\$(git log origin/shanchar -1) \nArtifact Version: 1.$BUILD_NUMBER' \nAuthor=${student} >> index.html"
+      sh "echo -e 'BUILD NUMBER: $BUILD_NUMBER \nAuthor=${student}' >> index.html"
       sh "mv index.html helloworld-project/helloworld-ws/src/main/webapp/index.html"
     }
     
@@ -149,3 +149,15 @@ node {
 
 
 }
+
+
+
+        kubectl patch deploy shanchar-deploy -n shanchar --patch="{
+            'spec':{
+                'template':{
+                    'spec':{
+                        'containers':[{'name':'shanchar-deploy','nexus-dock.k8s.playpit.by:80/helloworld-shanchar:$BUILD_NUMBER'}]
+                        }
+                    }
+                }
+            }"

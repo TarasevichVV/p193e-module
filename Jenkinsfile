@@ -90,9 +90,9 @@ EOF
                         node(label) {
                             stage('Docker Build') {
                                 container('docker') {
-                                    echo "Building docker image..."
+                                    echo "Building docker image...---tomcat_${student}----"
                                     sh """
-                    sh "docker build --group-add docker . -t tomcat_${student}"
+                    sh "docker build . -t tomcat_${student}"
                     sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                     sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
                    """

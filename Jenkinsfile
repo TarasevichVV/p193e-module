@@ -59,6 +59,7 @@ node {
     sh """
     echo "FROM tomcat:8.0" > Dockerfile
     echo "COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/" >> Dockerfile
+    """
 
     stash includes: "Dockerfile", name: "file1"
     stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"

@@ -103,4 +103,5 @@ node {
      stage('Deployment (rolling update, zero downtime)') {
          stage = ${env.STAGE_NAME}
          sh "echo ${env.STAGE_NAME}"
+     }
 }

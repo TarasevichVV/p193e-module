@@ -77,8 +77,11 @@ EOF
 """
                         sh "ls -al Dockerfile"
                         sh "echo '--------------------------docker build start--------------------------'"
-                        sh "find / -name docker"
-                        sh "docker build -t tomcat_${student} ."
+                       // sh "find / -name docker"
+                        def appImage = docker.build("tomcat_${student}")
+                        appImage.tag
+
+                        //sh "docker build . -t tomcat_${student}"
                         sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                         sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                     }

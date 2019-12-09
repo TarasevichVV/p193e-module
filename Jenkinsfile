@@ -57,11 +57,9 @@ node {
     sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile"
     //create docker image 'helloworld-{student}:{buildNumber}'
     sh """
-    cat > Dockerfile << EOF
-    FROM tomcat:8.0
-    COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
-    EOF
-    """
+    echo "FROM tomcat:8.0" > Dockerfile
+    echo "COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/" >> Dockerfile
+
     stash includes: "Dockerfile", name: "file1"
     stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"
 

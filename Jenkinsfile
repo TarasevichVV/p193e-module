@@ -19,6 +19,7 @@ node {
         <p> JOB_NAME = "$JOB_NAME" </p>
         <p> BUILD_TIME = "$(date)" </p>
         <p> ARTIFACT_VERSION = 1.0."$BUILD_NUMBER" </p>
+        EOF
         '''
         withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'

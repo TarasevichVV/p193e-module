@@ -107,19 +107,26 @@ Deployment
 Service
 Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) */
 //    pipeline-ibletsko-91.tar.gz
-// https://10.16.0.1/api/v1/namespaces/jenkins
-
-    node('kubernetes') {
-      sh "test"
+    podTemplate (label: nodelabel, containers: [
+        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+        containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true)
+    ],
+    volumes: [
+      hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
+      ]) {
+      node(nodelabel) {
+        container('docker') {
+          sh """
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          mv ./kubectl /usr/local/bin/kubectl
+          kubectl get pod -A
+          """
+        }
+      }
     }
-
-
-/*     sh """
-    set +e
-    kubectl create secret docker-registry nx-get-img --docker-server=http://192.168.56.177:32001 --docker-username=jenkins --docker-password=jenkins --docker-email=jenkins@kjenkins.com
-    set -e
-    """ */
-
-//    kubectl apply -f app-dpl.yml
   }
-}
+
+/*           sed -i "s|helloworld-${student}|helloworld-${student}:$BUILD_NUMBER|" app-dpl.yml
+          kubectl apply -f app-dpl.yml */
+

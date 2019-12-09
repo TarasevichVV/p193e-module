@@ -26,7 +26,6 @@ node {
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "warka"
     }
     }
-    /*
     stage ('3.sonar_scan') {
     def scannerHome = tool 'Sonar'
     withSonarQubeEnv() {
@@ -48,7 +47,6 @@ node {
                 }
             )
     }
-    */    
     stage ('5.triggering_job') {
         build job: 'MNTLAB-phardzeyeu-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'phardzeyeu']], wait: true;
         copyArtifacts(projectName: 'MNTLAB-phardzeyeu-child1-build-job', selector: lastSuccessful())
@@ -94,13 +92,11 @@ node {
                 }
         )
     }
-    /*
     stage ('7.asking_for_manual_approval') {
         timeout(time: 5, unit: "MINUTES") {
             input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
         }
     }
-    */
     stage ('8.deployment') {
         podTemplate(label: label2,
                     containers: [

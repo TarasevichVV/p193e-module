@@ -36,13 +36,13 @@ node {
     stage('Packaging and Publishing results'){
         parallel (
             arch: {
-                // sh '''
-                //     tar -zxf anikitsenka_dsl_script.tar.gz output.txt
-                //     ls -lha
-                //     ls -lha helloworld-project/helloworld-ws/target
-                //     tar -czf pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz output.txt helloworld-project/helloworld-ws/target/helloworld-ws.war
-                //     ls -lha
-                // '''
+                checkout([$class: 'GitSCM', branches: [[name: '*/anikitsenka']],
+                    userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]])
+                sh '''
+                    tar -zxf anikitsenka_dsl_script.tar.gz output.txt
+                    tar -czf pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz output.txt Jenkinsfile helloworld-project/helloworld-ws/target/helloworld-ws.war
+                    ls -lha
+                '''
                 stash includes: "pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz", name: "artefact_targz"
             },
             dock: {
@@ -62,10 +62,10 @@ node {
                         stage('Docker Build') {
                             container('docker') {
                                 echo "Building docker image..."
-                                //unstash "Docker"
+                                unstash "Docker"
                                 ls -lha
-                                // docker build -t anikitsenka/tomcat .
-                                // docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
+                                docker build -t anikitsenka/tomcat .
+                                docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
                                 sh """
                                     docker version
                                     """

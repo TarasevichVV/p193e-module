@@ -57,12 +57,8 @@ node {
     git branch: "${student}", url: 'https://github.com/MNT-Lab/p193e-module.git'
     sh """
     tar -zxvf "${student}"_dsl_script.tar.gz output.txt
-    cat output.txt
     cp "${JENKINS_HOME}"/workspace/EPBYMINW8538/mntlab-ci-pipeline@script/Jenkinsfile .
-    ls helloworld-project
-    ls helloworld-project/helloworld-ws/
-    ls helloworld-project/helloworld-ws/target/
-    ls helloworld-project/helloworld-ws/target/helloworld-ws/
+    tar czf pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz output.txt Jenkinsfile helloworld-ws.war
     ls 
     """
 

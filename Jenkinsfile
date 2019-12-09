@@ -1,5 +1,12 @@
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def machine = "centos-jenkins-${UUID.randomUUID().toString()}"
+def indx = '''
+        <p> ARTIFACT_VERSION = $BUILD_NUMBER </p>
+        <p> BUILD_TIME = $(date) </p>
+        <p> JOB_NAME = $JOB_NAME </p>
+        <p> COMMIT_ID = $GIT_COMMIT </p>
+        <p> AUTHOR = Serge </p>
+        '''      
 node {
    stage('Preparation') {
       checkout scm
@@ -10,6 +17,7 @@ node {
         stash includes: "Jenkinsfile", name: "jkf"
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'skudrenko'])
         withMaven(maven: 'M3') {
+            sh "echo "${indx}" >> helloworld-project/helloworld-ws/src/main/webapp/index.html"
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
             stash includes: "tomcat.yaml", name: "tom"

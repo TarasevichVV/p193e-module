@@ -16,8 +16,8 @@ node {
         git ([url: 'https://github.com/MNT-Lab/p193e-module.git', branch: 'skudrenko'])
         stash includes: "Jenkinsfile", name: "jkf"
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'skudrenko'])
+        sh "echo "${indx}" >> helloworld-project/helloworld-ws/src/main/webapp/index.html"
         withMaven(maven: 'M3') {
-            sh "echo "${indx}" >> helloworld-project/helloworld-ws/src/main/webapp/index.html"
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
             stash includes: "tomcat.yaml", name: "tom"

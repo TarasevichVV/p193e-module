@@ -57,7 +57,8 @@ node {
     sh """
     tar -zxvf "${student}"_dsl_script.tar.gz output.txt
     cat output.txt
-    cp "${JENKINS_HOME}"/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/* .
+    cp "${JENKINS_HOME}"/workspace/EPBYMINW8538/mntlab-ci-pipeline@script/Jenkinsfile .
+    cat Jenkinsfile
     cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
     ls 
     """

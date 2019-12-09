@@ -44,7 +44,7 @@ node('master') {
     //     withSonarQubeEnv("${SonarName}") {
     //         sh "${SH}/bin/sonar-scanner -Dsonar.projectKey=ekomarov_task-11:helloworld-ws -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -Dsonar.sources=helloworld-project/helloworld-ws/src"
     //     }
-    }
+    // }
     stage('Testing') {
         echo 'Testing'
         parallel 'mvn pre-integration-test': {

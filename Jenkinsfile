@@ -134,10 +134,7 @@ Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) *
     podTemplate (label: 'testnode', containers: [
         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
         containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true)
-    ],
-    volumes: [
-//      hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
-      ]) {
+    ]) {
       node('testnode') {
         container('centos') {
           unstash "st_yamls"

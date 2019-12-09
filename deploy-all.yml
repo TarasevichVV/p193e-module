@@ -8,7 +8,7 @@ data:
   .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy1kb2NrLms4cy5wbGF5cGl0LmJ5OjgwIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
 kind: Secret
 metadata:
-  name: start_docker
+  name: startdocker
   namespace: ibletsko
 type: kubernetes.io/dockerconfigjson
 ---
@@ -47,7 +47,7 @@ spec:
           successThreshold: 1
           timeoutSeconds: 5
       imagePullSecrets:
-      - name: start_docker
+      - name: startdocker
 ---
 apiVersion: v1
 kind: Service

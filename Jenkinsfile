@@ -69,12 +69,12 @@ node {
 
     def nodelabel = "buildnode"
     def nexusaddr = "nexus-dock.k8s.playpit.by:80"
-    podTemplate (label: nodelabel, containers: [
+/*     podTemplate (label: nodelabel, containers: [
       containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
     ],
     volumes: [
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
-    ]) {
+/*    */  ]) {
       node(nodelabel) {
         stage('build image') {
           container('docker') {
@@ -88,7 +88,7 @@ node {
           }
         }
       }
-    }
+    } */
   }
 
   stage('07 Asking for manual approval') {

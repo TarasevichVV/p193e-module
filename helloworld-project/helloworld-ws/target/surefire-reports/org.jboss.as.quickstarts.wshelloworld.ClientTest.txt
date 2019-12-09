@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.jboss.as.quickstarts.wshelloworld.ClientTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 3, Time elapsed: 0.055 s - in org.jboss.as.quickstarts.wshelloworld.ClientTest

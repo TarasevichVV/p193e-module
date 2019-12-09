@@ -1,0 +1,6 @@
+projectKey=helloworld:javaproject
+serverUrl=https://sonarqube-enterprise.tools.kfinfra.com
+serverVersion=7.7.0.23042
+dashboardUrl=https://sonarqube-enterprise.tools.kfinfra.com/dashboard?id=helloworld%3Ajavaproject
+ceTaskId=AWoB8JQyifidFGddlysm
+ceTaskUrl=https://sonarqube-enterprise.tools.kfinfra.com/api/ce/task?id=AWoB8JQyifidFGddlysm

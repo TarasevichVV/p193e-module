@@ -1,13 +1,4 @@
 apiVersion: v1
-kind: Service
+kind: Namespace
 metadata:
-  name: stsiapan
-  namespace: stsiapan
-spec:
-  selector:
-    app: stsiapan
-  type: LoadBalancer
-  ports:
-    - name: http
-      port: 80
-      targetPort: 8080
+  name: shanchar

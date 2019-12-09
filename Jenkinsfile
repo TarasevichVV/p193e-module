@@ -28,6 +28,7 @@ node {
     withMaven(maven: 'M3') {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
     }
+    stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "st_warfile"
   }
 
   stage('03 Sonar scan') {
@@ -92,6 +93,7 @@ node {
               stage('build image') {
                 container('docker') {
                   unstash "st_dockerfile"
+                  unstash "st_warfile"
                   sh """
                     docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
                     docker login -u admin -p admin $nexusaddr
@@ -103,7 +105,6 @@ node {
           } 
       }
     )
-    stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"
   }
 
   stage('07 Asking for manual approval') {

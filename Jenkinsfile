@@ -45,11 +45,6 @@ node {
                     sh "cp /var/jenkins_home/workspace/EPBYMINW9149/mntlab-ci-pipeline@script/Jenkinsfile ./"
                     sh "tar -czvf pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile"
                     sh "curl -v -u admin:admin --upload-file pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/amiasnikovich/${BUILD_NUMBER}/pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz"
-                    File file = new File('Dockerfile')
-                    file.write "FROM tomcat:8.0"
-                    file << "COPY *.war /usr/local/tomcat/webapps/"
-                    file << "EXPOSE 8080"
-                    file << 'CMD ["catalina.sh", "run"]'
 
                     stash includes: "helloworld-ws.war", name: "war"
                     stash includes: "Dockerfile", name: "docker"
@@ -67,8 +62,8 @@ node {
                     ) {
                         node(label) {
                            container('docker') {
-                               unstash 'war'
-                               unstash 'docker'
+                               unstash "war"
+                               unstash "docker"
                                sh '''
                                 docker build -t nexus-dock.k8s.playpit.by:80/helloworld-amiasnikovich:$BUILD_NUMBER .
                                 docker login -u admin -p admin nexus-dock.k8s.playpit.by:80

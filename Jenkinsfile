@@ -101,7 +101,7 @@ node {
         }
         stage ('Push functionality') {
             echo "Push functionality"
-//            sh "docker version"
+            sh "kubectl get po -A"
         }
     }
 }

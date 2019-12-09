@@ -85,31 +85,31 @@ node('master') {
         }, 'Creating Docker Image': {
             stage('Creating Docker Image') {
                 echo 'Creating Docker Image'
-                // podTemplate(label: label,
-                //     containers: [
-                //         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                //         containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
-                //     ],
-                //     volumes: [
-                //         hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
-                //     ]){
-                //         node(label) {
-                //             stage('Docker Build') {
-                //                 container('docker') {
-                //                 unstash "target_war"
-                //                 sh 'ls'
-                //                 sh """
-                //                 echo "${Dockerfiletemplate}" > Dockerfile
-                //                 docker version
-                //                 // #docker build -t helloworld-${student_branch}:${BUILD_NUMBER} .
-                //                 // #docker tag ${student_branch}/app:latest ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
-                //                 // #docker login -u admin -p admin ${nexusurl}
-                //                 // #docker push ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
-                //                 """
-                //                 }
-                //             }
-                //         }
-                //     }
+                podTemplate(label: label,
+                    containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
+                    ],
+                    volumes: [
+                        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
+                    ]){
+                        node(label) {
+                            stage('Docker Build') {
+                                container('docker') {
+                                unstash "target_war"
+                                sh 'ls'
+                                sh """
+                                echo "${Dockerfiletemplate}" > Dockerfile
+                                docker version
+                                docker build -t helloworld-${student_branch}:${BUILD_NUMBER} .
+                                docker tag ${student_branch}/app:latest ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
+                                docker login -u admin -p admin ${nexusurl}
+                                docker push ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
+                                """
+                                }
+                            }
+                        }
+                    }
             }
         }
     }

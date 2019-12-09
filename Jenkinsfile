@@ -6,7 +6,7 @@ node {
     
     stage ('Preparation (Checking out)') {
       checkout scm
-      echo -e "BUILD NUMBER: $BUILD_NUMBER\nBuldTime: `date`\nTriggeredBy: `git log origin/shanchar -1 --pretty=format:'%an'`\nArtifact Version: 1.$BUILD_NUMBER" >> index.html
+      echo -e "BUILD NUMBER: $BUILD_NUMBER\nBuldTime: `date`\nTriggeredBy: `git log origin/shanchar -1 --pretty=format:'\%an'`\nArtifact Version: 1.$BUILD_NUMBER" >> index.html
       sh "mv index.html helloworld-project/helloworld-ws/src/main/webapp/index.html"
     }
     

@@ -8,12 +8,12 @@ node {
             sh 'mvn clean install -f clear_project/helloworld-ws/pom.xml'
         }
     }
-    stage('sonar scaner') {
-        scannerHome = tool 'Sonar'
-        withSonarQubeEnv('Sonar') {
-            sh "${scannerHome}/bin/sonar-scanner  -e -Dsonar.projectKey=mias -e -Dsonar.projectName=amiasnikovich -e -Dsonar.sources=clear_project/helloworld-ws/src -e -Dsonar.java.binaries=clear_project/helloworld-ws/target"
-        }
-    }
+//    stage('sonar scaner') {
+//        scannerHome = tool 'Sonar'
+//        withSonarQubeEnv('Sonar') {
+//            sh "${scannerHome}/bin/sonar-scanner  -e -Dsonar.projectKey=mias -e -Dsonar.projectName=amiasnikovich -e -Dsonar.sources=clear_project/helloworld-ws/src -e -Dsonar.java.binaries=clear_project/helloworld-ws/target"
+//        }
+//    }
     stage('parallel testing') {
 
         parallel(

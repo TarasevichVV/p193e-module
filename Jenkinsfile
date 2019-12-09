@@ -143,7 +143,7 @@ node {
                         mv ./kubectl /usr/local/bin/kubectl
                         kubectl version
                         """
-                        sh "kubectl apply -f 
+                        sh "kubectl apply -f https://raw.githubusercontent.com/MNT-Lab/p193e-module/ayanchuk/deploy.yaml"
 
                     }
                 }

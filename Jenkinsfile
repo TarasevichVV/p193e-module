@@ -17,7 +17,7 @@ node {
         stash includes: "Jenkinsfile", name: "jkf"
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'skudrenko'])
         sh """
-              echo "${index}" > helloworld-project/helloworld-ws/src/main/webapp/index.html
+              echo "${indx}" > helloworld-project/helloworld-ws/src/main/webapp/index.html
            """
         withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'

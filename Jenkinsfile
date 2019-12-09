@@ -7,6 +7,16 @@ node {
         userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]])
     }
     stage ('Build') {
+        sh '''
+        cat < EOF >> helloworld-project/helloworld-ws/src/main/webapp/index.html
+        </p>
+        <b> Custom page by ANikitsenka </b>
+        </p>
+        <p> JOB_NAME = "$JOB_NAME" </p>
+        <p> Created "$(date)" </p>
+        <p> Minor version "$BUILD_ID" </p>
+        EOF
+        '''
         withMaven(maven: 'M3'){
             sh 'mvn clean verify -f helloworld-project/helloworld-ws/pom.xml'
             sh 'mvn package -f helloworld-project/helloworld-ws/pom.xml'

@@ -4,7 +4,7 @@ node {
         userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]])
     }
     stage ('Build') {
-        withMaven(maven: 'Maven'){
+        withMaven(maven: 'M3'){
             sh 'mvn clean verify -f helloworld-project/helloworld-ws/pom.xml'
             sh 'mvn package -f helloworld-project/helloworld-ws/pom.xml'
         }

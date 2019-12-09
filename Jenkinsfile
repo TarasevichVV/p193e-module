@@ -19,6 +19,9 @@ node {
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'skudrenko'])
         withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
+            stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
+//            stash includes: "tomcat.yaml", name: "deploy"
+            stash includes: "Dockerfile", name: "Dockerfile"
          }
       }
 
@@ -75,17 +78,16 @@ stage('Packaging and Publishing results'){
                         hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
                     ]){
                         node(label) {
-                            stage('Docker Build') {
+                            stage('docker_build') {
                                 container('docker') {
-                                unstash "war"
-                                unstash "Dockerfile"
-                                sh 'ls'
-                                sh """
-                                docker build -t skudrenko/app .
-                                docker tag skudrenko/app:latest nexus-dock.k8s.playpit.by:80/skudrenko/app:${BUILD_NUMBER}
-                                docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
-                                docker push nexus-dock.k8s.playpit.by:80/skudrenko/app:${BUILD_NUMBER}
-                                """
+                                    unstash "war"
+                                    sh """
+                                    echo "${Dockerfile}" > Dockerfile
+                                    docker build -t helloworld-skudrenko:${BUILD_NUMBER} .
+                                    docker tag helloworld-skudrenko:${BUILD_NUMBER} nexus-dock.k8s.playpit.by:80/helloworld-skudrenko:${BUILD_NUMBER}
+                                    docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                                    docker push nexus-dock.k8s.playpit.by:80/helloworld-skudrenko:${BUILD_NUMBER}                             
+                                    """
                                 }
                             }
                         }

@@ -6,6 +6,7 @@ node {
     
     stage ('Preparation (Checking out)') {
       checkout scm
+      //echo -e "BUILD NUMBER: $BUILD_NUMBER\nBuldTime: `date`\nTriggeredBy: `git log origin/shanchar -1 --pretty=format:'%an'`\nArtifact Version: 1.$BUILD_NUMBER" > helloworld-project/helloworld-ws/src/main/webapp/index.html
     }
     
     stage ('Building code') {
@@ -13,18 +14,16 @@ node {
       withMaven(maven: 'M3') {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install" 
      }
-      sh "ls -l helloworld-project/helloworld-ws/target/"  
-      sh "pwd"
       sh "cp helloworld-project/helloworld-ws/target/helloworld-ws.war ."
     }
 
- /*   stage('Sonar scan'){
+    stage('Sonar scan'){
             def scannerHome = tool 'Sonar';
             withSonarQubeEnv('Sonar'){
                 sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
             }
     }
-*/
+
     stage('Testing') {
     parallel(
         'pre-integration-test': {
@@ -123,8 +122,11 @@ node {
                                 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
                                 chmod +x ./kubectl
                                 mv ./kubectl /usr/local/bin/kubectl
-                                kubectl apply -f https://raw.githubusercontent.com/MNT-Lab/p193e-module/shanchar/svc.yaml
+                                kubectl apply -f https://raw.githubusercontent.com/MNT-Lab/p193e-module/shanchar/yaml.yaml
+                                sleep 5
                                 kubectl get ns
+                                kubectl get svc -n shanchar
+                                kubectl get pods -n shanchar
                                """
                         }
                     }

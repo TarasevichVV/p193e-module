@@ -31,10 +31,10 @@ node {
     </html>
     """
 
-        sh 'echo "${index_html} > $WORKSPACE/helloworld-project/helloworld-ws/src/main/webapp/index.html"'
+        sh 'echo "${index_html} > helloworld-project/helloworld-ws/src/main/webapp/index.html"'
 
-        withMaven(maven: 'maven-3') {
-            sh "mvn clean install -U -f $WORKSPACE/helloworld-project/helloworld-ws/pom.xml"
+        withMaven(maven: 'M3') {
+            sh "mvn clean install -U -f helloworld-project/helloworld-ws/pom.xml"
         }
     }
 

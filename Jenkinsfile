@@ -12,6 +12,7 @@ def Dockerfile='''  From alpine
                                 
                         EXPOSE 8080
                         CMD ["/opt/tomcat/bin/catalina.sh", "run"]'''
+def label-deploy = "centos-jenkins-${UUID.randomUUID().toString()}"
 node {
     stage('Preparation (Checking out)'){
         checkout scm
@@ -33,6 +34,7 @@ node {
         withMaven(maven: 'M3') { 
             sh "mvn clean -f helloworld-project/helloworld-ws/pom.xml  install"
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
+            stash includes: "tomcat.yaml", name: "deploy"
         }
     }
     stage('Sonar scan'){
@@ -101,7 +103,26 @@ node {
          }
      }
      stage('Deployment (rolling update, zero downtime)') {
-         stage = env.STAGE_NAME
-         sh "echo env.STAGE_NAME"
-     }
+        stage = env.STAGE_NAME
+            podTemplate(label: label2,
+                containers: [
+                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                    containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true)
+                ]
+            )
+            {
+                node(label-deploy) {
+                    container('centos') {
+                        unstash "deploy"
+                        sh """
+                        curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                        chmod +x ./kubectl
+                        mv ./kubectl /usr/local/bin/kubectl
+                        sed -i "s/IMAGE/nexus-dock.k8s.playpit.by:80/vtarasevich/app:${currentBuild.number}/" tomcat.yaml
+                        kubectl apply -f docker-deploy.yml
+                        """
+                    }
+                }
+            }
+        }
 }

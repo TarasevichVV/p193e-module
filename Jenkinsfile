@@ -32,7 +32,7 @@ node {
                 }
         )
     }
-    
+
      */
     stage('Triggering job from prev task') {
         build job: "MNTLAB-ashkraba-child1-build-job", parameters: [string(name: "BRANCH_NAME", value: "ashkraba")], wait: true
@@ -55,6 +55,7 @@ node {
         ) {
             node(label) {
                 container('docker') {
+                    sh "apk --no-cache add curl"
                     sh "curl -O http://nexus.k8s.playpit.by/repository/maven-releases/app/askraba/\"${BUILD_NUMBER}\"/pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz"
                     sh "tar -zxvf pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz"
                     sh """

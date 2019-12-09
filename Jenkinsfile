@@ -65,7 +65,7 @@ curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz 
 """
                 },
                 'creating_docker': {
-                    sh """
+/*                    sh """
 cat > Dockerfile <<EOF
 FROM tomcat
 RUN curl -u admin:admin -o pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz -L && \
@@ -74,8 +74,9 @@ tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz && \
 COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
 CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF
-"""
-                    sh "echo '--------------------------docker build startdocker home--------------------------'"
+"""*/
+                    sh "echo '-----------------------------------------docker build list dockerfile--------------------------------------------'"
+                    sh "ls -al Dockerfile"
                     def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 
                     podTemplate(label: label,
@@ -90,7 +91,18 @@ EOF
                         node(label) {
                             stage('Docker Build') {
                                 container('docker') {
+                                    sh """
+cat > Dockerfile <<EOF
+FROM tomcat
+RUN curl -u admin:admin -o pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz -L && \
+tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz && \
+#mv helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
+COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
+CMD bash /usr/local/tomcat/bin/catalina.sh run
+EOF
+"""
                                     echo "Building docker image...---tomcat_${student}----"
+
                                     sh """
                     sh "docker build . -t tomcat_${student}"
                     sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"

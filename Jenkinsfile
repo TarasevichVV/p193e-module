@@ -126,13 +126,13 @@ node('master') {
     catch (err) {
         currentBuild.result = 'FAILURE'
     }
-    finally {
+    finally { 
         // stage('Sending email'){
         //     emailext body: '''${SCRIPT, template="groovy-html.template"}''',
         //     mimeType: 'text/html',
         //         subject: "$currentBuild.result: Job '${currentBuild.fullDisplayName} ${currentBuild.number}' Stage:'${stage}'",
         //     to: "${mail_to}",
         //     recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-        }
+        // }
     } 
 }

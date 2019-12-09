@@ -77,11 +77,11 @@ stage ('packaging_and_publishing_results'){
                                 ]
                                ) {
                         node(label) {
-                            stage('Docker Build') {
+                            stage('docker_build') {
                                 container('docker') {
-                                    echo "Building docker image..."
                                     sh """
                                     ls
+                                    echo "${Dockerfile}" > Dockerfile
                                     docker build -t helloworld-skudrenko:${BUILD_NUMBER} .
                                     """
                                 }
@@ -89,6 +89,6 @@ stage ('packaging_and_publishing_results'){
                         }
                     }
                 }
-        )
-            }
+            )
+         }
 }

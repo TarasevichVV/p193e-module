@@ -9,12 +9,17 @@ node {
     stage ('Build') {
         sh '''
         cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
+            <html>
+            <head><title>Custom page by Andrei Nikitsenka</title></head>
+            <body>
             <p></p>
-            <b> Custom page by ANikitsenka </b>
+            <center><b> Custom page by ANikitsenka </b></center>
             <p></p>
             <p> JOB_NAME = "$JOB_NAME" </p>
             <p> Created "$(date)" </p>
             <p> Minor version "$BUILD_ID" </p>
+            </body>
+            </html>
         EOF
         '''
         withMaven(maven: 'M3'){

@@ -130,7 +130,7 @@ node('master') {
             emailext body: '''${SCRIPT, template="groovy-html.template"}''',
             mimeType: 'text/html',
                 subject: "$currentBuild.result: Job '${currentBuild.fullDisplayName} ${currentBuild.number}' Stage:'${stage}'",
-            to: "${mail_to}",
+            to: "",
             recipientProviders: [[$class: 'DevelopersRecipientProvider']]
         }
     } 

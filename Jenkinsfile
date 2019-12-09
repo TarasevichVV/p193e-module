@@ -24,17 +24,18 @@ node {
         withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "warka"
+        }
     }
-    }
+    /*
     stage ('3.sonar_scan') {
     def scannerHome = tool 'Sonar'
     withSonarQubeEnv() {
-        sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=phardzeyeu -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -e -Dsonar.sources=helloworld-project/helloworld-ws/src" 
+        sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=phardzeyeu -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -e -Dsonar.sources=helloworld-project/helloworld-ws/src"
         }
     }
     stage ('4.testing') {
         parallel (
-                'pre_integration_test' : { 
+                'pre_integration_test' : {
                     sh "echo 'mvn pre-integration-test'"
                 },
                 'integration_test' : {
@@ -42,11 +43,12 @@ node {
                         sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
                         }
                     },
-                'post_integration_test' : { 
+                'post_integration_test' : {
                     sh "echo 'mvn post-integration-test'"
                 }
             )
     }
+    */
     stage ('5.triggering_job') {
         build job: 'MNTLAB-phardzeyeu-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'phardzeyeu']], wait: true;
         copyArtifacts(projectName: 'MNTLAB-phardzeyeu-child1-build-job', selector: lastSuccessful())
@@ -65,14 +67,14 @@ node {
                 },
                 'creating_docker_image' : {
                     podTemplate(label: label,
-                                containers: [
+                            containers: [
                                     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                                     containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-                                ],
-                                volumes: [
+                            ],
+                            volumes: [
                                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                                ]
-                               ) {
+                            ]
+                    ) {
                         node(label) {
                             stage('6.1.docker_build') {
                                 container('docker') {
@@ -92,18 +94,20 @@ node {
                 }
         )
     }
+    /*
     stage ('7.asking_for_manual_approval') {
         timeout(time: 5, unit: "MINUTES") {
             input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
         }
     }
+    */
     stage ('8.deployment') {
         podTemplate(label: label2,
-                    containers: [
-                                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                                    containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
-                                ],                                
-                               ) {
+                containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
+                ],
+        ) {
             node(label2) {
                 stage('8.1.deployment') {
                     container('centos') {

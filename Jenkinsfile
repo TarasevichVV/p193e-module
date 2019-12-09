@@ -97,12 +97,12 @@ node('master') {
                             stage('Docker Build') {
                                 container('docker') {
                                 unstash "target_war"
-                                sh 'ls'
+                                //sh 'ls'
                                 sh """
                                 echo "${Dockerfiletemplate}" > Dockerfile
                                 docker version
                                 docker build -t helloworld-${student_branch}:${BUILD_NUMBER} .
-                                docker tag ${student_branch}/app:latest ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
+                                docker tag helloworld-${student_branch}:${BUILD_NUMBER} ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
                                 docker login -u admin -p admin ${nexusurl}
                                 docker push ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
                                 """

@@ -9,7 +9,9 @@ node {
       branches: [[name: 'origin/ibletsko']],
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]
     ])
-    stash includes: "Dockerfile", name: "file1"
+    stash includes: "Jenkinsfile", name: "st_jenkinsfile"
+    stash includes: "Dockerfile", name: "st_dockerfile"
+    stash includes: "*.yml", name: "st_yamls"
 
     checkout([$class: 'GitSCM',
       branches: [[name: 'origin/ibletsko']],
@@ -59,6 +61,7 @@ node {
     copyArtifacts projectName: "${job_to_use}", selector: lastCompleted() */
     //
     writeFile file: "output.txt", text: "output.txt For testing purposes."
+    stash includes: "*.txt", name: "st_output"
     archiveArtifacts '*'
   }
 
@@ -66,6 +69,8 @@ node {
     parallel (
       "parallel 1: archiving" : {
 //    writeFile file: "Jenkinsfile", text: "For testing purposes."
+        unstash "st_jenkinsfile"
+        unstash "st_output"
         sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile"
       },
       "parallel 2: image" : {
@@ -81,8 +86,9 @@ node {
             node(nodelabel) {
               stage('build image') {
                 container('docker') {
-                  unstash 'file1'
-                  unstash 'file2'
+//                  unstash 'file1'
+//                  unstash 'file2'
+                  unstash "st_jdockerfile"
                   sh """
                     docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
                     docker login -u admin -p admin $nexusaddr
@@ -130,6 +136,7 @@ Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) *
       ]) {
       node('testnode') {
         container('centos') {
+          unstash "st_yamls"
           sh """
           curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
           chmod +x ./kubectl

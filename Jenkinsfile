@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-def Dockerfile = """   
+def Dockerfile = ''' 
 FROM alpine
 
 RUN apk update && apk add wget tar openjdk8 && \
@@ -13,8 +13,8 @@ RUN apk update && apk add wget tar openjdk8 && \
 COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /opt/tomcat/webapps
 
 EXPOSE 8080
-CMD ["/opt/tomcat/bin/catalina.sh", "run"]
-"""
+CMD ["/opt/tomcat/bin/catalina.sh", "run"] '''
+
 node {
     stage ('checking_out') {
         checkout scm
@@ -22,7 +22,7 @@ node {
     stage ('building_code') {
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
         sh '''
-        cat << EOF >> helloworld-project/helloworld-ws/src/main/webapp/index.html
+        cat <<EOF >> helloworld-project/helloworld-ws/src/main/webapp/index.html
         <p> AUTHOR = phardzeyeu </p>
         <p> JOB_NAME = "$JOB_NAME" </p>
         <p> COMMIT_ID = "$GIT_COMMIT" </p>

@@ -74,33 +74,31 @@ COPY helloworld-ws.war /usr/local/tomcat/webapps/
 
   stage ('Docker deploy') {
   podTemplate(label: label,
-        containers: [
-                containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-            ],
-            volumes: [
-                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-            ]
-        ) {
+    containers: [
+        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+        containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+      ],
+      volumes: [
+        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+      ]
+    ) {
     node(label) {
-            container('docker') {
-                    echo "Building docker image..."
-                    sh """
+      container('docker') {
+        echo "Building docker image..."
+        sh """
 cat << "EOF" > Dockerfile
 FROM tomcat:8.0
 MAINTAINER Dzmitry Prusevich
 COPY helloworld-ws.war /usr/local/tomcat/webapps/
-    """
-                    sh """
-                       hostname
-                       whoami
-                       env
-                       echo $PATH
-                       ps -ef 
-                       docker version
-                       cat Dockerfile
-                       """
-                }
+"""
+        sh """
+          docker build -t helloworld-"{student}":"${BUILD_NUMBER}" .
+          docker tag helloworld-"{student}":"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-"{student}":"${BUILD_NUMBER}"
+          docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+          docker push nexus-dock.k8s.playpit.by:80/helloworld-"{student}":"${BUILD_NUMBER}"
+          docker rmi helloworld-"{student}":"${BUILD_NUMBER}"
+        """
+        }
     }
 }
 }

@@ -128,7 +128,7 @@ node {
         stage ('Asking for manual approval') {
             echo "Asking for manual approval"
             timeout(time: 2, unit: "MINUTES") {
-                input message: "Approve Deploy $JOB_BASE_NAME \/ $BUILD_NUMBER ?", ok: 'Yes'
+                input message: "Approve Deploy $JOB_BASE_NAME / $BUILD_NUMBER ?", ok: 'Yes'
         }
         stage ('Deployment (rolling update, zero downtime)') {
             echo "Deployment (rolling update, zero downtime)"

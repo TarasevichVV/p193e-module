@@ -1,22 +1,9 @@
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-def Dockerfile = '''  From alpine
-                                
-                    RUN apk update && apk add wget tar openjdk8 && \
-                        wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz && \
-                        tar -xvf apache-tomcat-8.5.20.tar.gz && \
-                        mkdir /opt/tomcat && \
-                        mv apache-tomcat*/* /opt/tomcat/
-                                
-                        COPY helloworld-ws.war /opt/tomcat/webapps
-                                
-                        EXPOSE 8080
-                        CMD ["/opt/tomcat/bin/catalina.sh", "run"]'''
-
+def student = "shanchar"
 
 
 node ('master') {
-    def student = "shanchar"
-
+    
     stage ('Preparation (Checking out)') {
       checkout scm
     }
@@ -73,6 +60,7 @@ node ('master') {
                 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz -C copy .
                 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz http://nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                 """
+                stash name: "build_docker", includes: "Dockerfile", "helloworld-ws.war" 
         },
         'Creating Docker Image  with naming convention': {
                 echo "curl by docker image"
@@ -90,13 +78,11 @@ node ('master') {
                             stage('Sab') {
                                 container('docker') {
                                     echo "Building docker image..."
+                                    unstash "build_docker"
                                     sh """
-                                       hostname
-                                       whoami
-                                       env
-                                       echo $PATH
-                                       ps -ef 
-                                       docker version
+                                       docker   build -t nexus-dock.k8s.playpit.by:80/${student}:$BUILD_NUMBER .
+                                       docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                                       docker push nexus-dock.k8s.playpit.by:80/${student}:$BUILD_NUMBER
                                        """
                                 }
                             }

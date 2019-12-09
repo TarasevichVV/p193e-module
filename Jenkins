@@ -18,7 +18,7 @@ node {
     stage('Testing'){
         parallel (
             test1: {
-                withMaven(maven: 'Maven'){
+                withMaven(maven: 'M3'){
                     sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
                 }
             },

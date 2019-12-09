@@ -1,4 +1,5 @@
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+def machine = "centos-jenkins-${UUID.randomUUID().toString()}"
 def Dockerfile = """  FROM alpine
                     RUN apk update && apk add wget tar openjdk8 && \
                     wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz && \
@@ -103,6 +104,27 @@ stage('Packaging and Publishing results'){
   stage ('Asking for manual Approval') {
         timeout(time: 5, unit: "MINUTES") {
             input message: 'Send this deploy to production?', ok: 'Yes'
+        }
+    }
+  stage ('Deploy') {
+        podTemplate(label: machine,
+                    containers: [
+                                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                                    containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
+                                ],                                
+                               ) {
+            node(machine) {
+                stage('8.1.deployment') {
+                    container('centos') {
+                        sh """
+                        curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                        chmod +x ./kubectl
+                        mv ./kubectl /usr/local/bin/kubectl
+                        kubectl version
+                        """
+                    }
+                }
+            }
         }
     }
 }

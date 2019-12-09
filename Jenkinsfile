@@ -1,3 +1,4 @@
+def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 node {
     stage('SCM git checkout') {
         git branch: 'ashkraba', url: 'https://github.com/MNT-Lab/p193e-module.git'

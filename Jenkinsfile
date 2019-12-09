@@ -34,7 +34,8 @@ node {
                 string(name: 'BRANCH_NAME', value: 'amiasnikovich')
         ], wait: true
 
-        copyArtifacts(projectname: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', filter: "*.txt")
+        copyArtifacts filter: '*.tar.gz', fingerprintArtifacts: true, projectName: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', target: 'Artifact'
+        //copyArtifacts(projectname: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', filter: "*.txt")
 
 
 //        script {

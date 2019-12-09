@@ -68,14 +68,12 @@ node {
 
     //def label = "worker-${UUID.randomUUID().toString()}"
     def nodelabel = "buildnode"
-    def nexusaddr = "nexus-service.jenkins.svc.cluster.local:50001"
-    def nexusaddr2 = "nexus-dock.k8s.playpit.by"
+    def nexusaddr = "nexus-dock.k8s.playpit.by"
     podTemplate (label: nodelabel, containers: [
       containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
     ],
     volumes: [
-      hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-      hostPathVolume(mountPath: "${WORKSPACE}", hostPath: "${WORKSPACE}")
+      hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
     ]) {
       node(nodelabel) {
         stage('build image') {
@@ -85,12 +83,12 @@ node {
             sh """
               ls -la
               find / -iname 'Dockerfile*'
-              docker build -t $nexusaddr2/helloworld-$student:$BUILD_NUMBER .
+              docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
               echo "-----"
               docker images
               echo "-----"
-              docker login -u admin -p admin --insecure-registry $nexusaddr2
-              docker push $nexusaddr2/helloworld-$student:$BUILD_NUMBER
+              docker login -u admin -p admin $nexusaddr
+              docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
               """
           }
         }

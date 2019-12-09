@@ -57,6 +57,8 @@ node {
                         ) {
                     node(label) {
                         stage('Docker Build') {
+                            checkout([$class: 'GitSCM', branches: [[name: '*/anikitsenka']],
+                                userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]])
                             container('docker') {
                                 echo "Building docker image..."
                                 sh """
@@ -75,7 +77,7 @@ node {
                     // docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
                     // docker login -u admin -p nexus 192.168.56.106:30083
                     // docker push 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
-                sh 'ls -lha images'
+                sh 'ls -lha'
             }
         )
     }

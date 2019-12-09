@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: tomcat-ibletsko
-        image: nexus-dock.k8s.playpit.by:80/helloworld-ibletsko:$BUILD_NUMBER
+        image: nexus-dock.k8s.playpit.by:80/helloworld-ibletsko:_deploy_ver_
         ports:
         - containerPort: 8080
           protocol: TCP

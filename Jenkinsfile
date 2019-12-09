@@ -82,9 +82,10 @@ node {
                                     unstash "Dockerfile"
                                     unstash "warka"
                                     sh """
-                                       docker build -t nexus-dock.k8s.playpit.by:80/${student}:$BUILD_NUMBER .
+                                       docker build -t nexus-dock.k8s.playpit.by:80/helloworld-${student}:$BUILD_NUMBER .
                                        docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
-                                       docker push nexus-dock.k8s.playpit.by:80/${student}:$BUILD_NUMBER
+                                       docker push nexus-dock.k8s.playpit.by:80/helloworld-${student}:$BUILD_NUMBER
+                                       docker rmi nexus-dock.k8s.playpit.by:80/helloworld-${student}:$BUILD_NUMBER
                                        """
                                 }
                             }
@@ -122,7 +123,8 @@ node {
                                 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
                                 chmod +x ./kubectl
                                 mv ./kubectl /usr/local/bin/kubectl
-                                kubectl version
+                                kubectl apply -f https://github.com/MNT-Lab/p193e-module/blob/shanchar/svc.yaml
+                                kubectl get ns
                                """
                         }
                     }
@@ -134,3 +136,4 @@ node {
 
 
 }
+

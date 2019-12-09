@@ -83,7 +83,7 @@ EOF
                         def appImage = docker.build("tomcat_${student}")
                         appImage.tag
                         sh "echo '--------------------------docker build start--------------------------'"
-                        sh "docker build . -t tomcat_${student}"
+                        sh "docker build --group-add docker . -t tomcat_${student}"
                         sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                         sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                     }

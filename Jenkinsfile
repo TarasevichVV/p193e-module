@@ -43,13 +43,13 @@ node {
                 }
             )
         }*/
-        stage('5-Triggering') {
+/*        stage('5-Triggering') {
             sh "echo --------------------start 5---------------------------"
             build job: "MNTLAB-${student}-child1-build-job", parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
             copyArtifacts fingerprintArtifacts: true, projectName: "MNTLAB-${student}-child1-build-job", selector: lastSuccessful()
             //sh 'find / -name output.txt'
             sh "echo trigering"
-        }
+        }*/
         stage('6-Archiving') {
             parallel(
                     'archiving_artifact': {
@@ -76,7 +76,7 @@ CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF
 """
                         sh "echo '--------------------------docker build start--------------------------'"
-                        sh "whereis docker"
+                        sh "find / -name docker"
                         sh "docker build -t tomcat_${student} ."
                         sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                         sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
@@ -128,7 +128,7 @@ EOF'''
         }
     } catch (e) {
         String error = "${e}";
-        emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}";', subject: 'Jenkins Error ${env.JOB_NAME} ', to: 'ironman@starkfabrick.com'
+        emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}";', subject: 'Jenkins Error ${env.JOB_NAME} ', to: 'mk.elz@bk.com'
         // Make the string with job info, example:
         // ${env.JOB_NAME}
         // ${env.BUILD_NUMBER}

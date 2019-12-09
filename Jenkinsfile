@@ -60,10 +60,10 @@ node {
                         copyArtifacts filter: 'output.txt', flatten: true, projectName: 'MNTLAB-skudrenko-child1-build-job', selector: workspace()
     }
 
-stage ('Push the Artifact to Nexus') {
-    parallel(
-        'Generating TAR archive'
-                        sh 'tar -zcvf pipeline-skudrenko-${BUILD_NUMBER}.tar.gz output.txt Jenkinsfile ./helloworld-ws/target/helloworld-ws.war'
+// stage ('Push the Artifact to Nexus') {
+//     parallel(
+//         'Generating TAR archive'
+//                         sh 'tar -zcvf pipeline-skudrenko-${BUILD_NUMBER}.tar.gz output.txt Jenkinsfile ./helloworld-ws/target/helloworld-ws.war'
 
 
 }

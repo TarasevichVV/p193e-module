@@ -7,14 +7,15 @@ node {
         checkout scm
         }
         stage('Building code'){
-            sh "echo $WORKSPACE"
             git branch: 'vtarasevich', url: 'https://github.com/MNT-Lab/build-t00ls'
             sh label: '', script: '''TimeStamp=$(date)
                                     cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
                                     <!DOCTYPE html>
                                     <html>
                                     <body>
-                                    <h1>author=LUNTIK</h1>
+                                    <h1>author=vtarasevich</h1>
+                                    <p>commitId: $(git log -n 1 --pretty=format:%H)</p>
+                                    <p>triggeredBy: $(git show -s --pretty=%an)</p>
                                     <p>build_number=${BUILD_NUMBER}</p>
                                     <p>buildTime=$TimeStamp</p>
                                     </body>

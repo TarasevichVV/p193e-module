@@ -20,7 +20,7 @@ node {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean package"
     }
   }
-
+/*
   stage ('Sonar scan') {
     def scannerHome = tool 'Sonar'
     withSonarQubeEnv('Sonar') {
@@ -43,7 +43,7 @@ node {
       }
     )
   }
-
+*/
   stage ('Triggering job and fetching artefact after finishing') {
     build job: "MNTLAB-${student}-child1-build-job",
     parameters: [ string(name: "BRANCH_NAME", value: "${student}") ], wait: true

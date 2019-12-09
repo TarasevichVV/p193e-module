@@ -55,7 +55,7 @@ node {
         ) {
             node(label) {
                 container('docker') {
-                    sh "apk --no-cache add curl"
+                    sh "apk add curl"
                     sh "apk add tar"
                     sh "curl -O http://nexus.k8s.playpit.by/repository/maven-releases/app/askraba/\"${BUILD_NUMBER}\"/pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz"
                     sh "tar xzvf pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz"

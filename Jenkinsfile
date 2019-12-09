@@ -99,7 +99,6 @@ tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz &&\
 mv helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
 #COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
 CMD bash /usr/local/tomcat/bin/catalina.sh run
-
 EOF
 
 #docker build . -t helloworld-${student}:${BUILD_NUMBER}

@@ -50,7 +50,21 @@ node {
     copyArtifacts (projectName: "MNTLAB-${student}-child1-build-job", selector: lastSuccessful())
     }
     sh "ls"
+
+  stage ('Packaging and Publishing results') {
+  'Archiving artifact': {
+    git branch: "${student}", url: 'https://github.com/MNT-Lab/p193e-module.git'
+    sh """
+    tar -zxvf "${student}"_dsl_script.tar.gz output.txt
+    cat output.txt
+    cp "${JENKINS_HOME}"/workspace/EPBYMINW9138/mntlab-ci-pipeline@script/* .
+    cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
+    ls 
+    """
+      }
   }
+
+}
 
 
 

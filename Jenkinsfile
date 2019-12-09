@@ -4,6 +4,7 @@ def job_to_use = "MNTLAB-ibletsko-child1-build-job"
 
 node {
   stage('01 git checkout') {
+// workspace cleanup
 //    sh "rm -rf *"
     checkout scm
     checkout([$class: 'GitSCM',
@@ -117,11 +118,11 @@ node {
   }
 
   stage('08 Deployment') {
-    podTemplate (label: 'testnode', containers: [
+    podTemplate (label: 'deploynode', containers: [
         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
         containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true)
     ]) {
-      node('testnode') {
+      node('deploynode') {
         container('centos') {
           unstash "st_yamls"
           sh """

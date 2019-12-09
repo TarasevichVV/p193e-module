@@ -40,10 +40,10 @@ spec:
           protocol: TCP
         readinessProbe:
           httpGet:
-            path: /
+            path: /helloworld-ws
             port: 8080
-          initialDelaySeconds: 24
-          periodSeconds: 3
+          initialDelaySeconds: 10
+          periodSeconds: 5
           successThreshold: 1
           timeoutSeconds: 5
       imagePullSecrets:

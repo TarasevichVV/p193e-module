@@ -124,7 +124,7 @@ node {
                                 chmod +x ./kubectl
                                 mv ./kubectl /usr/local/bin/kubectl
                                 kubectl apply -f https://raw.githubusercontent.com/MNT-Lab/p193e-module/shanchar/yaml.yaml
-                                kubectl patch deployment shanchar-deploy -p '{"spec": {"template": {"spec": {"containers": [{"name": "shanchar-deploy", image: "nexus-dock.k8s.playpit.by:80/helloworld-shanchar:$BUILD_NUMBER"}]}}}}'
+                                kubectl set image deployment shanchar-deploy -n shanchar shanchar-deploy=nexus-dock.k8s.playpit.by:80/helloworld-shanchar:"$BUILD_NUMBER"
                                 sleep 5
                                 kubectl get ns
                                 kubectl get svc -n shanchar

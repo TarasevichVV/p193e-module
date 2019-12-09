@@ -96,7 +96,7 @@ node {
                                     echo $PATH
                                     ps -ef 
                                     docker version
-                                    docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
+                                    docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} -f Dockerfile
                                     """
                                     // docker tag helloworld-phardzeyeu:${BUILD_NUMBER} 192.168.56.66:32389/phardzeyeu/tomcat:$BUILD_NUMBER
                                     // docker login -u admin -p admin123 192.168.56.66:32389

@@ -23,17 +23,17 @@ node {
         withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
-//            stash includes: "tomcat.yaml", name: "deploy"
+            stash includes: "tomcat.yaml", name: "tom"
 //            stash includes: "Dockerfile", name: "Dockerfile"
          }
       }
 
-   stage('Testing Phase I (Sonar)'){
-        def scannerHome = tool 'Sonar';
-        withSonarQubeEnv(){
-            sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=skudrenko -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
-        }
-    }
+//   stage('Testing Phase I (Sonar)'){
+//        def scannerHome = tool 'Sonar';
+//        withSonarQubeEnv(){
+//            sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=skudrenko -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+//        }
+//    }
 
    stage ('Testing Phase II (Unit)') {
         parallel(
@@ -101,11 +101,11 @@ stage('Packaging and Publishing results'){
                 }
             )
         }
-  stage ('Asking for manual Approval') {
-        timeout(time: 5, unit: "MINUTES") {
-            input message: 'Send this deploy to production?', ok: 'Yes'
-        }
-    }
+//  stage ('Asking for manual Approval') {
+//        timeout(time: 5, unit: "MINUTES") {
+//            input message: 'Send this deploy to production?', ok: 'Yes'
+//        }
+//    }
   stage ('Deploy') {
         podTemplate(label: machine,
                     containers: [
@@ -116,11 +116,13 @@ stage('Packaging and Publishing results'){
             node(machine) {
                 stage('Deployment container') {
                     container('centos') {
+                        unstash "tom"
                         sh """
                         curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
                         chmod +x ./kubectl
                         mv ./kubectl /usr/local/bin/kubectl
-                        kubectl version
+                        sed -i "s/BUILD_NUMBER/${BUILD_NUMBER}/g" tomcat.yaml
+                        kubectl apply -f tomcat.yaml
                         """
                     }
                 }

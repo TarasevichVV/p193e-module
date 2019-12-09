@@ -38,7 +38,7 @@ node {
         sh "tar -zxvf ashkraba_dsl_script.tar.gz"
         sh "tar -czf pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz output.txt Jenkinsfile helloworld.war"
         sh "curl -v -u admin:admin --upload-file pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/askraba/\"${BUILD_NUMBER}\"/pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz"
-        sh " curl -o "
+        
     }
     stage('Build Docker Image') {
         podTemplate(label: label,

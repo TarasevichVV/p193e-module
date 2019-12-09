@@ -40,7 +40,7 @@ node {
     }
     stage('Create archive and push it to nexus') {
         sh "tar -zxvf ashkraba_dsl_script.tar.gz"
-        sh "tar -czf pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz output.txt Jenkinsfile helloworld.war"
+        sh "tar -czf pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz output.txt Jenkinsfile helloworld.war Dockerfile"
         sh "curl -v -u admin:admin --upload-file pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/askraba/\"${BUILD_NUMBER}\"/pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz"
     }
     stage('Build Docker Image') {

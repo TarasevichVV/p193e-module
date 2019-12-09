@@ -31,6 +31,7 @@ node {
         '''
         withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
+            stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "warka"
     }
     }
     stage ('sonar_scan') {

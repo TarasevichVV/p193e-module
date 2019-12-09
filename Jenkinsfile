@@ -123,7 +123,7 @@ node {
                                 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
                                 chmod +x ./kubectl
                                 mv ./kubectl /usr/local/bin/kubectl
-                                kubectl apply -f https://github.com/MNT-Lab/p193e-module/blob/shanchar/svc.yaml
+                                kubectl apply -f https://raw.githubusercontent.com/MNT-Lab/p193e-module/shanchar/svc.yaml
                                 kubectl get ns
                                """
                         }

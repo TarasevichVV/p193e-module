@@ -62,7 +62,7 @@ metadata:
   name: shanchar-ingress
   namespace: shanchar
   annotations:
-    ingress.kubernetes.io/rewrite-target: serviceName=shanchar-svc rewrite=/helloworld-ws/
+    nginx.org/rewrites: serviceName=shanchar-svc rewrite=/helloworld-ws/
 spec:
   rules:
   - host: shanchar-app.k8s.playpit.by    

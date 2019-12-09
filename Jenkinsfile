@@ -35,12 +35,13 @@ node {
         ], wait: true
 
         copyArtifacts filter: '*.tar.gz', fingerprintArtifacts: true, projectName: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', target: 'Artifact'
-        //copyArtifacts(projectname: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', filter: "*.txt")
-
-
-//        script {
-//            step([$class: 'CopyArtifact', projectNAme: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', filter: 'output.txt', target: 'Child_job'])
-//        }
-
+    }
+    stage('pack_and_pub_res') {
+        parallel(
+                get_artifact: {
+                    sh "tar -xvzf Artifact/amiasnikovich-script.tar.gz tar"
+                    sh "-czvf pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz -C helloworld-project/helloworld-ws/target/helloworld-ws.war -C Artifact/output.txt -C /var/jenkins_home/workspace/EPBYMINW9149/mntlab-ci-pipeline@script/Jenkinsfile"
+                }
+        )
     }
 }

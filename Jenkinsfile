@@ -76,12 +76,14 @@ CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF
 """
                         sh "ls -al Dockerfile"
-                        sh "echo '--------------------------docker build start--------------------------'"
+                        sh "echo '--------------------------docker build startdocker home--------------------------'"
                        // sh "find / -name docker"
+                        def dockerHome = tool 'dockerTool'
+                        env.PATH = "${dockerHome}/bin:${env.PATH}"
                         def appImage = docker.build("tomcat_${student}")
                         appImage.tag
-
-                        //sh "docker build . -t tomcat_${student}"
+                        sh "echo '--------------------------docker build start--------------------------'"
+                        sh "docker build . -t tomcat_${student}"
                         sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                         sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                     }

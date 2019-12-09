@@ -66,7 +66,7 @@ node {
                             ]
                     ) {
                         node(label) {
-                           container('build_container') {
+                           container('docker') {
                                unstash('war')
                                unstash('docker')
                                sh '''

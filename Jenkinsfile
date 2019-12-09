@@ -133,6 +133,126 @@ node {
         }
         stage ('Deployment (rolling update, zero downtime)') {
             echo "Deployment (rolling update, zero downtime)"
+            'deploy image': {
+                podTemplate(label: label,
+                    containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
+                    ],
+                ) {
+            node(label2) {
+                stage('Deploy') {
+                    container('centos') {
+                        sh """
+                        yum install -y yum-utils
+                        cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+                        [kubernetes]
+                        name=Kubernetes
+                        baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+                        enabled=1
+                        gpgcheck=1
+                        repo_gpgcheck=1
+                        gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+                        """
+                        sh """
+                        yum install -y kubectl
+                        cat <<EOF | kubectl apply -f -
+                        ---
+                        apiVersion: v1
+                        kind: Namespace
+                        metadata:
+                        name: ayanchuk
+                        ---
+                        apiVersion: v1
+                        data:
+                        .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy1kb2NrLms4cy5wbGF5cGl0LmJ5OjgwIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
+                        kind: Secret
+                        metadata:
+                        name: docker-secret
+                        namespace: ayanchuk
+                        type: kubernetes.io/dockerconfigjson
+                        ---
+                        apiVersion: apps/v1
+                        kind: Deployment
+                        metadata:
+                        name: application
+                        namespace: ayanchuk
+                        spec:
+                        replicas: 1
+                        strategy:
+                        type: RollingUpdate
+                        rollingUpdate:
+                            maxSurge: 1
+                            maxUnavailable: 25%
+                        selector:
+                            matchLabels:
+                            app: application
+                        template:
+                            metadata:
+                            labels:
+                                app: application
+                            spec:
+                            containers:
+                                - name: hello-app
+                                image: nexus-dock.k8s.playpit.by:80/helloworld-shanchar:$BUILD_NUMBER
+                                ports:
+                                    - containerPort: 8080
+                                readinessProbe:
+                                httpGet:
+                                    path: /
+                                    port: 8080
+                                    initialDelaySeconds: 5
+                                    periodSeconds: 5
+                                    successThreshold: 1
+                                livenessProbe:
+                                    httpGet:
+                                    path: /helloworld-ws
+                                    port: 8080          
+                            imagePullSecrets:
+                            - name: docker-secret   
+                        ---
+                        apiVersion: v1
+                        kind: Service
+                        metadata:
+                        name: application-svc
+                        namespace: ayanchuk
+                        labels:
+                            app: application
+                        spec:
+                        ports:
+                        - name: application-svc
+                            port: 80
+                            targetPort: 8080
+                            protocol: TCP
+                        selector:
+                            app: application
+                        type: LoadBalancer
+                        ---
+                        apiVersion: extensions/v1beta1
+                        kind: Ingress
+                        metadata:
+                        name: application-ingress
+                        namespace: ayanchuk
+                        annotations:
+                            nginx.org/rewrites: serviceName=application-svc rewrite=/helloworld-ws/
+                        spec:
+                        rules:
+                        - host: ayanchuk-app.k8s.playpit.by
+                            http:
+                            paths: 
+                            - path: /
+                                backend:
+                                serviceName: application-svc
+                                servicePort: application-svc
+                        }
+                        """
+                    }
+                }
+            }
+            
+        }
+    }
+    }
         }
         stage ('Implement handling  errors on each stage') {
             echo "Implement handling  errors on each stage"

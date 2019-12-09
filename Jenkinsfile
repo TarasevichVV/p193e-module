@@ -1,28 +1,24 @@
 #!/usr/bin/env groovy
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+def student = "dprusevich"
 
-podTemplate(label: label,
-        containers: [
-                containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-            ],
-            volumes: [
-                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-            ]
-        ) {
-    node(label) {
-            stage('Sab') {
-                container('docker') {
-                    echo "Building docker image..."
-                    sh """
-                       hostname
-                       whoami
-                       env
-                       echo $PATH
-                       ps -ef 
-                       docker version
-                       """
-                }
-            }
+node {
+
+  stage ('Check out scm') {
+    checkout scm
+  }
+  stage('Build') {
+    git branch: 'dprusevich', url: 'https://github.com/MNT-Lab/build-t00ls'
+    sh '''
+    build_time="$(echo $(date +'%Y%m%d_%H:%M:%S'))"
+    version="$BUILD_NUMBER"
+    triggered_by="$(echo $(git --no-pager show -s --format='%an' $GIT_COMMIT))"
+    sed -i "s|<body>|&\\nversion=\"${version}\"  \\nBuildTime=\"${build_time}\" \\nTriggeredBy=\"$triggered_by\" |" helloworld-project/helloworld-ws/src/main/webapp/index.html
+    '''
+    withMaven(maven: "M3") {
+      sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean package"
     }
+  }
 }
+
+

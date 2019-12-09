@@ -10,17 +10,15 @@ def Dockerfile = """  FROM alpine
                     
                     CMD ["/opt/tomcat/bin/catalina.sh", "run"]
                  """
-def mvnHome = tool 'M3'
 node {
    stage('Preparation') {
       checkout scm
       // git branch: 'skudrenko', url: 'https://github.com/MNT-Lab/build-t00ls.git'
    }
    stage('Build code') {
-      // Run the maven build
-      withEnv(["MVN_HOME=$mvnHome"]) {
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'skudrenko'])
-        sh '"$MVN_HOME/bin/mvn" -f helloworld-project/helloworld-ws/pom.xml clean install -U'
+        withEnv(maven: 'M3') {
+            sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
          }
       }
 
@@ -34,19 +32,19 @@ node {
    stage ('Testing Phase II (Unit)') {
         parallel(
                 'Pre Integration': {
-                        withEnv(["MVN_HOME=$mvnHome"]) {
+                        withMaven(maven: 'M3') {
                                 sh '''
                                 echo "mvn pre-integration-test"
                                 '''
                         }
                 },
                 'Integration': {
-                        withEnv(["MVN_HOME=$mvnHome"]) {
+                        withMaven(maven: 'M3') {
                                 sh '"$MVN_HOME/bin/mvn" -f helloworld-project/helloworld-ws/pom.xml integration-test'
                         }
                 },
                 'Post Integration': {
-                        withEnv(["MVN_HOME=$mvnHome"]) {
+                        withMaven(maven: 'M3') {
                                 sh '''
                                 echo "mvn post-integration-test"
                                 '''
@@ -60,13 +58,10 @@ node {
                         copyArtifacts filter: 'output.txt', flatten: true, projectName: 'MNTLAB-skudrenko-child1-build-job', selector: workspace()
     }
 
-// stage ('Push the Artifact to Nexus') {
-//     parallel(
-//         'Generating TAR archive'
-//                         sh 'tar -zcvf pipeline-skudrenko-${BUILD_NUMBER}.tar.gz output.txt Jenkinsfile ./helloworld-ws/target/helloworld-ws.war'
+//stage ('Push the Artifact to Nexus') {
+//    parallel(
+//        'Generating TAR archive'
+//                        sh 'tar -zcvf pipeline-skudrenko-${BUILD_NUMBER}.tar.gz output.txt Jenkinsfile ./helloworld-ws/target/helloworld-ws.war'
 
 
 }
-
-
-

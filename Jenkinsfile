@@ -66,7 +66,10 @@ FROM tomcat:8.0
 MAINTAINER Dzmitry Prusevich
 COPY helloworld-ws.war /usr/local/tomcat/webapps/
     """
-    sh "cat Dockerfile"
+    sh """
+    curl -v -u admin:admin --upload-file pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz \
+    nexus.k8s.playpit.by/repository/maven-releases/app/"${student}"/"${BUILD_NUMBER}"/pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz
+    """
   }
 
 }

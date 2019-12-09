@@ -40,7 +40,7 @@ node {
                 },
                 'Integration': {
                         withMaven(maven: 'M3') {
-                                sh '"$MVN_HOME/bin/mvn" -f helloworld-project/helloworld-ws/pom.xml integration-test'
+                                sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'
                         }
                 },
                 'Post Integration': {
@@ -65,5 +65,3 @@ node {
 
 
 }
-
-

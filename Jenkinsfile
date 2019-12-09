@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-
+def student = dprusevich
 node {
 
   stage ('Preparation (Checking out)') {
@@ -8,7 +8,7 @@ node {
   }
   
   stage ('Building code') {
-    git branch: 'dprusevich', url: 'https://github.com/MNT-Lab/build-t00ls'
+    git branch: "${student}", url: 'https://github.com/MNT-Lab/build-t00ls'
     sh '''
     build_time="$(echo $(date +'%Y%m%d_%H:%M:%S'))"
     version="$BUILD_NUMBER"
@@ -36,6 +36,16 @@ node {
       }
     )
   }
-}
+
+  stage ('Triggering job and fetching artefact after finishing') {
+    build job: "MNTLAB-${student}-child1-build-job",
+    parameters: [ string(name: "BRANCH_NAME", value: "${student}") ], wait: true
+    copyArtifacts (projectName: "MNTLAB-${student}-child1-build-job", selector: lastSuccessful())
+    }
+  }
+
+
+
+
 
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env groovy
 
-def student = apavlovsky
+def student = 'apavlovsky'
 
 node {
     stage('Preparation (Checking out)'){
-        checkout scm
+        git branch: 'apavlovsky', url: 'https://github.com/MNT-Lab/build-t00ls.git'
     }
 
     stage('Building'){

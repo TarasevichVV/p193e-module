@@ -10,6 +10,14 @@ node {
 
         stage('2-Build') {
             git branch: "${student}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
+            sh """
+cat <<EOF >> helloworld-project/helloworld-ws/src/main/webapp/index.html
+<p> Author = "${student}" </p>
+<p> Job_Name = "$JOB_NAME" </p>
+<p> Build_Date = `date '+%A %d-%B, %Y'` </p>
+<p> VERSION = 0.1."$BUILD_NUMBER" </p>
+EOF
+"""
             withMaven(maven: "M3") { //maven3-6-3
                 sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
                 sh "echo --------------------final 1---------------------------"
@@ -65,16 +73,7 @@ curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz 
 """
                 },
                 '6-2-creating_docker': {
-/*                    sh """
-cat > Dockerfile <<EOF
-FROM tomcat
-RUN curl -u admin:admin -o pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz -L && \
-tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz && \
-#mv helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
-COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
-CMD bash /usr/local/tomcat/bin/catalina.sh run
-EOF
-"""*/
+
                     sh "echo '-----------------------------------------docker build list dockerfile--------------------------------------------'"
                     sh "ls -al Dockerfile"
                     def label = "docker-jenkins-${UUID.randomUUID().toString()}"
@@ -126,19 +125,7 @@ docker rmi helloworld-${student}:${BUILD_NUMBER}"
                             }
                         }
                     }
-                    /*sh "ls -al Dockerfile"
-                    sh "echo '--------------------------docker build startdocker home--------------------------'"
-                   // sh "find / -name docker"
-                    def dockerHome = tool 'dockerTool'
-                    env.PATH = "${dockerHome}/bin:${env.PATH}"
-                    def appImage = docker.build("tomcat_${student}")
-                    appImage.tag
-                    sh "echo '--------------------------docker build start--------------------------'"
-                    sh "docker build --group-add docker . -t tomcat_${student}"
-                    sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
-                    sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
-                }*/
-                }
+                 }
                     )
                         // }
 //            nexusArtifactUploader {
@@ -165,18 +152,12 @@ docker rmi helloworld-${student}:${BUILD_NUMBER}"
             timeout (time:1, unit:'MINUTES') {
                 input "Approve deploy to prod?", ok: 'Yes'
             }
-
         }
         stage('8-Deploy') {
             sh "echo deploy"
 
         }
-        // }
-        stage('9-Sending status') {
 
-            sh "echo Sending status"
-
-        }
         } catch (e) {
             String error = "${e}";
             emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}";', subject: 'Jenkins Error ${env.JOB_NAME} ', to: 'mk.elz@bk.com'

@@ -61,6 +61,8 @@ node {
     ls helloworld-project
     ls helloworld-project/helloworld-ws/
     ls helloworld-project/helloworld-ws/target/
+    ls helloworld-project/helloworld-ws/target/**/*.war
+    rm -f Dockerfile Jenkinsfile2 docker-deploy.yml docker-deploy2.yml jobs.groovy script.sh
     ls 
     """
 

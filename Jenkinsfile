@@ -90,7 +90,7 @@ node {
             node(nodelabel) {
               stage('build image') {
                 container('docker') {
-                  unstash "st_jdockerfile"
+                  unstash "st_dockerfile"
                   sh """
                     docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
                     docker login -u admin -p admin $nexusaddr

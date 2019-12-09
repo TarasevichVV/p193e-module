@@ -98,7 +98,8 @@ node {
                                     docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
                                     docker tag helloworld-phardzeyeu:${BUILD_NUMBER} nexus-dock.k8s.playpit.by:80/helloworld-phardzeyeu:${BUILD_NUMBER}
                                     docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
-                                    docker push nexus-dock.k8s.playpit.by:80/helloworld-phardzeyeu:${BUILD_NUMBER}                             
+                                    docker push nexus-dock.k8s.playpit.by:80/helloworld-phardzeyeu:${BUILD_NUMBER}
+                                    docker rmi nexus-dock.k8s.playpit.by:80/helloworld-phardzeyeu:${BUILD_NUMBER}
                                     """
                                 }
                             }

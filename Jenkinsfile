@@ -42,6 +42,7 @@ node {
     parameters: [ string(name: "BRANCH_NAME", value: "${student}") ], wait: true
     copyArtifacts (projectName: "MNTLAB-${student}-child1-build-job", selector: lastSuccessful())
     }
+    sh "ls"
   }
 
 

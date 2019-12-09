@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
-student='melizarov'
-mails_to_notify='mk-ez@mmmk.com'
+student = 'melizarov'
+mails_to_notify = 'mk-ez@mmmk.com'
 node {
     try {
         stage('1-Checkout') {
@@ -52,20 +52,20 @@ node {
         }*/
         stage('6-Archiving') {
             parallel(
-                    'archiving_artifact': {
-                        //sh 'find / -name Jenkinsfile -type f -exec ls -al {} '
-                        //sh 'find / -name output.txt'
-                        //sh 'find / -name *.war'
-                        sh """
+                'archiving_artifact': {
+                    //sh 'find / -name Jenkinsfile -type f -exec ls -al {} '
+                    //sh 'find / -name output.txt'
+                    //sh 'find / -name *.war'
+                    sh """
 tar zxvf ${student}_dsl_script.tar.gz
 cp /var/jenkins_home/workspace/EPBYMINW6852/mntlab-ci-pipeline@script/Jenkinsfile ./
 cp helloworld-project/helloworld-ws/target/helloworld-ws.war ./
 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile
 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
 """
-                    },
-                    'creating_docker': {
-                        sh """
+                },
+                'creating_docker': {
+                    sh """
 cat > Dockerfile <<EOF
 FROM tomcat
 RUN curl -u admin:admin -o pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz -L && \
@@ -75,20 +75,46 @@ COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat
 CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF
 """
-                        sh "ls -al Dockerfile"
-                        sh "echo '--------------------------docker build startdocker home--------------------------'"
-                       // sh "find / -name docker"
-                        def dockerHome = tool 'dockerTool'
-                        env.PATH = "${dockerHome}/bin:${env.PATH}"
-                        def appImage = docker.build("tomcat_${student}")
-                        appImage.tag
-                        sh "echo '--------------------------docker build start--------------------------'"
-                        sh "docker build --group-add docker . -t tomcat_${student}"
-                        sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
-                        sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
+                    sh "echo '--------------------------docker build startdocker home--------------------------'"
+                    def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+
+                    podTemplate(label: label,
+                        containers: [
+                            containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                            containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+                        ],
+                        volumes: [
+                                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                        ]
+                    ) {
+                        node(label) {
+                            stage('Docker Build') {
+                                container('docker') {
+                                    echo "Building docker image..."
+                                    sh """
+                    sh "docker build --group-add docker . -t tomcat_${student}"
+                    sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
+                    sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+                   """
+                                }
+                            }
+                        }
                     }
-            )
-       // }
+                    /*sh "ls -al Dockerfile"
+                    sh "echo '--------------------------docker build startdocker home--------------------------'"
+                   // sh "find / -name docker"
+                    def dockerHome = tool 'dockerTool'
+                    env.PATH = "${dockerHome}/bin:${env.PATH}"
+                    def appImage = docker.build("tomcat_${student}")
+                    appImage.tag
+                    sh "echo '--------------------------docker build start--------------------------'"
+                    sh "docker build --group-add docker . -t tomcat_${student}"
+                    sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
+                    sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
+                }*/
+                }
+                    )
+                        // }
 //            nexusArtifactUploader {
 //                nexusVersion('nexus2')
 //                protocol('http')
@@ -105,15 +131,16 @@ EOF
 //                }
 //                //nexusArtifactUploader artifacts: [[artifactId: 'GZIP', classifier: '', file: 'pipeline-${student}-${BUILD_NUMBER}.tar.gz', type: 'tar.gz']], credentialsId: 'nexus-cred', groupId: 'Hllo_ws', nexusUrl: 'nexus.k8s.playpit.by', nexusVersion: 'nexus2', protocol: 'http', repository: 'maven-releases/app/${student}/${BUILD_NUMBER}/', version: '0.1'}
 //            }
-        }
-        stage('7-Asking approval') {
-
-            sh "echo Asking"
 
         }
-        stage('8-Deploy') {
-            sh "echo deploy"
-            sh '''cat > Dockerfile <<EOF
+                    stage('7-Asking approval') {
+
+                        sh "echo Asking"
+
+                    }
+                    stage('8-Deploy') {
+                        sh "echo deploy"
+                        sh '''cat > Dockerfile <<EOF
 FROM tomcat
 RUN curl -u admin:admin -o pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz -L && \
 tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz && \
@@ -121,25 +148,25 @@ tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz && \
 COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
 CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF'''
-            sh "whereis docker"
-            sh "docker build -t tomcat_${student} ."
-            sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
-            sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
-        }
-       // }
-        stage('9-Sending status') {
+                        sh "whereis docker"
+                        sh "docker build -t tomcat_${student} ."
+                        sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
+                        sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
+                    }
+                    // }
+                    stage('9-Sending status') {
 
-            sh "echo Sending status"
+                        sh "echo Sending status"
 
-        }
-    } catch (e) {
-        String error = "${e}";
-        emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}";', subject: 'Jenkins Error ${env.JOB_NAME} ', to: 'mk.elz@bk.com'
-        // Make the string with job info, example:
-        // ${env.JOB_NAME}
-        // ${env.BUILD_NUMBER}
-        // ${env.BUILD_URL}
-        // and other variables in the code
+                    }
+        } catch (e) {
+            String error = "${e}";
+            emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}";', subject: 'Jenkins Error ${env.JOB_NAME} ', to: 'mk.elz@bk.com'
+            // Make the string with job info, example:
+            // ${env.JOB_NAME}
+            // ${env.BUILD_NUMBER}
+            // ${env.BUILD_URL}
+            // and other variables in the code
 /*        mail bcc: '',
                 cc: '',
                 charset: 'UTF-8',
@@ -150,6 +177,6 @@ EOF'''
                 to: "${mails_to_notify}",
                 //body: "<b>${pivote}</b><br>\n\nError mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}";
                 body: "<br>\n\nError mesage: ${error}\n\n<br>Project: ${JOB_NAME} <br>Build Number: ${BUILD_NUMBER} <br> URL de build: ${BUILD_URL}";*/
-        //error "${error}"
+            //error "${error}"
+        }
     }
-}

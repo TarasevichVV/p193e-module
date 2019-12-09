@@ -106,6 +106,7 @@ EOF
                                     echo "6-2-1--b:  Building docker image...---tomcat_${student}----"
 
                                     sh """
+                    echo "build in docker pod: "
                     sh pwd ; sh "ls -al Docker*"
                     sh "docker build . -t tomcat_${student}"
                     sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"

@@ -48,6 +48,7 @@ node {
 
                     stash includes: "clear_project/helloworld-ws/target/helloworld-ws.war", name: "war"
 
+
                 },
 
                 create_container: {
@@ -63,6 +64,12 @@ node {
                         node(label) {
                            container('docker') {
                                unstash "war"
+                               sh ''' cat <<EOF > Dockerfile
+                               FROM tomcat:8.0
+                               COPY *.war /usr/local/tomcat/webapps/
+                               EXPOSE 8080
+                               CMD ["catalina.sh", "run"]
+                               '''
                                sh '''
                                 docker build -t nexus-dock.k8s.playpit.by:80/helloworld-amiasnikovich:$BUILD_NUMBER .
                                 docker login -u admin -p admin nexus-dock.k8s.playpit.by:80

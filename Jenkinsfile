@@ -46,9 +46,6 @@ node {
                 stash includes: "pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz", name: "artefact_targz"
             },
             dock: {
-                sh '''
-                    echo "Where is ur Docker image?"
-                    '''
                 podTemplate(label: label,
                         containers: [
                             containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
@@ -78,7 +75,7 @@ node {
                     // docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
                     // docker login -u admin -p nexus 192.168.56.106:30083
                     // docker push 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
-
+                sh 'ls -lha'
             }
         )
     }

@@ -158,7 +158,9 @@ docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUM
                     stage('7-Asking approval') {
 
                         sh "echo Asking"
-                        input "Approve deploy to prod?"
+                        timeout (time:1, unit:'MINUTES') {
+                            input "Approve deploy to prod?"
+                        }
 
                     }
                     stage('8-Deploy') {

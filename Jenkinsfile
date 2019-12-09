@@ -68,23 +68,58 @@ node {
             failFast: false
             blocking: true
             build job: 'MNTLAB-ayanchuk-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "$BRANCH_NAME"]]
-            copyArtifacts(projectName: 'MNTLAB-ayanchuk-child1-build-job')
+            copyArtifacts(projectName: 'MNTLAB-ayanchuk-child1-build-job', selector: lastCompleted())
+            stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "app"
         }
         stage ('Packaging and Publishing results') {
             parallel(
                 'Create docker image': {
-                    sh 'echo "Create Docker Image"'
+                    podTemplate(label: label,
+                        containers: [
+                                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                                    containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
+                            ],
+                            volumes: [
+                                    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+//                                    hostPathVolume(hostPath: "${WORKSPACE}/helloworld-project/helloworld-ws/target/helloworld-ws.war", mountPath: '/helloworld-ws.war')
+                            ])
+
+                            {
+                                node(label) {
+                                    container('docker') {
+                                        unstash "app"
+                                        sh """
+                                        cat <<EOF > /Dockerfile
+                                        FROM alpine
+                                        RUN apk update && apk add wget tar openjdk8 && \
+                                        wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz && \
+                                        tar -xvf apache-tomcat-8.5.20.tar.gz && \
+                                        mkdir /opt/tomcat && \
+                                        mv apache-tomcat*/* /opt/tomcat/
+                                        COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /opt/tomcat/webapps/
+                                        EXPOSE 80:8080
+                                        HEALTHCHECK CMD curl --fail http://localhost:8080/ || exit 1
+                                        CMD ["/opt/tomcat/bin/catalina.sh", "run"]
+                                        """
+//                                        sh "docker login -u admin -p admin nexus-dock.k8s.playpit.by:80"
+                                        sh "docker build -f /Dockerfile -t nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUMBER ."
+                                        sh "docker images"
+                                        sh "docker push nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUMBER"
+                                        sh "docker rmi nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUMBER"
+
+                                    }
+
+                                }
+                            }
+
+
+
                 },
                 'Create tar.gz': {
                     sh 'echo "unzip"'
                     sh 'tar -xvzf script.tar.gz; ls -ahl'
-//                    sh "find ./ -name helloworld-ws.war"
-//                    sh 'tar -cvf "pipeline-ayanchuk-${currentBuild.number}.tar" -C helloworld-project/helloworld-ws/target helloworld-ws.war'
-//                    sh 'tar -rf "pipeline-ayanchuk-${currentBuild.number}.tar" -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-dsl Jenkinsfile'
-//                    sh 'tar -rf "pipeline-ayanchuk-${currentBuild.number}.tar" output.txt ; gzip "pipeline-ayanchuk-${currentBuild.number}.tar"'
                     sh 'echo "create gz"'
                     sh "tar -cvzf pipeline-ayanchuk-${currentBuild.number}.tar.gz output.txt -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-pipeline@script/ Jenkinsfile -C ${WORKSPACE}/helloworld-project/helloworld-ws/target/ helloworld-ws.war" 
-//                    -C /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-dsl/ Jenkinsfile'
                     sh 'echo "deplpoy Artifact Archive"'
                     sh "curl -v -u admin:admin --upload-file pipeline-ayanchuk-${currentBuild.number}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/ayanchuk/${currentBuild.number}/pipeline-ayanchuk-${currentBuild.number}.tar.gz"
                 }
@@ -101,7 +136,7 @@ node {
         }
         stage ('Push functionality') {
             echo "Push functionality"
-            sh "kubectl get po -A"
+//            sh "kubectl get po -A"
         }
     }
 }

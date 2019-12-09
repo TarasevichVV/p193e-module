@@ -11,6 +11,7 @@ node {
     ])
     stash 'mnt-source'
     sh "ls -la"
+    stash includes: "Dockerfile", name: "file1"
   }
 
   stage('02 Building code') {
@@ -60,11 +61,13 @@ node {
 // Jenkinsfile
     writeFile file: "Jenkinsfile", text: "For testing purposes."
     sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile"
+// -- DELETE --
 /*    sh """
     echo "FROM tomcat:8.0" > Dockerfile
     echo "COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/" >> Dockerfile
-    """ */
-    stash includes: "Dockerfile", name: "file1"
+//    """ */
+//    stash includes: "Dockerfile", name: "file1"
+// -- --
     stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"
 
     def nodelabel = "buildnode"

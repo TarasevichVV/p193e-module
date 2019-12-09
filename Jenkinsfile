@@ -54,7 +54,7 @@ node {
     }
 
     stage ('Triggering job and fetching artifact after finishing') {
-                        build job: 'MNTLAB-skudrenko-child1-build-job', wait: true
+                        build job: 'MNTLAB-skudrenko-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'skudrenko']], wait: true;
                         copyArtifacts filter: 'output.txt', flatten: true, projectName: 'MNTLAB-skudrenko-child1-build-job', selector: workspace()
     }
 
@@ -65,3 +65,5 @@ node {
 
 
 }
+
+

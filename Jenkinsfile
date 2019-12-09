@@ -89,7 +89,7 @@ node {
               echo "-----"
               docker images
               echo "-----"
-              docker login -u admin -p admin $nexusaddr2
+              docker login -u admin -p admin --insecure-registry $nexusaddr2
               docker push $nexusaddr2/helloworld-$student:$BUILD_NUMBER
               """
           }

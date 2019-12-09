@@ -81,4 +81,9 @@ node {
                 }
         )
     }
+    stage('approval') {
+        timeout(time: 10, unit: 'MINUTES'){
+            input(id: 'Deployment', message: 'Deploy or not?', ok: 'Deploy')
+        }
+    }
 }

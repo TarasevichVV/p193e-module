@@ -133,12 +133,11 @@ node {
         }
         stage ('Deployment (rolling update, zero downtime)') {
             echo "Deployment (rolling update, zero downtime)"
-            'deploy image': {
-                podTemplate(label: label,
-                    containers: [
-                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                        containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
-                    ],
+            podTemplate(label: label2,
+                containers: [
+                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                    containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
+                ],
                 ) {
             node(label2) {
                 stage('Deploy') {
@@ -252,8 +251,6 @@ node {
             
         }
     }
-    }
-        }
         stage ('Implement handling  errors on each stage') {
             echo "Implement handling  errors on each stage"
         }

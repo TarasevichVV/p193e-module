@@ -8,7 +8,7 @@ node {
     }
     stage ('Build') {
         sh '''
-        cat < EOF >> helloworld-project/helloworld-ws/src/main/webapp/index.html
+        cat << EOF >> helloworld-project/helloworld-ws/src/main/webapp/index.html
         </p>
         <b> Custom page by ANikitsenka </b>
         </p>

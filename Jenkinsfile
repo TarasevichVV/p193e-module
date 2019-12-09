@@ -40,9 +40,9 @@ node('master') {
 
     stage('Sonar scan') {
         echo 'Sonar scan'
-//        def ST = tool 'Scanner-of-K8s-Sonar';
+        def SH = tool ${SonarTool};
         withSonarQubeEnv("${SonarName}") {
-            sh "tool ${tool ${SonarTool}}/bin/sonar-scanner -Dsonar.projectKey=ekomarov_task-11:helloworld-ws -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -Dsonar.sources=helloworld-project/helloworld-ws/src"
+            sh "${SH}/bin/sonar-scanner -Dsonar.projectKey=ekomarov_task-11:helloworld-ws -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -Dsonar.sources=helloworld-project/helloworld-ws/src"
         }
     }
     stage('Testing') {

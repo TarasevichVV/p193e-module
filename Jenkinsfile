@@ -17,7 +17,7 @@ node {
     cat helloworld-project/helloworld-ws/src/main/webapp/index.html
     '''
     withMaven(maven: "M3") {
-      sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean package"
+      sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
     }
   }
 /*
@@ -58,7 +58,6 @@ node {
     tar -zxvf "${student}"_dsl_script.tar.gz output.txt
     cat output.txt
     cp "${JENKINS_HOME}"/workspace/EPBYMINW8538/mntlab-ci-pipeline@script/Jenkinsfile .
-    cat Jenkinsfile
     cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
     ls 
     """

@@ -118,7 +118,7 @@ node {
                         curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
                         chmod +x ./kubectl
                         mv ./kubectl /usr/local/bin/kubectl
-                        sed -i "s/IMAGE/nexus-dock.k8s.playpit.by:80/vtarasevich/app:${currentBuild.number}/" tomcat.yaml
+                        sed -i "s%IMAGE%nexus-dock.k8s.playpit.by:80/vtarasevich/app:${currentBuild.number}%" tomcat.yaml
                         kubectl apply -f docker-deploy.yml
                         """
                     }

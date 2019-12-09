@@ -98,7 +98,6 @@ node('master') {
                                 stage('Docker Build') {
                                     container('docker') {
                                     unstash "target_war"
-                                    //sh 'ls'
                                     sh """
                                     echo "${Dockerfiletemplate}" > Dockerfile
                                     docker build -t helloworld-${student_branch}:${BUILD_NUMBER} .
@@ -127,12 +126,12 @@ node('master') {
         currentBuild.result = 'FAILURE'
     }
     finally { 
-        // stage('Sending email'){
-        //     emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-        //     mimeType: 'text/html',
-        //         subject: "$currentBuild.result: Job '${currentBuild.fullDisplayName} ${currentBuild.number}' Stage:'${stage}'",
-        //     to: "${mail_to}",
-        //     recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-        // }
+        stage('Sending email'){
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+            mimeType: 'text/html',
+                subject: "$currentBuild.result: Job '${currentBuild.fullDisplayName} ${currentBuild.number}' Stage:'${stage}'",
+            to: "${mail_to}",
+            recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+        }
     } 
 }

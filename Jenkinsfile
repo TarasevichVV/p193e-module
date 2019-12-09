@@ -43,10 +43,12 @@ node {
   }
 
   stage('05 Triggering job and fetching artefact') {
-    build job: "${job_to_use}", parameters: [
+/*     build job: "${job_to_use}", parameters: [
       [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]//, wait: true by default
     ]
-    copyArtifacts projectName: "${job_to_use}", selector: lastCompleted()
+    copyArtifacts projectName: "${job_to_use}", selector: lastCompleted() */
+    //
+    writeFile file: "output.txt", text: "output.txt For testing purposes."
     archiveArtifacts '*'
   }
 
@@ -84,13 +86,16 @@ node {
               find / -iname 'Dockerfile*'
               docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
               echo "-----"
+              docker images
               echo "-----"
+              docker login -u admin -p admin $nexusaddr
+              docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER 
               """
           }
         }
       }
     }
-//              docker images
+
 //             docker login -u admin -p admin $nexusaddr
 
 /*     wrappers {

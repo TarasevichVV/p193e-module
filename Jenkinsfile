@@ -17,6 +17,7 @@ node {
    }
    stage('Build code') {
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'skudrenko'])
+        stash includes: "Jenkinsfile", name: "jkf"
         withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
@@ -64,9 +65,12 @@ node {
 stage('Packaging and Publishing results'){
         parallel(
             'Creating tar gz': {
-                sh "tar xvzf  skudrenko_dsl_script.tar.gz"
-                sh "tar cvzf pipeline-skudrenko-${BUILD_NUMBER}.tar.gz output.txt Jenkinsfile helloworld-project/helloworld-ws/target/helloworld-ws.war"
-                sh "curl -v -u admin:admin --upload-file pipeline-skudrenko-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/skudrenko/${BUILD_NUMBER}/pipeline-skudrenko-${BUILD_NUMBER}.tar.gz"
+                unstash "jkf"
+                sh '''
+                tar xvzf  skudrenko_dsl_script.tar.gz"
+                tar cvzf pipeline-skudrenko-${BUILD_NUMBER}.tar.gz output.txt Jenkinsfile helloworld-project/helloworld-ws/target/helloworld-ws.war
+                curl -v -u admin:admin --upload-file pipeline-skudrenko-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/skudrenko/${BUILD_NUMBER}/pipeline-skudrenko-${BUILD_NUMBER}.tar.gz
+                '''
                 },
             'Creating Docker Image':  {
                 podTemplate(label: label,

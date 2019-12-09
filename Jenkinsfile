@@ -101,10 +101,10 @@ COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat
 CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF
 
-docker build . -t tomcat_${student}
-docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
-docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
-"""/*
+#docker build . -t helloworld-${student}:${BUILD_NUMBER}
+#docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+#docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+"""
                                     echo "6-2-1--a: dockerfile:"
                                     sh "ls -al Dockerfile"
                                     echo "6-2-1--b:  Building docker image...---tomcat_${student}----"
@@ -112,11 +112,11 @@ docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUM
                                     sh """
                     echo "build in docker pod:  "
                     pwd  
-                    "ls -al Docker*"
-                    sh "docker build . -t tomcat_${student}"
-                    sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
-                    sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
-                   """*/
+                    ls -al Docker*"
+                    docker build . -t helloworld-${student}:${BUILD_NUMBER}
+                    docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+                    docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+                   """
                                 }
                             }
                         }

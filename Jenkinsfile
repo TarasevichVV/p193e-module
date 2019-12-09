@@ -59,9 +59,12 @@ node {
 
   stage('05 Triggering job and fetching artefact') {
 // WORKING --
-    build job: "${job_to_use}", parameters: [
-      [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]//, wait: true by default
-    ], wait: true
+    catchError {
+      build job: "${job_to_use}", parameters: [
+        [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]//, wait: true by default
+      ], wait: true
+    }
+    step([$class: 'Mailer', recipients: 'alert@no.email'])
     copyArtifacts projectName: "${job_to_use}", selector: lastCompleted()
     stash includes: "*.txt", name: "st_output"
     archiveArtifacts '*'
@@ -88,7 +91,7 @@ node {
             hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
             ]) {
             node(nodelabel) {
-              stage('build image') {
+//              stage('build image') {
                 container('docker') {
                   unstash "st_dockerfile"
                   unstash "st_warfile"
@@ -98,9 +101,9 @@ node {
                     docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
                     """
                 }
-              }
+//              }
             }
-          } 
+          }
       }
     )
   }

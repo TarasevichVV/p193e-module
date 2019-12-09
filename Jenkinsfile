@@ -118,7 +118,7 @@ node {
             }
         currentBuild.result = 'SUCCESS'
     }
-    catch (Exception err) {
+    catch (err) {
         currentBuild.result = 'FAILURE'
     }
     finally {

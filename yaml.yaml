@@ -56,13 +56,13 @@ spec:
   selector:
     app: shanchar-deploy
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: shanchar-ingress
   namespace: shanchar
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: serviceName=shanchar-svc rewrite=/helloworld-ws/
+    ingress.kubernetes.io/rewrite-target: serviceName=shanchar-svc rewrite=/helloworld-ws/
 spec:
   rules:
   - host: shanchar-app.k8s.playpit.by    

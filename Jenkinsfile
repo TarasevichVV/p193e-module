@@ -6,6 +6,8 @@ node {
     
     stage ('Preparation (Checking out)') {
       checkout scm
+      sh "ls -la"
+      sh "pwd"      
       sh "echo -e 'BUILD NUMBER: $BUILD_NUMBER \nAuthor=${student}' >> index.html"
       sh "mv index.html helloworld-project/helloworld-ws/src/main/webapp/index.html"
     }

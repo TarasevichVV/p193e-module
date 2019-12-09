@@ -119,7 +119,7 @@ node {
                         chmod +x ./kubectl
                         mv ./kubectl /usr/local/bin/kubectl
                         sed -i "s%IMAGE%nexus-dock.k8s.playpit.by:80/vtarasevich/app:${currentBuild.number}%" tomcat.yaml
-                        kubectl apply -f docker-deploy.yml
+                        kubectl apply -f tomcat.yaml
                         """
                     }
                 }

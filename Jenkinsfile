@@ -21,6 +21,7 @@ node {
         checkout scm
     }
     stage ('building_code') {
+        
         git ([url: 'https://github.com/MNT-Lab/p193e-module.git', branch: 'phardzeyeu'])
         stash includes: "Jenkinsfile", name: "jfile"
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
@@ -111,6 +112,10 @@ node {
         }
     }
     stage ('deploy') {
-        sh "echo norm"
+        sh """
+        kubectl create namespace phardzeyeu
+        kubectl apply -f tomcat.yaml 
+        kubectl apply -f service.yaml 
+        """
     }
 }

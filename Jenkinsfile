@@ -106,7 +106,7 @@ COPY helloworld-ws.war /usr/local/tomcat/webapps/
     }
   )
   }
-
+/*
   stage ('Asking for manual approval') {
     echo "building of image with application is ready"
     script {
@@ -115,6 +115,33 @@ COPY helloworld-ws.war /usr/local/tomcat/webapps/
       echo "next stage"}
     }
   }
+*/
+
+  stage ('Deployment (rolling update, zero downtime)') {
+    podTemplate(label: deploy,
+    containers: [
+      containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+      containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+    ],
+    volumes: [
+      hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+    ]
+    ) {
+    node(deploy) {
+      container('docker') {
+      echo "Building docker image..."
+      sh """
+yum install -y curl 
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+kubectl version
+"""
+          }
+        }
+      }
+    }
+
 }
 
 

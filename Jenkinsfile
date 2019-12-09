@@ -90,7 +90,7 @@ node {
                                 container('docker') {
                                     echo "Building docker image..."
                                     sh """
-                                    cat << EOF > Dockerfile 
+                                    cat <<EOF >Dockerfile 
                                     FROM alpine
 
                                     RUN apk update && apk add wget tar openjdk8 && \

@@ -105,12 +105,11 @@ node {
                 }
         )
     }
-}
-// Input Step
-timeout(time: 5, unit: "MINUTES") {
-    input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
-}
-node {
+    stage ('asking_for_manual_approval') {
+        timeout(time: 5, unit: "MINUTES") {
+            input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
+        }
+    }
     stage ('deploy') {
         sh "echo norm"
     }

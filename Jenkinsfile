@@ -126,6 +126,7 @@ Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) *
       }
     }
   }
+}
 
 /*           sed -i "s|helloworld-${student}|helloworld-${student}:$BUILD_NUMBER|" app-dpl.yml
           kubectl apply -f app-dpl.yml */

@@ -22,12 +22,12 @@ node {
          }
       }
 
-   stage('Testing Phase I (Sonar)'){
-        def scannerHome = tool 'Sonar';
-        withSonarQubeEnv(){
-            sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=skudrenko -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
-        }
-    }
+//   stage('Testing Phase I (Sonar)'){
+//        def scannerHome = tool 'Sonar';
+//        withSonarQubeEnv(){
+//            sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=skudrenko -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+//        }
+//    }
 
    stage ('Testing Phase II (Unit)') {
         parallel(

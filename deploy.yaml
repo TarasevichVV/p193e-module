@@ -71,7 +71,7 @@ metadata:
   name: application-ingress
   namespace: ayanchuk
   annotations:
-    nginx.ingress.kubernetes.io/app-root: /helloworld-ws
+ nginx.org/rewrites: serviceName=application-svc rewrite=/helloworld-ws/
 spec:
   rules:
   - host: ayanchuk-app.k8s.playpit.by

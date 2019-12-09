@@ -9,6 +9,7 @@ node {
       branches: [[name: 'origin/ibletsko']],
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]
     ])
+    sh "ls -la"
     stash includes: "Jenkinsfile", name: "st_jenkinsfile"
     stash includes: "Dockerfile", name: "st_dockerfile"
     stash includes: "*.yml", name: "st_yamls"
@@ -71,7 +72,10 @@ node {
 //    writeFile file: "Jenkinsfile", text: "For testing purposes."
         unstash "st_jenkinsfile"
         unstash "st_output"
-        sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile"
+        sh """
+          tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile
+          curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
+          """
       },
       "parallel 2: image" : {
         def nodelabel = "buildnode"

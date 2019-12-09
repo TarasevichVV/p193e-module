@@ -9,20 +9,19 @@ node {
       branches: [[name: 'origin/ibletsko']],
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
     ])
+    stash includes: "Dockerfile", name: "file1"
     stash 'mnt-source'
     sh "ls -la"
-    stash includes: "Dockerfile", name: "file1"
   }
 
   stage('02 Building code') {
     withMaven(maven: 'M3') {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
     }
-//    sh "ls -la"
-//    sh "ls helloworld-project/helloworld-ws/"
   }
 
   stage('03 Sonar scan') {
+// WORKING --
 /*     def scannerHome = tool 'Sonar';
     withSonarQubeEnv('Sonar') {
       sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarcheck -Dsonar.sources=helloworld-project/helloworld-ws/src -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
@@ -36,6 +35,7 @@ node {
       },
       "parallel 2" : {
         withMaven(maven: 'M3') {
+// WORKING --
 //          "sh 'mvn integration-test'"
         }
       },
@@ -46,6 +46,7 @@ node {
   }
 
   stage('05 Triggering job and fetching artefact') {
+// WORKING --
 /*     build job: "${job_to_use}", parameters: [
       [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]//, wait: true by default
     ]
@@ -56,11 +57,39 @@ node {
   }
 
   stage('06 Packaging and Publishing results') {
-// ! PARALLEL !
-// ------------
-// Jenkinsfile
-    writeFile file: "Jenkinsfile", text: "For testing purposes."
-    sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile"
+    parallel (
+      "parallel 1: archiving" : {
+//    writeFile file: "Jenkinsfile", text: "For testing purposes."
+        sh "tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile"
+      },
+      "parallel 2: image" : {
+        def nodelabel = "buildnode"
+        def nexusaddr = "nexus-dock.k8s.playpit.by:80"
+        sh "echo parallel 2: image"
+        /* podTemplate (label: nodelabel, containers: [
+          containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
+          ],
+          volumes: [
+            hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
+            ]) {
+            node(nodelabel) {
+              stage('build image') {
+                container('docker') {
+                  unstash 'file1'
+                  unstash 'file2'
+                  sh """
+                    docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
+                    docker login -u admin -p admin $nexusaddr
+                    docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
+                    """
+                }
+              }
+            }
+          } */
+      }
+    )
+    stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"
+
 // -- DELETE --
 /*    sh """
     echo "FROM tomcat:8.0" > Dockerfile
@@ -68,33 +97,10 @@ node {
 //    """ */
 //    stash includes: "Dockerfile", name: "file1"
 // -- --
-    stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"
-
-    def nodelabel = "buildnode"
-    def nexusaddr = "nexus-dock.k8s.playpit.by:80"
-/*     podTemplate (label: nodelabel, containers: [
-      containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
-    ],
-    volumes: [
-      hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
-      ]) {
-      node(nodelabel) {
-        stage('build image') {
-          container('docker') {
-            unstash 'file1'
-            unstash 'file2'
-            sh """
-              docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
-              docker login -u admin -p admin $nexusaddr
-              docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
-              """
-          }
-        }
-      }
-    } */
   }
 
   stage('07 Asking for manual approval') {
+// WORKING --
 /*     script {
       timeout(time: 5, unit: 'MINUTES') {
         input(id: "Deploy Gate", message: "Deploy ${currentBuild.projectName}?", ok: 'Deploy')

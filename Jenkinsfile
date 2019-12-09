@@ -18,7 +18,7 @@ node {
     '''
     withMaven(maven: "M3") {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
-      sh "ls helloworld-project/helloworld-ws/target/" 
+      sh "cp helloworld-project/helloworld-ws/target/*.war ." 
     }
   }
 /*
@@ -63,7 +63,6 @@ node {
     ls helloworld-project/helloworld-ws/
     ls helloworld-project/helloworld-ws/target/
     ls helloworld-project/helloworld-ws/target/helloworld-ws/
-    rm -f Dockerfile Jenkinsfile2 docker-deploy.yml docker-deploy2.yml jobs.groovy script.sh
     ls 
     """
 

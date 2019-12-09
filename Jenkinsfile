@@ -23,7 +23,7 @@ node {
     }
     stage ('2.building_code') {
         git ([url: 'https://github.com/Gardej/jenkins.git', branch: 'master'])
-        stash includes: "tomcat.yaml", name: "tomcatyaml"
+        stash includes: "tomcat.yml", name: "tomcat"
         git ([url: 'https://github.com/MNT-Lab/p193e-module.git', branch: 'phardzeyeu'])
         stash includes: "Jenkinsfile", name: "jfile"
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
@@ -126,7 +126,7 @@ node {
             node(label2) {
                 stage('8.1.deployment') {
                     container('centos') {
-                        unstash "tomcatyaml"
+                        unstash "tomcat"
                         sh """
                         curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
                         chmod +x ./kubectl

@@ -89,6 +89,43 @@ stage ('packaging_and_publishing_results'){
                         }
                     }
                 }
+        )
+            }
+
+stage('Packaging and Publishing results'){
+        parallel(
+            'Creating tar gz': {
+                sh "tar xvzf  skudrenko_dsl_script.tar.gz"
+                sh "tar cvzf pipeline-skudrenko-${BUILD_NUMBER}.tar.gz output.txt Jenkinsfile helloworld-project/helloworld-ws/target/helloworld-ws.war"
+                sh "curl -v -u admin:admin --upload-file pipeline-skudrenko-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/skudrenko/${BUILD_NUMBER}/pipeline-skudrenko-${BUILD_NUMBER}.tar.gz"
+                },
+            'Creating Docker Image':  {
+                podTemplate(label: label,
+                    containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
+                    ],
+                    volumes: [
+                        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
+                    ]){
+                        node(label) {
+                            stage('Docker Build') {
+                                container('docker') {
+                                unstash "war"
+                                unstash "Dockerfile"
+                                sh 'ls'
+                                sh """
+                                docker build -t skudrenko/app .
+                                docker tag skudrenko/app:latest nexus-dock.k8s.playpit.by:80/skudrenko/app:${BUILD_NUMBER}
+                                docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                                docker push nexus-dock.k8s.playpit.by:80/skudrenko/app:${BUILD_NUMBER}
+                                """
+                                }
+                            }
+                        }
+                    }
+                }
             )
-         }
+        }
+
 }

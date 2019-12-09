@@ -10,7 +10,7 @@ node {
         }
     }
     stage('Sonar scan'){
-        def scannerHome = tool 'SonarQ';
+        def scannerHome = tool 'Sonar';
         withSonarQubeEnv(){
             sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=anikitsenka -Dsonar.sources=helloworld-project/helloworld-ws/src -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
         }
@@ -51,7 +51,7 @@ node {
                     // docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
                     // docker login -u admin -p nexus 192.168.56.106:30083
                     // docker push 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
-                
+
             }
         )
     }

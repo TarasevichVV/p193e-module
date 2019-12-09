@@ -40,9 +40,9 @@ node {
     stage('pack_and_pub_res') {
         parallel(
                 get_artifact: {
-                    sh "tar -xvzf Artifact/amiasnikovich-script.tar.gz -C ."
-                    sh "cp helloworld-project/helloworld-ws/target/helloworld-ws.war ."
-                    sh "cp /var/jenkins_home/workspace/EPBYMINW9149/mntlab-ci-pipeline@script/Jenkinsfile ."
+                    sh "tar -xvzf Artifact/amiasnikovich-script.tar.gz -C ./"
+                    sh "cp helloworld-project/helloworld-ws/target/helloworld-ws.war ./"
+                    sh "cp /var/jenkins_home/workspace/EPBYMINW9149/mntlab-ci-pipeline@script/Jenkinsfile ./"
                     sh "tar -czvf pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile"
                     sh "curl -v -u admin:admin --upload-file pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/amiasnikovich/${BUILD_NUMBER}/pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz"
                     File file = new File('Dockerfile')

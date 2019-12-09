@@ -75,6 +75,7 @@ COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat
 CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF
 """
+                        sh "ls -al Dockerfile"
                         sh "echo '--------------------------docker build start--------------------------'"
                         sh "find / -name docker"
                         sh "docker build -t tomcat_${student} ."

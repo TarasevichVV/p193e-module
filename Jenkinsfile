@@ -9,12 +9,12 @@ node {
     stage ('Build') {
         sh '''
         cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
-        </p>
-        <b> Custom page by ANikitsenka </b>
-        </p>
-        <p> JOB_NAME = "$JOB_NAME" </p>
-        <p> Created "$(date)" </p>
-        <p> Minor version "$BUILD_ID" </p>
+            <p></p>
+            <b> Custom page by ANikitsenka </b>
+            <p></p>
+            <p> JOB_NAME = "$JOB_NAME" </p>
+            <p> Created "$(date)" </p>
+            <p> Minor version "$BUILD_ID" </p>
         EOF
         '''
         withMaven(maven: 'M3'){
@@ -42,8 +42,7 @@ node {
     }
     stage('Triggering job and fetching artefact after finishing'){
         build job: "MNTLAB-anikitsenka-child1-build-job", parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "anikitsenka"]], wait: true;
-        copyArtifacts(filter:'*', projectName: 'MNTLAB-anikitsenka-child1-build-job', selector: lastSuccessful());
-        sh 'ls -lha'
+        copyArtifacts(filter:'*', projectName: 'MNTLAB-anikitsenka-child1-build-job', selector: lastSuccessful())
     }
     stage('Packaging and Publishing results'){
         parallel (
@@ -76,18 +75,17 @@ node {
                                 unstash "Dockerfile"
                                 unstash "binary_webapp"
                                 sh '''
-                                ls -lha
-                                docker build -t anikitsenka:${BUILD_ID} .
-                                docker tag anikitsenka:${BUILD_ID} nexus-dock.k8s.playpit.by:80/anikitsenka:${BUILD_ID}
-                                docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
-                                docker push nexus-dock.k8s.playpit.by:80/anikitsenka:${BUILD_ID}
-                                docker rmi nexus-dock.k8s.playpit.by:80/anikitsenka:${BUILD_ID}
+                                    ls -lha
+                                    docker build -t anikitsenka:${BUILD_ID} .
+                                    docker tag anikitsenka:${BUILD_ID} nexus-dock.k8s.playpit.by:80/anikitsenka:${BUILD_ID}
+                                    docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                                    docker push nexus-dock.k8s.playpit.by:80/anikitsenka:${BUILD_ID}
+                                    docker rmi nexus-dock.k8s.playpit.by:80/anikitsenka:${BUILD_ID}
                                 '''
                             }
                         }
                     }
                 }
-                sh 'ls -lha'
             }
         )
     }
@@ -104,13 +102,13 @@ node {
             node(label_deploy) {
                     container('centos') {
                         unstash "Deployment"
-                        sh """
-                        curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-                        chmod +x ./kubectl
-                        mv ./kubectl /usr/local/bin/kubectl
-                        sed -i "s/BUILD_NUMBER/${BUILD_NUMBER}/g" deploy.yml
-                        kubectl apply -f deploy.yml
-                        """
+                        sh '''
+                            curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                            chmod +x ./kubectl
+                            mv ./kubectl /usr/local/bin/kubectl
+                            sed -i "s/BUILD_NUMBER/${BUILD_NUMBER}/g" deploy.yml
+                            kubectl apply -f deploy.yml
+                        '''
                     }
                 }
         }

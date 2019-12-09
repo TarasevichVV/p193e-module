@@ -6,7 +6,8 @@ node {
     
     stage ('Preparation (Checking out)') {
       checkout scm
-      //echo -e "BUILD NUMBER: $BUILD_NUMBER\nBuldTime: `date`\nTriggeredBy: `git log origin/shanchar -1 --pretty=format:'%an'`\nArtifact Version: 1.$BUILD_NUMBER" > helloworld-project/helloworld-ws/src/main/webapp/index.html
+      echo -e "BUILD NUMBER: $BUILD_NUMBER\nBuldTime: `date`\nTriggeredBy: `git log origin/shanchar -1 --pretty=format:'%an'`\nArtifact Version: 1.$BUILD_NUMBER" >> index.html
+      sh "mv index.html helloworld-project/helloworld-ws/src/main/webapp/index.html"
     }
     
     stage ('Building code') {
@@ -17,13 +18,13 @@ node {
       sh "cp helloworld-project/helloworld-ws/target/helloworld-ws.war ."
     }
 
-/*    stage('Sonar scan'){
+    stage('Sonar scan'){
             def scannerHome = tool 'Sonar';
             withSonarQubeEnv('Sonar'){
                 sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
             }
     }
-*/
+
     stage('Testing') {
     parallel(
         'pre-integration-test': {
@@ -123,9 +124,19 @@ node {
                                 chmod +x ./kubectl
                                 mv ./kubectl /usr/local/bin/kubectl
                                 kubectl apply -f https://raw.githubusercontent.com/MNT-Lab/p193e-module/shanchar/yaml.yaml
+                                kubectl patch deploy shanchar-deploy -n shanchar --patch="{
+                                    'spec':{
+                                        'template':{
+                                            'spec':{
+                                                'containers':[{'name':'shanchar-deploy','nexus-dock.k8s.playpit.by:80/helloworld-shanchar:$BUILD_NUMBER'}]
+                                                }
+                                            }
+                                        }
+                                    }"
                                 sleep 5
                                 kubectl get ns
                                 kubectl get svc -n shanchar
+
                                 kubectl get pods -n shanchar
                                """
                         }
@@ -138,4 +149,3 @@ node {
 
 
 }
-

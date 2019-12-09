@@ -115,7 +115,7 @@ Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) *
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
       ]) {
       node('testnode') {
-        container('docker') {
+        container('centos') {
           sh """
           curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
           chmod +x ./kubectl

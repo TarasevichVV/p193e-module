@@ -1,12 +1,12 @@
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def machine = "centos-jenkins-${UUID.randomUUID().toString()}"
-def indx = '''
+def indx = """
         <p> ARTIFACT_VERSION = $BUILD_NUMBER </p>
         <p> BUILD_TIME = $(date) </p>
         <p> JOB_NAME = $JOB_NAME </p>
         <p> COMMIT_ID = $GIT_COMMIT </p>
         <p> AUTHOR = Serge </p>
-        '''
+        """
 node {
    stage('Preparation') {
       checkout scm

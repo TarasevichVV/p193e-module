@@ -11,6 +11,7 @@ def nexusmavenrepo = 'maven-releases' //'docker'
 def nexusdockerrepo = 'nexus-dock.k8s.playpit.by:80'//'docker-releases'
 def nexusdockercred = 'admin:admin'
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+def mail_to = "komarovea@gmail.com"
 def Dockerfiletemplate = '''  From alpine
 
                     RUN apk update && apk add wget tar openjdk8 && \
@@ -24,100 +25,114 @@ def Dockerfiletemplate = '''  From alpine
                         EXPOSE 8080
                         CMD ["/opt/tomcat/bin/catalina.sh", "run"]'''
 node('master') {
-
-    stage('Preparation') {
-        echo 'Preparation'
-        echo "Branch is ${student_branch}"
-        git branch: "${student_branch}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
-    }
-
-    stage('Building code') {
-        echo 'Building code'
-        withMaven(maven: "${mavenName}") {
-        sh 'mvn -B clean package -f helloworld-project/helloworld-ws/pom.xml'
+    try {
+        stage('Preparation') {
+            echo 'Preparation'
+            echo "Branch is ${student_branch}"
+            git branch: "${student_branch}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
         }
-    }
 
-    // stage('Sonar scan') {
-    //     echo 'Sonar scan'
-    //     def SH = tool "${SonarTool}";
-    //     withSonarQubeEnv("${SonarName}") {
-    //         sh "${SH}/bin/sonar-scanner -Dsonar.projectKey=ekomarov_task-11:helloworld-ws -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -Dsonar.sources=helloworld-project/helloworld-ws/src"
-    //     }
-    // }
-    stage('Testing') {
-        echo 'Testing'
-        parallel 'mvn pre-integration-test': {
-            stage('mvn pre-integration-test') {
-                echo 'mvn pre-integration-test'
-                }
-        }, 'mvn integration-test': {
-            stage('mvn integration-test') {
-                echo 'mvn integration-test' 
-                withMaven(maven: "${mavenName}") { sh "mvn -B integration-test -f helloworld-project/helloworld-ws/pom.xml" }
-                }
-        }, 'mvn post-integration-test': {
-            stage('mvn post-integration-test') {
-                echo 'mvn post-integration-test'
-                }
+        stage('Building code') {
+            echo 'Building code'
+            withMaven(maven: "${mavenName}") {
+            sh 'mvn -B clean package -f helloworld-project/helloworld-ws/pom.xml'
+            }
         }
-    }
-    stage('Triggering job and fetching artefact after finishing') {
-        echo 'Triggering job and fetching artefact after finishing'
-        build job: "MNTLAB-${student_branch}-child1-build-job", parameters: [[$class: 'StringParameterValue', name: "BRANCH_NAME", value: "$student_branch"]]
-        copyArtifacts fingerprintArtifacts: true, projectName: "MNTLAB-${student_branch}-child1-build-job", selector: lastSuccessful()
-    }
-    stage('Packaging and Publishing results') {
-        echo 'Packaging and Publishing results'
-        parallel "Archiving artifact from MNTLAB-${student_branch}-child1-build-job": {
-            stage("Archiving artifact from MNTLAB-${student_branch}-child1-build-job") {
-                echo "Archiving artifact from MNTLAB-${student_branch}-child1-build-job"
-                sh """
-                    tar -xzf ${student_branch}_dsl_script.tar.gz; 
-                    #ls -ahl;
-                    cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                    tar -czf pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
-                    curl -v -u ${nexusdockercred} --upload-file pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz ${nexusproto}${nexusclusterurl}/repository/${nexusmavenrepo}/app/${student_branch}/${BUILD_NUMBER}/pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz
-                    """
-                //nexusArtifactUploader artifacts: [[artifactId: "pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz", classifier: '', file: "pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz", type: '.tar.gz']], credentialsId: '', groupId: 'pipeline.groupId', nexusUrl: "${nexusurl}", nexusVersion: 'nexus3', protocol: "${nexusproto}", repository: "${nexusmavenrepo}", version: "${BUILD_NUMBER}"
-                stash includes: 'helloworld-project/helloworld-ws/target/helloworld-ws.war', name: 'target_war'
-                }
-        }, 'Creating Docker Image': {
-            stage('Creating Docker Image') {
-                echo 'Creating Docker Image'
-                podTemplate(label: label,
-                    containers: [
-                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                        containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
-                    ],
-                    volumes: [
-                        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
-                    ]){
-                        node(label) {
-                            stage('Docker Build') {
-                                container('docker') {
-                                unstash "target_war"
-                                //sh 'ls'
-                                sh """
-                                echo "${Dockerfiletemplate}" > Dockerfile
-                                docker build -t helloworld-${student_branch}:${BUILD_NUMBER} .
-                                docker tag helloworld-${student_branch}:${BUILD_NUMBER} ${nexusdockerrepo}/helloworld-${student_branch}:${BUILD_NUMBER}
-                                docker login -u admin -p admin ${nexusdockerrepo}
-                                docker push ${nexusdockerrepo}/helloworld-${student_branch}:${BUILD_NUMBER}
-                                """
-                                }
-                            }
-                        }
+
+        // stage('Sonar scan') {
+        //     echo 'Sonar scan'
+        //     def SH = tool "${SonarTool}";
+        //     withSonarQubeEnv("${SonarName}") {
+        //         sh "${SH}/bin/sonar-scanner -Dsonar.projectKey=ekomarov_task-11:helloworld-ws -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -Dsonar.sources=helloworld-project/helloworld-ws/src"
+        //     }
+        // }
+        stage('Testing') {
+            echo 'Testing'
+            parallel 'mvn pre-integration-test': {
+                stage('mvn pre-integration-test') {
+                    echo 'mvn pre-integration-test'
+                    }
+            }, 'mvn integration-test': {
+                stage('mvn integration-test') {
+                    echo 'mvn integration-test' 
+                    withMaven(maven: "${mavenName}") { sh "mvn -B integration-test -f helloworld-project/helloworld-ws/pom.xml" }
+                    }
+            }, 'mvn post-integration-test': {
+                stage('mvn post-integration-test') {
+                    echo 'mvn post-integration-test'
                     }
             }
         }
+        stage('Triggering job and fetching artefact after finishing') {
+            echo 'Triggering job and fetching artefact after finishing'
+            build job: "MNTLAB-${student_branch}-child1-build-job", parameters: [[$class: 'StringParameterValue', name: "BRANCH_NAME", value: "$student_branch"]]
+            copyArtifacts fingerprintArtifacts: true, projectName: "MNTLAB-${student_branch}-child1-build-job", selector: lastSuccessful()
+        }
+        stage('Packaging and Publishing results') {
+            echo 'Packaging and Publishing results'
+            parallel "Archiving artifact from MNTLAB-${student_branch}-child1-build-job": {
+                stage("Archiving artifact from MNTLAB-${student_branch}-child1-build-job") {
+                    echo "Archiving artifact from MNTLAB-${student_branch}-child1-build-job"
+                    sh """
+                        tar -xzf ${student_branch}_dsl_script.tar.gz; 
+                        #ls -ahl;
+                        cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
+                        tar -czf pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
+                        curl -v -u ${nexusdockercred} --upload-file pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz ${nexusproto}${nexusclusterurl}/repository/${nexusmavenrepo}/app/${student_branch}/${BUILD_NUMBER}/pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz
+                        """
+                    //nexusArtifactUploader artifacts: [[artifactId: "pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz", classifier: '', file: "pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz", type: '.tar.gz']], credentialsId: '', groupId: 'pipeline.groupId', nexusUrl: "${nexusurl}", nexusVersion: 'nexus3', protocol: "${nexusproto}", repository: "${nexusmavenrepo}", version: "${BUILD_NUMBER}"
+                    stash includes: 'helloworld-project/helloworld-ws/target/helloworld-ws.war', name: 'target_war'
+                    }
+            }, 'Creating Docker Image': {
+                stage('Creating Docker Image') {
+                    echo 'Creating Docker Image'
+                    podTemplate(label: label,
+                        containers: [
+                            containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                            containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
+                        ],
+                        volumes: [
+                            hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
+                        ]){
+                            node(label) {
+                                stage('Docker Build') {
+                                    container('docker') {
+                                    unstash "target_war"
+                                    //sh 'ls'
+                                    sh """
+                                    echo "${Dockerfiletemplate}" > Dockerfile
+                                    docker build -t helloworld-${student_branch}:${BUILD_NUMBER} .
+                                    docker tag helloworld-${student_branch}:${BUILD_NUMBER} ${nexusdockerrepo}/helloworld-${student_branch}:${BUILD_NUMBER}
+                                    docker login -u admin -p admin ${nexusdockerrepo}
+                                    docker push ${nexusdockerrepo}/helloworld-${student_branch}:${BUILD_NUMBER}
+                                    """
+                                    }
+                                }
+                            }
+                        }
+                }
+            }
+        }
+        stage('Asking for manual approval') {
+            echo 'Asking for manual approval'
+            stage = env.STAGE_NAME
+            timeout(time: 1, unit: "MINUTES") { input message: "Please, approve deploy tomcat app, build number ${BUILD_NUMBER}", ok: 'Approve' }
+        }
+        stage('Deployment') {
+            echo 'Deployment'
+        }
+        currentBuild.result = 'SUCCESS'
     }
-    stage('Asking for manual approval') {
-        echo 'Asking for manual approval'
-        stage = env.STAGE_NAME
-        timeout(time: 1, unit: "MINUTES") { input message: "Please, approve deploy tomcat app, build number ${BUILD_NUMBER}", ok: 'Approve' }
+    catch (err) {
+        currentBuild.result = 'FAILURE'
     }
-    stage('Deployment') {
-        echo 'Deployment'
-    }
+    finally {
+        // stage('Sending email'){
+        //     emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+        //     mimeType: 'text/html',
+        //         subject: "$currentBuild.result: Job '${currentBuild.fullDisplayName} ${currentBuild.number}' Stage:'${stage}'",
+        //     to: "${mail_to}",
+        //     recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+        }
+    } 
 }

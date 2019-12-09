@@ -43,6 +43,39 @@ node {
                     sh "cp helloworld-project/helloworld-ws/target/helloworld-ws.war ."
                     sh "cp /var/jenkins_home/workspace/EPBYMINW9149/mntlab-ci-pipeline@script/Jenkinsfile ."
                     sh "tar -czvf pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile"
+                    sh "curl -v -u admin:admin --upload-file pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/amiasnikovich/${BUILD_NUMBER}/pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz"
+                    sh '''cat <<EOF > Dockerfile
+                            FROM tomcat:8.0
+                            COPY *.war /usr/local/tomcat/webapps/
+                            EXPOSE 8080
+                            CMD ["catalina.sh", "run"]
+                            EOF'''
+                    stash includes: "helloworld-ws.war", name: "war"
+                    stash includes: "Dockerfile", name: "docker"
+                },
+
+                create_container: {
+                    podTemplate(label: label,
+                            containers: [
+                                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                                    containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+                            ],
+                            volumes: [
+                                    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                            ]
+                    ) {
+                        node(label) {
+                           container('build_container') {
+                               unstash('war')
+                               unstash('docker')
+                               sh '''
+                                docker build -t nexus-dock.k8s.playpit.by:80/helloworld-amiasnikovich:$BUILD_NUMBER .
+                                docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                                docker push nexus-dock.k8s.playpit.by:80/helloworld-amiasnikovich:$BUILD_NUMBER
+                                '''
+                           }
+                        }
+                    }
                 }
         )
     }

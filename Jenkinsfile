@@ -1,6 +1,7 @@
 #!/usr/bin/env groovy
 
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+def label2 = "centos-jenkins-${UUID.randomUUID().toString()}"
 def Dockerfile='''  From alpine
                                 
                     RUN apk update && apk add wget tar openjdk8 && \

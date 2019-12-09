@@ -1,16 +1,5 @@
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def machine = "centos-jenkins-${UUID.randomUUID().toString()}"
-def Dockerfile = """  FROM alpine
-                    RUN apk update && apk add wget tar openjdk8 && \
-                    wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz && \
-                    tar -xvf apache-tomcat-8.5.20.tar.gz && \
-                    mkdir /opt/tomcat && \
-                    mv apache-tomcat*/* /opt/tomcat/
-                    COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /opt/tomcat/webapps
-                    EXPOSE 8080
-                    
-                    CMD ["/opt/tomcat/bin/catalina.sh", "run"]
-                 """
 node {
    stage('Preparation') {
       checkout scm
@@ -24,7 +13,7 @@ node {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
             stash includes: "tomcat.yaml", name: "tom"
-//            stash includes: "Dockerfile", name: "Dockerfile"
+            stash includes: "Dockerfile", name: "dock"
          }
       }
 
@@ -87,8 +76,8 @@ stage('Packaging and Publishing results'){
                             stage('Build Docker Container') {
                                 container('docker') {
                                     unstash "war"
+                                    unstash "dock"
                                     sh """
-                                    echo "${Dockerfile}" > Dockerfile
                                     docker build -t helloworld-skudrenko:${BUILD_NUMBER} .
                                     docker tag helloworld-skudrenko:${BUILD_NUMBER} nexus-dock.k8s.playpit.by:80/helloworld-skudrenko:${BUILD_NUMBER}
                                     docker login -u admin -p admin nexus-dock.k8s.playpit.by:80

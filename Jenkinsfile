@@ -145,7 +145,7 @@ Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) *
           curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
           chmod +x ./kubectl
           mv ./kubectl /usr/local/bin/kubectl
-          sed -i "s/_deploy_ver_/_deploy_ver_:$BUILD_NUMBER/" deploy-all.yml
+          sed -i "s/_deploy_ver_/$BUILD_NUMBER/" deploy-all.yml
           kubectl apply -f deploy-all.yml
           kubectl get pod -A
           """

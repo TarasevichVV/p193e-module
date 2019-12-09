@@ -60,7 +60,7 @@ node {
                         stage('Docker Build') {
                             container('docker') {
                                 sh 'echo "Building docker image..."'
-                                unstash "Docker"
+                                unstash "Dockerfile"
                                 sh '''
                                 ls -lha
                                 docker build -t anikitsenka/tomcat .

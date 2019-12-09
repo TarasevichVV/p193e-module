@@ -1,3 +1,4 @@
+def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 node {
     stage('check src to build') {
         git([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'amiasnikovich', credentialsId: '33c48519f78014a6f656a10b73d153cfa1da8f1e'])

@@ -7,10 +7,16 @@ node {
     checkout scm
     checkout([$class: 'GitSCM',
       branches: [[name: 'origin/ibletsko']],
-      userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
+      userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]
     ])
     stash includes: "Dockerfile", name: "file1"
+
+    checkout([$class: 'GitSCM',
+      branches: [[name: 'origin/ibletsko']],
+      userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
+    ])
     stash 'mnt-source'
+
     sh "ls -la"
   }
 

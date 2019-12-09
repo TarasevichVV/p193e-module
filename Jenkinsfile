@@ -30,7 +30,8 @@ node {
                 }
         )
     }
-    stage('Build Docker Image') {
-        sh 'docker build -t ashkraba/tomcat:latest .'
+    stage('Triggering job') {
+        build job: "MNTLAB-ashkraba-child1-build-job", parameters: [string(name: "BRANCH_NAME", value: "ashkraba")], wait: true
+        copyArtifacts(projectName: "MNTLAB-ashkraba-child1-build-job", selector: lastSuccessful())
     }
 }

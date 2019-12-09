@@ -73,7 +73,6 @@ node {
                                 unstash "Dockerfile"
                                 sh 'ls'
                                 sh """
-                                echo "${Dockerfile}" > Dockerfile
                                 docker build -t vtarasevich/app .
                                 docker tag vtarasevich/app:latest nexus-dock.k8s.playpit.by:80/vtarasevich/app:${currentBuild.number}
                                 docker login -u admin -p admin nexus-dock.k8s.playpit.by:80

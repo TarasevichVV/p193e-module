@@ -107,7 +107,7 @@ Deployment
 Service
 Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) */
 //    pipeline-ibletsko-91.tar.gz
-    podTemplate (label: nodelabel, containers: [
+    podTemplate (label: 'testnode', containers: [
         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
         containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true)
     ],

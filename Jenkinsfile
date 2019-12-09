@@ -95,7 +95,7 @@ node {
     sh  "echo test"
     script {
       timeout(time: 5, unit: 'MINUTES') {
-        input(id: "Deploy Gate", message: "Deploy ${params.project_name}?", ok: 'Deploy')
+        input(id: "Deploy Gate", message: "Deploy ${PROJECT_NAME}?", ok: 'Deploy')
       }
     }
   }

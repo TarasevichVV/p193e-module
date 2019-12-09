@@ -65,18 +65,16 @@ node {
                                 unstash "binary_webapp"
                                 sh '''
                                 ls -lha
-                                docker build -t anikitsenka/tomcat .
-                                docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
-                                docker version
+                                docker build -t anikitsenka:${BUILD_ID} .
+                                docker tag anikitsenka:${BUILD_ID} nexus-dock.k8s.playpit.by:80/anikitsenka:${BUILD_ID}
+                                docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                                docker push nexus-dock.k8s.playpit.by:80/anikitsenka:${BUILD_ID}
+                                docker rmi nexus-dock.k8s.playpit.by:80/anikitsenka:${BUILD_ID}
                                 '''
                             }
                         }
                     }
                 }
-                    // docker build -t anikitsenka/tomcat .
-                    // docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
-                    // docker login -u admin -p nexus 192.168.56.106:30083
-                    // docker push 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
                 sh 'ls -lha'
             }
         )

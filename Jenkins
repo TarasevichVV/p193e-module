@@ -1,3 +1,5 @@
+def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+
 node {
     stage('Preparation (Checking out)') {
         checkout([$class: 'GitSCM', branches: [[name: '*/anikitsenka']],
@@ -47,6 +49,31 @@ node {
                 sh '''
                     echo "Where is ur Docker image?"
                     '''
+                podTemplate(label: label,
+                        containers: [
+                            containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                            containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+                            ],
+                        volumes: [
+                            hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                        ]
+                        ) {
+                    node(label) {
+                        stage('Docker Build') {
+                            container('docker') {
+                                echo "Building docker image..."
+                                sh """
+                                    hostname
+                                    whoami
+                                    env
+                                    echo $PATH
+                                    ps -ef
+                                    docker version
+                                    """
+                            }
+                        }
+                    }
+                }
                     // docker build -t anikitsenka/tomcat .
                     // docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
                     // docker login -u admin -p nexus 192.168.56.106:30083

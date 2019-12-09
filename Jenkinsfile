@@ -105,18 +105,19 @@ EOF
 #docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
 #docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
 """
-                                    echo "6-2-1--a: dockerfile:"
+
+                                    sh "echo '6-2-1--a: dockerfile:'"
                                     sh "ls -al Dockerfile"
-                                    echo "6-2-1--b:  Building docker image...---tomcat_${student}----"
+                                    sh "echo '6-2-1--b:  Building docker image...---tomcat_${student}----'"
 
                                     sh """
-                    echo "build in docker pod:  "
-                    pwd  
-                    ls -al Docker*"
-                    docker build . -t helloworld-${student}:${BUILD_NUMBER}
-                    docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
-                    docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
-                   """
+echo "build in docker pod:  "
+pwd  
+ls -al Docker*"
+docker build . -t helloworld-${student}:${BUILD_NUMBER}
+docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+"""
                                 }
                             }
                         }

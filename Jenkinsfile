@@ -1,6 +1,7 @@
 #!/usr/bin/env groovy
 
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+def label2 = "centos-jenkins-${UUID.randomUUID().toString()}"
 def Dockerfile='''  
 FROM alpine
 
@@ -17,10 +18,10 @@ CMD ["/opt/tomcat/bin/catalina.sh", "run"]
 '''
 
 node {
-    stage ('checking_out') {
+    stage ('1.checking_out') {
         checkout scm
     }
-    stage ('building_code') {
+    stage ('2.building_code') {
         
         git ([url: 'https://github.com/MNT-Lab/p193e-module.git', branch: 'phardzeyeu'])
         stash includes: "Jenkinsfile", name: "jfile"
@@ -40,13 +41,13 @@ node {
     }
     }
     /*
-    stage ('sonar_scan') {
+    stage ('3.sonar_scan') {
     def scannerHome = tool 'Sonar'
     withSonarQubeEnv() {
         sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=phardzeyeu -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -e -Dsonar.sources=helloworld-project/helloworld-ws/src" 
         }
     }
-    stage ('testing') {
+    stage ('4.testing') {
         parallel (
                 'pre_integration_test' : { 
                     sh "echo 'mvn pre-integration-test'"
@@ -62,11 +63,11 @@ node {
             )
     }
     */    
-    stage ('triggering_job') {
+    stage ('5.triggering_job') {
         build job: 'MNTLAB-phardzeyeu-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'phardzeyeu']], wait: true;
         copyArtifacts(projectName: 'MNTLAB-phardzeyeu-child1-build-job', selector: lastSuccessful())
     }
-    stage ('packaging_and_publishing_results'){
+    stage ('6.packaging_and_publishing_results'){
         parallel (
                 'archiving_artifact' : {
                     unstash "jfile"
@@ -89,7 +90,7 @@ node {
                                 ]
                                ) {
                         node(label) {
-                            stage('docker_build') {
+                            stage('6.1.docker_build') {
                                 container('docker') {
                                     unstash "warka"
                                     sh """
@@ -106,16 +107,29 @@ node {
                 }
         )
     }
-    stage ('asking_for_manual_approval') {
+    /*
+    stage ('7.asking_for_manual_approval') {
         timeout(time: 5, unit: "MINUTES") {
             input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
         }
     }
-    stage ('deploy') {
-        sh """
-        kubectl create namespace phardzeyeu
-        kubectl apply -f tomcat.yaml 
-        kubectl apply -f service.yaml 
-        """
+    */
+    stage ('8.deployment') {
+        podTemplate(label: label2,
+                    containers: [
+                                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                                    containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
+                                ],                                
+                               ) {
+            node(label2) {
+                stage('8.1.deployment') {
+                    container('centos') {
+                        sh """
+                        echo norm
+                        """
+                    }
+                }
+            }
+        }
     }
 }

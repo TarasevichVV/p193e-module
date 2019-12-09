@@ -1,11 +1,13 @@
 #!groovy
-def student_build ='ekomarov'
-def nexusclusterurl = 'nexus-service.nexus.svc.cluster.local:8081'//'nexus.k8s.playpit.by:80'
-def nexusurl = 'nexus:80'//'nexus.k8s.playpit.by:80'
+def student_branch ='ekomarov'
+def mavenName = 'M3'//'Maven'
+def SonarName = 'Sonar'//'K8s-sonar'
+def nexusclusterurl = 'nexus.k8s.playpit.by:80'//'nexus-service.nexus.svc.cluster.local:8081'
+def nexusurl = 'nexus.k8s.playpit.by:80'//'nexus:80'
 def nexusproto = 'http://'
-def nexusport = "8123" // '50001'
+def nexusport = '50001'//'8123'
 def nexusmavenrepo = 'maven-releases' //'docker'
-def nexusdockerrepo = 'docker-releases' //'docker'
+def nexusdockerrepo = 'docker'//'docker-releases'
 def nexusdockercred = 'admin:admin'
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def Dockerfiletemplate = '''  From alpine
@@ -24,13 +26,13 @@ node('master') {
 
     stage('Preparation') {
         echo 'Preparation'
-        echo "Branch is ${student_build}"
-        git branch: "${student_build}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
+        echo "Branch is ${student_branch}"
+        git branch: "${student_branch}", url: 'https://github.com/MNT-Lab/build-t00ls.git'
     }
 
     stage('Building code') {
         echo 'Building code'
-        withMaven(maven: 'Maven') {
+        withMaven(maven: "${mavenName}") {
         sh 'mvn -B clean package -f helloworld-project/helloworld-ws/pom.xml'
         }
     }
@@ -38,7 +40,7 @@ node('master') {
     stage('Sonar scan') {
         echo 'Sonar scan'
         def ST = tool 'Scanner-of-K8s-Sonar';
-        withSonarQubeEnv('K8s-sonar') {
+        withSonarQubeEnv("${SonarName}") {
             sh "${ST}/bin/sonar-scanner -Dsonar.projectKey=ekomarov_task-11:helloworld-ws -Dsonar.java.binaries=helloworld-project/helloworld-ws/target -Dsonar.sources=helloworld-project/helloworld-ws/src"
         }
     }
@@ -51,7 +53,7 @@ node('master') {
         }, 'mvn integration-test': {
             stage('mvn integration-test') {
                 echo 'mvn integration-test' 
-                withMaven(maven: 'Maven') { sh "mvn -B integration-test -f helloworld-project/helloworld-ws/pom.xml" }
+                withMaven(maven: "${mavenName}") { sh "mvn -B integration-test -f helloworld-project/helloworld-ws/pom.xml" }
                 }
         }, 'mvn post-integration-test': {
             stage('mvn post-integration-test') {
@@ -61,22 +63,22 @@ node('master') {
     }
     stage('Triggering job and fetching artefact after finishing') {
         echo 'Triggering job and fetching artefact after finishing'
-        build job: "MNTLAB-${student_build}-child1-build-job", parameters: [[$class: 'StringParameterValue', name: "BRANCH_NAME", value: "$student_build"]]
-        copyArtifacts fingerprintArtifacts: true, projectName: "MNTLAB-${student_build}-child1-build-job", selector: lastSuccessful()
+        build job: "MNTLAB-${student_branch}-child1-build-job", parameters: [[$class: 'StringParameterValue', name: "BRANCH_NAME", value: "$student_branch"]]
+        copyArtifacts fingerprintArtifacts: true, projectName: "MNTLAB-${student_branch}-child1-build-job", selector: lastSuccessful()
     }
     stage('Packaging and Publishing results') {
         echo 'Packaging and Publishing results'
-        parallel "Archiving artifact from MNTLAB-${student_build}-child1-build-job": {
-            stage("Archiving artifact from MNTLAB-${student_build}-child1-build-job") {
-                echo "Archiving artifact from MNTLAB-${student_build}-child1-build-job"
+        parallel "Archiving artifact from MNTLAB-${student_branch}-child1-build-job": {
+            stage("Archiving artifact from MNTLAB-${student_branch}-child1-build-job") {
+                echo "Archiving artifact from MNTLAB-${student_branch}-child1-build-job"
                 sh """
-                    tar -xzf ${student_build}_dsl_script.tar.gz; 
+                    tar -xzf ${student_branch}_dsl_script.tar.gz; 
                     #ls -ahl;
                     cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                    tar -czf pipeline-${student_build}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
-                    curl -v -u ${nexusdockercred} --upload-file pipeline-${student_build}-${BUILD_NUMBER}.tar.gz ${nexusproto}${nexusclusterurl}/repository/${nexusmavenrepo}/app/${student_build}/${BUILD_NUMBER}/pipeline-${student_build}-${BUILD_NUMBER}.tar.gz
+                    tar -czf pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
+                    curl -v -u ${nexusdockercred} --upload-file pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz ${nexusproto}${nexusclusterurl}/repository/${nexusmavenrepo}/app/${student_branch}/${BUILD_NUMBER}/pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz
                     """
-                //nexusArtifactUploader artifacts: [[artifactId: "pipeline-${student_build}-${BUILD_NUMBER}.tar.gz", classifier: '', file: "pipeline-${student_build}-${BUILD_NUMBER}.tar.gz", type: '.tar.gz']], credentialsId: '', groupId: 'pipeline.groupId', nexusUrl: "${nexusurl}", nexusVersion: 'nexus3', protocol: "${nexusproto}", repository: "${nexusmavenrepo}", version: "${BUILD_NUMBER}"
+                //nexusArtifactUploader artifacts: [[artifactId: "pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz", classifier: '', file: "pipeline-${student_branch}-${BUILD_NUMBER}.tar.gz", type: '.tar.gz']], credentialsId: '', groupId: 'pipeline.groupId', nexusUrl: "${nexusurl}", nexusVersion: 'nexus3', protocol: "${nexusproto}", repository: "${nexusmavenrepo}", version: "${BUILD_NUMBER}"
                 stash includes: 'helloworld-project/helloworld-ws/target/helloworld-ws.war', name: 'target_war'
                 }
         }, 'Creating Docker Image': {
@@ -98,10 +100,10 @@ node('master') {
                 //                 sh """
                 //                 echo "${Dockerfiletemplate}" > Dockerfile
                 //                 docker version
-                //                 // #docker build -t helloworld-${student_build}:${BUILD_NUMBER} .
-                //                 // #docker tag ${student_build}/app:latest ${nexusurl}/${student_build}/app:${BUILD_NUMBER}
+                //                 // #docker build -t helloworld-${student_branch}:${BUILD_NUMBER} .
+                //                 // #docker tag ${student_branch}/app:latest ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
                 //                 // #docker login -u admin -p admin ${nexusurl}
-                //                 // #docker push ${nexusurl}/${student_build}/app:${BUILD_NUMBER}
+                //                 // #docker push ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
                 //                 """
                 //                 }
                 //             }

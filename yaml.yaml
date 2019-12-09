@@ -1,0 +1,74 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shanchar
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy1kb2NrLms4cy5wbGF5cGl0LmJ5OjgwIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
+kind: Secret
+metadata:
+  name: docker-secret
+  namespace: shanchar
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shanchar-deploy
+  namespace: shanchar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shanchar-deploy
+  template:
+    metadata:
+      labels:
+        app: shanchar-deploy
+    spec:
+      containers:
+        - name: shanchar-deploy
+          image: nexus-dock.k8s.playpit.by:80/helloworld-shanchar
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+      - name: docker-secret
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shanchar-svc
+  namespace: shanchar
+  labels:
+    app: shanchar-deploy
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: shanchar-deploy
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: shanchar-ingress
+  namespace: shanchar
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: serviceName=shanchar-svc rewrite=/helloworld-ws/
+spec:
+  rules:
+  - host: shanchar-app.k8s.playpit.by    
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: shanchar-svc
+          servicePort: 80

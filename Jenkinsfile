@@ -22,9 +22,8 @@ node {
         checkout scm
     }
     stage ('2.building_code') {
-        git ([url: 'https://github.com/Gardej/jenkins.git', branch: 'master'])
-        stash includes: "tomcat.yml", name: "tomcat"
         git ([url: 'https://github.com/MNT-Lab/p193e-module.git', branch: 'phardzeyeu'])
+        stash includes: "tomcat.yml", name: "tomcat"
         stash includes: "Jenkinsfile", name: "jfile"
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
         sh '''

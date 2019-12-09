@@ -94,5 +94,18 @@ node ('master') {
             }
     )
     }
+
+    stage ('Asking for manual approval'){
+        script{
+            timeout(time: 1, unit: "MINUTES") {
+            input "Continue?"
+            echo "Jump to next stage"}
+    }
+    }
+
+
+
+
+
 }
 

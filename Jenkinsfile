@@ -8,7 +8,7 @@ node {
     }
     stage ('Build') {
         sh '''
-        cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
+        cat << Thanks > helloworld-project/helloworld-ws/src/main/webapp/index.html
             <html>
             <head><title>Custom page by Andrei Nikitsenka</title></head>
             <body>
@@ -20,7 +20,7 @@ node {
             <p> Minor version "$BUILD_ID" </p>
             </body>
             </html>
-        EOF
+        Thanks
         '''
         withMaven(maven: 'M3'){
             sh 'mvn clean verify -f helloworld-project/helloworld-ws/pom.xml'

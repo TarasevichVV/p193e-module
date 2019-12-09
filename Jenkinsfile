@@ -106,8 +106,16 @@ COPY helloworld-ws.war /usr/local/tomcat/webapps/
     }
   )
   }
-}
 
+  stage ('Asking for manual approval') {
+    echo "building of image with application is ready"
+    script {
+      timeout (time:1, unit:'MINUTES') {
+      input "deploy image?"
+      echo "next stage"}
+    }
+  }
+}
 
 
 

@@ -19,18 +19,15 @@ node {
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'skudrenko'])
         withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
-            stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
-//            stash includes: "tomcat.yaml", name: "deploy"
-            stash includes: "Dockerfile", name: "Dockerfile"
          }
       }
 
-//   stage('Testing Phase I (Sonar)'){
-//        def scannerHome = tool 'Sonar';
-//        withSonarQubeEnv(){
-//            sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=skudrenko -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
-//        }
-//    }
+   stage('Testing Phase I (Sonar)'){
+        def scannerHome = tool 'Sonar';
+        withSonarQubeEnv(){
+            sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=skudrenko -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+        }
+    }
 
    stage ('Testing Phase II (Unit)') {
         parallel(
@@ -60,40 +57,6 @@ node {
                         build job: 'MNTLAB-skudrenko-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'skudrenko']], wait: true;
                         copyArtifacts(projectName: 'MNTLAB-skudrenko-child1-build-job', selector: lastSuccessful())
     }
-stage ('packaging_and_publishing_results'){
-        parallel (
-                'archiving_artifact' : {
-                    sh """
-                    tar zxf skudrenko_dsl_script.tar.gz
-                    cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                    tar czf pipeline-skudrenko-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
-                    """
-                },
-                'creating_docker_image' : {
-                    podTemplate(label: label,
-                                containers: [
-                                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                                    containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-                                ],
-                                volumes: [
-                                    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                                ]
-                               ) {
-                        node(label) {
-                            stage('docker_build') {
-                                container('docker') {
-                                    sh """
-                                    ls
-                                    echo "${Dockerfile}" > Dockerfile
-                                    docker build -t helloworld-skudrenko:${BUILD_NUMBER} .
-                                    """
-                                }
-                            }
-                        }
-                    }
-                }
-        )
-            }
 
 stage('Packaging and Publishing results'){
         parallel(
@@ -130,5 +93,4 @@ stage('Packaging and Publishing results'){
                 }
             )
         }
-
 }

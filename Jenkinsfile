@@ -61,14 +61,14 @@ node {
                     node(label) {
                         stage('Docker Build') {
                             container('docker') {
-                                echo "Building docker image..."
+                                sh 'echo "Building docker image..."'
                                 unstash "Docker"
+                                sh '''
                                 ls -lha
                                 docker build -t anikitsenka/tomcat .
                                 docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
-                                sh """
-                                    docker version
-                                    """
+                                docker version
+                                '''
                             }
                         }
                     }

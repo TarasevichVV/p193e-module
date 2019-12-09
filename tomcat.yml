@@ -69,7 +69,7 @@ metadata:
   name: tomcat-ingress
   namespace: phardzeyeu
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.org/rewrites: serviceName=tomcat-service rewrite=/helloworld-ws/
 spec:
   rules:
   - host: phardzeyeu-app.k8s.playpit.by

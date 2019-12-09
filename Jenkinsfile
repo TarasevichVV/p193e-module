@@ -13,13 +13,13 @@ node {
         stash includes: "Dockerfile", name: "docker"
         stash includes: "Jenkinsfile", name: "jfile"
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
-        sh '''
+        sh """
         cat <<EOF >> helloworld-project/helloworld-ws/src/main/webapp/index.html
         <p> AUTHOR = phardzeyeu </p>
-        <p> JOB_NAME = "$JOB_NAME" </p>
-        <p> BUILD_TIME = "$(date)" </p>
-        <p> ARTIFACT_VERSION = 1.0."$BUILD_NUMBER" </p>
-        '''
+        <p> JOB_NAME = $JOB_NAME </p>
+        <p> BUILD_TIME = $(date) </p>
+        <p> ARTIFACT_VERSION = 1.0.$BUILD_NUMBER </p>
+        """
         withMaven(maven: 'M3') {
             sh 'mvn clean install -f helloworld-project/helloworld-ws/pom.xml'
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "warka"

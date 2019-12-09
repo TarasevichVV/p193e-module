@@ -67,8 +67,8 @@ node {
                     ) {
                         node(label) {
                            container('docker') {
-                               unstash('war')
-                               unstash('docker')
+                               unstash 'war'
+                               unstash 'docker'
                                sh '''
                                 docker build -t nexus-dock.k8s.playpit.by:80/helloworld-amiasnikovich:$BUILD_NUMBER .
                                 docker login -u admin -p admin nexus-dock.k8s.playpit.by:80

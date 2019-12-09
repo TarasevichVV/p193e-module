@@ -90,7 +90,7 @@ node {
                                     sh """
                                     ls
                                     echo "${Dockerfile}" > Dockerfile
-                                    sh "docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
+                                    sh docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
                                     """
                                     
                                     // docker tag helloworld-phardzeyeu:${BUILD_NUMBER} 192.168.56.66:32389/phardzeyeu/tomcat:$BUILD_NUMBER

@@ -72,8 +72,39 @@ COPY helloworld-ws.war /usr/local/tomcat/webapps/
     """
   }
 
+  stage ('Docker deploy') {
+  podTemplate(label: label,
+        containers: [
+                containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+            ],
+            volumes: [
+                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+            ]
+        ) {
+    node(label) {
+            container('docker') {
+                    echo "Building docker image..."
+                    sh """
+cat << "EOF" > Dockerfile
+FROM tomcat:8.0
+MAINTAINER Dzmitry Prusevich
+COPY helloworld-ws.war /usr/local/tomcat/webapps/
+    """
+                    sh """
+                       hostname
+                       whoami
+                       env
+                       echo $PATH
+                       ps -ef 
+                       docker version
+                       cat Dockerfile
+                       """
+                }
+    }
 }
-
+}
+}
 
 
 

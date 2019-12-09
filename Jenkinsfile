@@ -11,7 +11,7 @@ node {
       branches: [[name: 'origin/ibletsko']],
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]
     ])
-    sh "ls -la"
+//    sh "ls -la"
     stash includes: "Jenkinsfile", name: "st_jenkinsfile"
     stash includes: "Dockerfile", name: "st_dockerfile"
     stash includes: "*.yml", name: "st_yamls"
@@ -22,7 +22,7 @@ node {
     ])
     stash 'mnt-source'
 
-    sh "ls -la"
+//    sh "ls -la"
   }
 
   stage('02 Building code') {
@@ -48,7 +48,7 @@ node {
       "parallel 2" : {
         withMaven(maven: 'M3') {
 // WORKING --
-//          "sh 'mvn integration-test'"
+          "sh 'mvn integration-test'"
         }
       },
       "parallel 3" : {
@@ -61,10 +61,8 @@ node {
 // WORKING --
     build job: "${job_to_use}", parameters: [
       [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]//, wait: true by default
-    ]
+    ], wait: true
     copyArtifacts projectName: "${job_to_use}", selector: lastCompleted()
-//
-//    writeFile file: "output.txt", text: "output.txt For testing purposes."
     stash includes: "*.txt", name: "st_output"
     archiveArtifacts '*'
   }
@@ -72,7 +70,6 @@ node {
   stage('06 Packaging and Publishing results') {
     parallel (
       "parallel 1: archiving" : {
-//    writeFile file: "Jenkinsfile", text: "For testing purposes."
         unstash "st_jenkinsfile"
         unstash "st_output"
         sh """
@@ -110,20 +107,20 @@ node {
 
   stage('07 Asking for manual approval') {
 // WORKING --
-/*     script {
+    script {
       timeout(time: 5, unit: 'MINUTES') {
-        input(id: "Deploy Gate", message: "Deploy ${currentBuild.projectName}?", ok: 'Deploy')
+        input(id: "Deploy Gate", message: "Deploy ${currentBuild.projectName}?", ok: '08 Deployment')
       }
-    } */
+    }
   }
 
   stage('08 Deployment') {
     podTemplate (label: 'deploynode', containers: [
         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-        containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true)
+        containerTemplate(name: 'launch', image: 'centos', ttyEnabled: true)
     ]) {
       node('deploynode') {
-        container('centos') {
+        container('launch') {
           unstash "st_yamls"
           sh """
           curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl

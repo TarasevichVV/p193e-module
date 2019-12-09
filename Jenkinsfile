@@ -89,8 +89,8 @@ node {
                             stage('Docker Build') {
                                 container('docker') {
                                     echo "Building docker image..."
-                                    sh """
-                                    cat <<EOF >Dockerfile 
+                                    sh '''
+                                    cat <<EOF > Dockerfile 
                                     FROM alpine
 
                                     RUN apk update && apk add wget tar openjdk8 && \
@@ -104,8 +104,7 @@ node {
                                     EXPOSE 8080
                       
                                     CMD ["/opt/tomcat/bin/catalina.sh", "run"]
-                                    EOF
-                                    """
+                                    EOF '''
                                     sh """
                                     docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
                                     """

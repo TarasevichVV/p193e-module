@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: anikitsenka
+
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy1kb2NrLms4cy5wbGF5cGl0LmJ5OjgwIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
+kind: Secret
+metadata:
+  name: docker-secret-anikitsenka
+  namespace: anikitsenka
+type: kubernetes.io/dockerconfigjson
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anikitsenka-tomcat
+  namespace: anikitsenka
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app: anikitsenka-tomcat
+  template:
+    metadata:
+      labels:
+        app: anikitsenka-tomcat
+    spec:
+      containers:
+        - name: anikitsenka-tomcat
+          image: nexus-dock.k8s.playpit.by:80/anikitsenka:BUILD_NUMBER
+          ports:
+          - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /helloworld-ws
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+      imagePullSecrets:
+      - name: docker-secret-anikitsenka
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: anikitsenka-tomcat-svc
+  namespace: anikitsenka
+spec:
+  selector:
+    app: anikitsenka-tomcat
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: anikitsenka-tomcat-ingress
+  namespace: anikitsenka
+  annotations:
+    nginx.org/rewrites: serviceName=anikitsenka-tomcat-svc rewrite=/helloworld-ws/
+spec:
+  rules:
+  - host: anikitsenka-app.k8s.playpit.by
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: anikitsenka-tomcat-svc
+          servicePort: 80

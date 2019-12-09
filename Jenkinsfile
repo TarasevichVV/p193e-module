@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-def student = dprusevich
+def student = "dprusevich"
 node {
 
   stage ('Preparation (Checking out)') {

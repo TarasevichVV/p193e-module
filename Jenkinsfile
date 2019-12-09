@@ -4,11 +4,11 @@ def mavenName = 'M3'//'Maven'
 def SonarTool = 'Sonar'//'Scanner-of-K8s-Sonar'
 def SonarName = 'Sonar'//'K8s-sonar'
 def nexusclusterurl = 'nexus.k8s.playpit.by:80'//'nexus-service.nexus.svc.cluster.local:8081'
-def nexusurl = 'nexus.k8s.playpit.by:80'//'nexus:80'
+//def nexusurl = 'nexus.k8s.playpit.by:80'//'nexus:80'
 def nexusproto = 'http://'
 def nexusport = '50001'//'8123'
 def nexusmavenrepo = 'maven-releases' //'docker'
-def nexusdockerrepo = 'docker'//'docker-releases'
+def nexusdockerrepo = 'nexus-dock.k8s.playpit.by:80'//'docker-releases'
 def nexusdockercred = 'admin:admin'
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def Dockerfiletemplate = '''  From alpine
@@ -102,9 +102,9 @@ node('master') {
                                 echo "${Dockerfiletemplate}" > Dockerfile
                                 docker version
                                 docker build -t helloworld-${student_branch}:${BUILD_NUMBER} .
-                                docker tag helloworld-${student_branch}:${BUILD_NUMBER} ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
-                                docker login -u admin -p admin ${nexusurl}
-                                docker push ${nexusurl}/${student_branch}/app:${BUILD_NUMBER}
+                                docker tag helloworld-${student_branch}:${BUILD_NUMBER} ${nexusdockerrepo}/${student_branch}/app:${BUILD_NUMBER}
+                                docker login -u admin -p admin ${nexusdockerrepo}
+                                docker push ${nexusdockerrepo}/${student_branch}/app:${BUILD_NUMBER}
                                 """
                                 }
                             }

@@ -1,6 +1,5 @@
 #!/usr/bin/env groovy
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-def student = "dprusevich"
 
 node {
 
@@ -8,7 +7,7 @@ node {
     checkout scm
   }
   
-  stage('Building code’) {
+  stage ('Building code') {
     git branch: 'dprusevich', url: 'https://github.com/MNT-Lab/build-t00ls'
     sh '''
     build_time="$(echo $(date +'%Y%m%d_%H:%M:%S'))"

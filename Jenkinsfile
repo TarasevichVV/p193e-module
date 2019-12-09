@@ -10,6 +10,7 @@ node {
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
     ])
     stash 'mnt-source'
+    sh "ls -la"
   }
 
   stage('02 Building code') {
@@ -91,15 +92,12 @@ node {
   }
 
   stage('07 Asking for manual approval') {
-    steps {
-      sh  "echo test"
-      script {
-        timeout(time: 5, unit: 'MINUTES') {
-          input(id: "Deploy Gate", message: "Deploy ${params.project_name}?", ok: 'Deploy')
-        }
+    sh  "echo test"
+    script {
+      timeout(time: 5, unit: 'MINUTES') {
+        input(id: "Deploy Gate", message: "Deploy ${params.project_name}?", ok: 'Deploy')
       }
     }
-
   }
 
   stage('08 Deployment') {

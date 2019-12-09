@@ -97,7 +97,7 @@ node {
                                         mkdir /opt/tomcat && \
                                         mv apache-tomcat*/* /opt/tomcat/
                                         COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /opt/tomcat/webapps/
-                                        EXPOSE 80:8080
+                                        EXPOSE 8080
                                         HEALTHCHECK CMD curl --fail http://localhost:8080/ || exit 1
                                         CMD ["/opt/tomcat/bin/catalina.sh", "run"]
                                         """
@@ -127,9 +127,9 @@ node {
         }
         stage ('Asking for manual approval') {
             echo "Asking for manual approval"
-            timeout(time: 2, unit: "MINUTES") {
-                input message: "Approve Deploy $JOB_BASE_NAME / $BUILD_NUMBER ?", ok: 'Yes'
-            }
+//            timeout(time: 2, unit: "MINUTES") {
+//                input message: "Approve Deploy $JOB_BASE_NAME / $BUILD_NUMBER ?", ok: 'Yes'
+//            }
         }
         stage ('Deployment (rolling update, zero downtime)') {
             echo "Deployment (rolling update, zero downtime)"

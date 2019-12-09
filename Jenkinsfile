@@ -106,11 +106,20 @@ Namespase : {student}
 Deployment
 Service
 Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) */
-    sh """
+//    pipeline-ibletsko-91.tar.gz
+// https://10.16.0.1/api/v1/namespaces/jenkins
+
+    node('kubernetes') {
+      sh "test"
+    }
+
+
+/*     sh """
     set +e
     kubectl create secret docker-registry nx-get-img --docker-server=http://192.168.56.177:32001 --docker-username=jenkins --docker-password=jenkins --docker-email=jenkins@kjenkins.com
     set -e
-    """
+    """ */
+
 //    kubectl apply -f app-dpl.yml
   }
 }

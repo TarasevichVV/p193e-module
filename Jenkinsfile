@@ -75,7 +75,8 @@ COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat
 CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF
 """
-                        sh "echo '--------------------------dock    er build start--------------------------'"
+                        sh "echo '--------------------------docker build start--------------------------'"
+                        sh "whereis docker"
                         sh "docker build -t tomcat_${student} ."
                         sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                         sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"

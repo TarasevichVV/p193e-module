@@ -79,7 +79,7 @@ node {
             }
         )
     }
-    stage ('Asking for manual approva') {
+    stage ('Asking for manual approval') {
     timeout(time: 3, unit: "MINUTES") { input message: 'U r brave, are not u?', ok: 'Yes' }
     }
 }

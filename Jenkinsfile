@@ -88,6 +88,7 @@ node {
                         node(label) {
                             stage('docker_build') {
                                 container('docker') {
+                                    unstash "war"
                                     sh "echo "${Dockerfile}" > Dockerfile"
                                     sh "ls"
                                     sh "docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} ."

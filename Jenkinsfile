@@ -54,56 +54,58 @@ node {
     sh "ls"
 
   stage ('Packaging and Publishing results') {
-  
-    git branch: "${student}", url: 'https://github.com/MNT-Lab/p193e-module.git'
-    sh """
-    tar -zxvf "${student}"_dsl_script.tar.gz output.txt
-    cp "${JENKINS_HOME}"/workspace/EPBYMINW8538/mntlab-ci-pipeline@script/Jenkinsfile .
-    tar czf pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz output.txt Jenkinsfile helloworld-ws.war
-    """
-    sh """
-    cat << "EOF" > Dockerfile
+  parallel(
+    'Archiving artifact': {
+      git branch: "${student}", url: 'https://github.com/MNT-Lab/p193e-module.git'
+      sh """
+      tar -zxvf "${student}"_dsl_script.tar.gz output.txt
+      cp "${JENKINS_HOME}"/workspace/EPBYMINW8538/mntlab-ci-pipeline@script/Jenkinsfile .
+      tar czf pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz output.txt Jenkinsfile helloworld-ws.war
+      """
+      sh """
+      cat << "EOF" > Dockerfile
 FROM tomcat:8.0
 MAINTAINER Dzmitry Prusevich
 COPY helloworld-ws.war /usr/local/tomcat/webapps/
-    """
-    sh """
-    curl -v -u admin:admin --upload-file pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz \
-    nexus.k8s.playpit.by/repository/maven-releases/app/"${student}"/"${BUILD_NUMBER}"/pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz
-    """
-  }
-
-  stage ('Docker deploy') {
-  podTemplate(label: label,
+      """
+      sh """
+      curl -v -u admin:admin --upload-file pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz \
+      nexus.k8s.playpit.by/repository/maven-releases/app/"${student}"/"${BUILD_NUMBER}"/pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz
+      """
+    },
+    'Docker deploy': {
+    podTemplate(label: label,
     containers: [
-        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-        containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-      ],
-      volumes: [
-        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-      ]
+      containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+      containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+    ],
+    volumes: [
+      hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+    ]
     ) {
     node(label) {
-        container('docker') {
-        echo "Building docker image..."
-        sh """
+      container('docker') {
+      echo "Building docker image..."
+      sh """
 cat << "EOF" > Dockerfile
 FROM tomcat:8.0
 MAINTAINER Dzmitry Prusevich
 COPY helloworld-ws.war /usr/local/tomcat/webapps/
 """
-        unstash "war"
-        sh """
-          docker build -t helloworld-dprusevich:"${BUILD_NUMBER}" .
-          docker tag helloworld-dprusevich:"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:"${BUILD_NUMBER}"
-          docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
-          docker push nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:"${BUILD_NUMBER}"
-          docker rmi helloworld-dprusevich:"${BUILD_NUMBER}"
-        """
+      unstash "war"
+      sh """
+        docker build -t helloworld-dprusevich:"${BUILD_NUMBER}" .
+        docker tag helloworld-dprusevich:"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:"${BUILD_NUMBER}"
+        docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+        docker push nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:"${BUILD_NUMBER}"
+        docker rmi helloworld-dprusevich:"${BUILD_NUMBER}"
+      """
+          }
         }
+      }
     }
-}
-}
+  )
+  }
 }
 
 

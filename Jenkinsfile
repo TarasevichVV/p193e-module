@@ -100,11 +100,10 @@ node('master') {
                                 //sh 'ls'
                                 sh """
                                 echo "${Dockerfiletemplate}" > Dockerfile
-                                docker version
                                 docker build -t helloworld-${student_branch}:${BUILD_NUMBER} .
-                                docker tag helloworld-${student_branch}:${BUILD_NUMBER} ${nexusdockerrepo}/${student_branch}/app:${BUILD_NUMBER}
+                                docker tag helloworld-${student_branch}:${BUILD_NUMBER} ${nexusdockerrepo}/helloworld-${student_branch}:${BUILD_NUMBER}
                                 docker login -u admin -p admin ${nexusdockerrepo}
-                                docker push ${nexusdockerrepo}/${student_branch}/app:${BUILD_NUMBER}
+                                docker push ${nexusdockerrepo}/helloworld-${student_branch}:${BUILD_NUMBER}
                                 """
                                 }
                             }

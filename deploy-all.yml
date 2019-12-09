@@ -81,5 +81,5 @@ spec:
       - path: /
         backend:
           serviceName: tomcat-ibletsko
-servicePort: 80
+          servicePort: 80
 

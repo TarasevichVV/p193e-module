@@ -81,7 +81,7 @@ node {
         def nodelabel = "buildnode"
         def nexusaddr = "nexus-dock.k8s.playpit.by:80"
         sh "echo parallel 2: image"
-        /* podTemplate (label: nodelabel, containers: [
+        podTemplate (label: nodelabel, containers: [
           containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
           ],
           volumes: [
@@ -90,8 +90,6 @@ node {
             node(nodelabel) {
               stage('build image') {
                 container('docker') {
-//                  unstash 'file1'
-//                  unstash 'file2'
                   unstash "st_jdockerfile"
                   sh """
                     docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
@@ -101,18 +99,10 @@ node {
                 }
               }
             }
-          } */
+          } 
       }
     )
     stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "file2"
-
-// -- DELETE --
-/*    sh """
-    echo "FROM tomcat:8.0" > Dockerfile
-    echo "COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/" >> Dockerfile
-//    """ */
-//    stash includes: "Dockerfile", name: "file1"
-// -- --
   }
 
   stage('07 Asking for manual approval') {
@@ -125,12 +115,6 @@ node {
   }
 
   stage('08 Deployment') {
-//(rolling update, zero downtime)
-/*
-Namespace : {student}
-Deployment
-Service
-Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) */
     podTemplate (label: 'testnode', containers: [
         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
         containerTemplate(name: 'centos', image: 'centos', ttyEnabled: true)

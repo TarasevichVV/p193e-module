@@ -52,7 +52,7 @@ node {
         }*/
         stage('6-Archiving') {
             parallel(
-                'archiving_artifact': {
+                '6-1-archiving_artifact': {
                     //sh 'find / -name Jenkinsfile -type f -exec ls -al {} '
                     //sh 'find / -name output.txt'
                     //sh 'find / -name *.war'
@@ -64,7 +64,7 @@ tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war 
 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
 """
                 },
-                'creating_docker': {
+                '6-2-creating_docker': {
 /*                    sh """
 cat > Dockerfile <<EOF
 FROM tomcat
@@ -89,7 +89,7 @@ EOF
                         ]
                     ) {
                         node(label) {
-                            stage('Docker Build') {
+                            stage('6-2-1-Docker Build') {
                                 container('docker') {
                                     sh """
 cat > Dockerfile <<EOF
@@ -101,9 +101,12 @@ COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat
 CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF
 """
-                                    echo "Building docker image...---tomcat_${student}----"
+                                    echo "6-2-1--a: dockerfile:"
+                                    sh "ls -al Docherfile"
+                                    echo "6-2-1--b:  Building docker image...---tomcat_${student}----"
 
                                     sh """
+                    sh pwd ; sh "ls -al Docker*"
                     sh "docker build . -t tomcat_${student}"
                     sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
                     sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}

@@ -18,13 +18,13 @@ node {
       sh "cp helloworld-project/helloworld-ws/target/helloworld-ws.war ."
     }
 
-    stage('Sonar scan'){
+ /*   stage('Sonar scan'){
             def scannerHome = tool 'Sonar';
             withSonarQubeEnv('Sonar'){
                 sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
             }
     }
-
+*/
     stage('Testing') {
     parallel(
         'pre-integration-test': {

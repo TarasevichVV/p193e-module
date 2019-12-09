@@ -1,10 +1,9 @@
-#!/usr/bin/env groovy
 def student = apavlovsky
 def branch_name = apavlovsky
 
 node {
     stage('Preparation (Checking out)'){
-        git branch: "$branch_name",
+        git branch: "${branch_name}",
             url: 'https://github.com/MNT-Lab/build-t00ls.git'
     }
 
@@ -37,35 +36,3 @@ node {
     }
 
 }
-
-
-"""
-def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-
-podTemplate(label: label,
-        containers: [
-                containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-            ],
-            volumes: [
-                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-            ]
-        ) {
-    node(label) {
-            stage('Sab') {
-                container('docker') {
-                    echo "Building docker image..."
-                    sh """
-                       hostname
-                       whoami
-                       env
-                       echo $PATH
-                       ps -ef 
-                       docker version
-                       """
-                }
-            }
-    }
-}
-"""
-

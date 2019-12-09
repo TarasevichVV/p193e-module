@@ -2,18 +2,6 @@
 
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def label2 = "centos-jenkins-${UUID.randomUUID().toString()}"
-def Dockerfile='''  From alpine
-                                
-                    RUN apk update && apk add wget tar openjdk8 && \
-                        wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz && \
-                        tar -xvf apache-tomcat-8.5.20.tar.gz && \
-                        mkdir /opt/tomcat && \
-                        mv apache-tomcat*/* /opt/tomcat/
-                                
-                        COPY helloworld-ws.war /opt/tomcat/webapps
-                                
-                        EXPOSE 8080
-                        CMD ["/opt/tomcat/bin/catalina.sh", "run"]'''
 
 String BRANCH_NAME='ayanchuk'
 
@@ -30,6 +18,12 @@ node {
         }
 
         stage ('Building code') {
+            sh """
+            sed -i "37i Build Number: $BUILD_NUMBER<br></p>" helloworld-project/helloworld-ws/src/main/webapp/index.html
+            sed -i "37i BuldTime: $(date)<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
+            sed -i "37i TriggeredBy: $(git log -1 --pretty=format:'%an')<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
+            sed -i "37i <p>Artefact Version: 1.2.$BUILD_NUMBER<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
+            """
             withMaven(
                 maven: 'M3'){
 //            sh "pwd"
@@ -145,7 +139,7 @@ node {
                     container('centos') {
                         sh """
                         yum install -y yum-utils
-                        cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+                        cat << EOF > /etc/yum.repos.d/kubernetes.repo
                         [kubernetes]
                         name=Kubernetes
                         baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
@@ -153,38 +147,37 @@ node {
                         gpgcheck=1
                         repo_gpgcheck=1
                         gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-                        EOF
+                         EOF
                         """
                         sh """
                         yum install -y kubectl
                         cat <<EOF | kubectl apply -f -
-                        ---
                         apiVersion: v1
                         kind: Namespace
                         metadata:
-                        name: ayanchuk
+                          name: ayanchuk
                         ---
                         apiVersion: v1
                         data:
-                        .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy1kb2NrLms4cy5wbGF5cGl0LmJ5OjgwIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
+                          .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy1kb2NrLms4cy5wbGF5cGl0LmJ5OjgwIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
                         kind: Secret
                         metadata:
-                        name: docker-secret
-                        namespace: ayanchuk
+                          name: docker-secret
+                          namespace: ayanchuk
                         type: kubernetes.io/dockerconfigjson
                         ---
                         apiVersion: apps/v1
                         kind: Deployment
                         metadata:
-                        name: application
-                        namespace: ayanchuk
+                          name: application
+                          namespace: ayanchuk
                         spec:
-                        replicas: 1
-                        strategy:
-                        type: RollingUpdate
-                        rollingUpdate:
-                            maxSurge: 1
-                            maxUnavailable: 25%
+                          replicas: 1
+                          strategy:
+                            type: RollingUpdate
+                            rollingUpdate:
+                              maxSurge: 1
+                              maxUnavailable: 25%
                         selector:
                             matchLabels:
                             app: application
@@ -194,10 +187,10 @@ node {
                                 app: application
                             spec:
                             containers:
-                                - name: hello-app
+                            - name: hello-app
                                 image: nexus-dock.k8s.playpit.by:80/helloworld-shanchar:$BUILD_NUMBER
                                 ports:
-                                    - containerPort: 8080
+                                - containerPort: 8080
                                 readinessProbe:
                                 httpGet:
                                     path: /
@@ -215,37 +208,37 @@ node {
                         apiVersion: v1
                         kind: Service
                         metadata:
-                        name: application-svc
-                        namespace: ayanchuk
-                        labels:
+                          name: application-svc
+                          namespace: ayanchuk
+                          labels:
                             app: application
                         spec:
-                        ports:
-                        - name: application-svc
+                          ports:
+                          - name: application-svc
                             port: 80
                             targetPort: 8080
                             protocol: TCP
-                        selector:
+                          selector:
                             app: application
-                        type: LoadBalancer
+                          type: ClusterIP
                         ---
                         apiVersion: extensions/v1beta1
                         kind: Ingress
                         metadata:
-                        name: application-ingress
-                        namespace: ayanchuk
-                        annotations:
+                          name: application-ingress
+                          namespace: ayanchuk
+                          annotations:
                             nginx.org/rewrites: serviceName=application-svc rewrite=/helloworld-ws/
                         spec:
-                        rules:
-                        - host: ayanchuk-app.k8s.playpit.by
+                          rules:
+                          - host: ayanchuk-app.k8s.playpit.by
                             http:
-                            paths: 
-                            - path: /
+                              paths: 
+                              - path: /
                                 backend:
-                                serviceName: application-svc
-                                servicePort: application-svc
-                        }
+                                  serviceName: application-svc
+                                  servicePort: application-svc
+                        EOF
                         """
                     }
                 }

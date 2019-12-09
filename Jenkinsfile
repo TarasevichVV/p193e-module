@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-def Dockerfile '''  FROM alpine
+def Dockerfile """  FROM alpine
 
                     RUN apk update && apk add wget tar openjdk8 && \
                     wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz && \
@@ -14,7 +14,7 @@ def Dockerfile '''  FROM alpine
                     EXPOSE 8080
                     
                     CMD ["/opt/tomcat/bin/catalina.sh", "run"]
-                    '''
+               """
 node {
     stage ('checking_out') {
         checkout scm

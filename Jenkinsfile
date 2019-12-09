@@ -63,21 +63,14 @@ node {
         build job: 'MNTLAB-phardzeyeu-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'phardzeyeu']], wait: true;
         copyArtifacts(projectName: 'MNTLAB-phardzeyeu-child1-build-job', selector: lastSuccessful())
     }
-    stage ('archiving_artifact') {
+    stage ('packaging_and_publishing_results'){
+        parallel (
+                'archiving_artifact' : {
                     unstash "jfile"
                     sh """
                     tar zxvf phardzeyeu_dsl_script.tar.gz
                     cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                     tar czf pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile
-                    """
-                }
-    stage ('packaging_and_publishing_results'){
-        parallel (
-                'archiving_artifact' : {
-                    sh """
-                    tar zxvf phardzeyeu_dsl_script.tar.gz
-                    cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                    tar czf pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
                     """
                 },
                 'creating_docker_image' : {

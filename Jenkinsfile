@@ -91,8 +91,7 @@ node {
                                     unstash "warka"
                                     sh """
                                     echo "${Dockerfile}" > Dockerfile
-                                    sh ls
-                                    sh docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
+                                    docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
                                     """
                                                                        
                                     // docker tag helloworld-phardzeyeu:${BUILD_NUMBER} 192.168.56.66:32389/phardzeyeu/tomcat:$BUILD_NUMBER

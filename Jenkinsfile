@@ -19,6 +19,7 @@ node {
     withMaven(maven: "M3") {
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
       sh "cp helloworld-project/helloworld-ws/target/*.war ." 
+    stash name: "war", includes: "helloworld-ws.war"
     }
   }
 /*
@@ -91,6 +92,7 @@ FROM tomcat:8.0
 MAINTAINER Dzmitry Prusevich
 COPY helloworld-ws.war /usr/local/tomcat/webapps/
 """
+        unstash "war"
         sh """
           docker build -t helloworld-dprusevich:"${BUILD_NUMBER}" .
           docker tag helloworld-dprusevich:"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:"${BUILD_NUMBER}"

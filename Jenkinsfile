@@ -149,15 +149,3 @@ node {
 
 
 }
-
-
-
-        kubectl patch deploy shanchar-deploy -n shanchar --patch="{
-            'spec':{
-                'template':{
-                    'spec':{
-                        'containers':[{'name':'shanchar-deploy','nexus-dock.k8s.playpit.by:80/helloworld-shanchar:$BUILD_NUMBER'}]
-                        }
-                    }
-                }
-            }"

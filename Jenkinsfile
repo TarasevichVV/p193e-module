@@ -4,6 +4,7 @@ def job_to_use = "MNTLAB-ibletsko-child1-build-job"
 
 node {
   stage('01 git checkout') {
+    sh "rm -rf ."
     checkout scm
     checkout([$class: 'GitSCM',
       branches: [[name: 'origin/ibletsko']],
@@ -56,12 +57,12 @@ node {
 
   stage('05 Triggering job and fetching artefact') {
 // WORKING --
-/*     build job: "${job_to_use}", parameters: [
+    build job: "${job_to_use}", parameters: [
       [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]//, wait: true by default
     ]
-    copyArtifacts projectName: "${job_to_use}", selector: lastCompleted() */
-    //
-    writeFile file: "output.txt", text: "output.txt For testing purposes."
+    copyArtifacts projectName: "${job_to_use}", selector: lastCompleted()
+//
+//    writeFile file: "output.txt", text: "output.txt For testing purposes."
     stash includes: "*.txt", name: "st_output"
     archiveArtifacts '*'
   }

@@ -117,7 +117,7 @@ Ingress rule ( app should be available by url: {student}-app.k8s.playpit.by  ) *
       node(nodelabel) {
         container('docker') {
           sh """
-          curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
           chmod +x ./kubectl
           mv ./kubectl /usr/local/bin/kubectl
           kubectl get pod -A

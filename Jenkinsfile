@@ -89,11 +89,12 @@ node {
                             stage('docker_build') {
                                 container('docker') {
                                     unstash "warka"
-                                    sh "echo "${Dockerfile}" > Dockerfile"
-                                    sh "ls"
-                                    sh "docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} ."
-                                    
-                                    
+                                    sh """
+                                    echo "${Dockerfile}" > Dockerfile
+                                    sh ls
+                                    sh docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
+                                    """
+                                                                       
                                     // docker tag helloworld-phardzeyeu:${BUILD_NUMBER} 192.168.56.66:32389/phardzeyeu/tomcat:$BUILD_NUMBER
                                     // docker login -u admin -p admin123 192.168.56.66:32389
                                     // docker push 192.168.56.66:32389/phardzeyeu/tomcat:$BUILD_NUMBER

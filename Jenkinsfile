@@ -143,8 +143,7 @@ node {
                         mv ./kubectl /usr/local/bin/kubectl
                         kubectl version
                         """
-                        sh """
-                        cat <<EOF | kubectl apply -f -
+                        sh """cat <<EOF | kubectl apply -f -
                         ---
                         apiVersion: v1
                         kind: Namespace
@@ -228,8 +227,7 @@ node {
                                 backend:
                                   serviceName: application-svc
                                   servicePort: application-svc
-                        EOF
-                        """
+                        EOF"""
                     }
                 }
             }

@@ -152,6 +152,7 @@ EOF
                     stage('7-Asking approval') {
 
                         sh "echo Asking"
+                        input "Approve deploy to prod?"
 
                     }
                     stage('8-Deploy') {

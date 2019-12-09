@@ -40,7 +40,7 @@ node {
         parallel(
                 get_artifact: {
                     sh "tar -xvzf Artifact/amiasnikovich-script.tar.gz"
-                    sh "-czvf pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz -C helloworld-project/helloworld-ws/target/helloworld-ws.war -C Artifact/output.txt" //-C /var/jenkins_home/workspace/EPBYMINW9149/mntlab-ci-pipeline@script/Jenkinsfile"
+                    sh "tar -czvf pipeline-amiasnikovich-${BUILD_NUMBER}.tar.gz -C helloworld-project/helloworld-ws/target/helloworld-ws.war -C Artifact/output.txt -C /var/jenkins_home/workspace/EPBYMINW9149/mntlab-ci-pipeline@script/Jenkinsfile"
                 }
         )
     }

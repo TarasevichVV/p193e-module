@@ -21,6 +21,8 @@ node {
         checkout scm
     }
     stage ('building_code') {
+        git ([url: 'https://github.com/MNT-Lab/d193l-module.git', branch: 'phardzeyeu'])
+        stash includes: "Jenkinsfile", name: "jfile"
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
         sh '''
         cat <<EOF >> helloworld-project/helloworld-ws/src/main/webapp/index.html
@@ -62,10 +64,11 @@ node {
         copyArtifacts(projectName: 'MNTLAB-phardzeyeu-child1-build-job', selector: lastSuccessful())
     }
     stage ('archiving_artifact') {
+                    unstash "jfile"
                     sh """
                     tar zxvf phardzeyeu_dsl_script.tar.gz
                     cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                    tar czf pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
+                    tar czf pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile
                     """
                 }
     stage ('packaging_and_publishing_results'){

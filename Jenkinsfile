@@ -163,24 +163,13 @@ docker rmi helloworld-${student}:${BUILD_NUMBER}"
 
             sh "echo Asking"
             timeout (time:1, unit:'MINUTES') {
-                input "Approve deploy to prod?"
+                input "Approve deploy to prod?", ok: 'Yes'
             }
 
         }
         stage('8-Deploy') {
             sh "echo deploy"
-/*                        sh '''cat > Dockerfile <<EOF
-FROM tomcat
-RUN curl -u admin:admin -o pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz -L && \
-tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz && \
-#mv helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
-COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
-CMD bash /usr/local/tomcat/bin/catalina.sh run
-EOF'''
-            sh "whereis docker"
-            sh "docker build -t tomcat_${student} ."
-            sh "docker tag tomcat_${student} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"
-            sh "docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}"*/
+
         }
         // }
         stage('9-Sending status') {

@@ -66,7 +66,7 @@ node {
                                unstash "war"
                                sh ''' cat <<EOF > Dockerfile
                                FROM tomcat:8.0
-                               COPY *.war /usr/local/tomcat/webapps/
+                               COPY clear_project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
                                EXPOSE 8080
                                CMD ["catalina.sh", "run"]
                                '''

@@ -95,13 +95,13 @@ node {
             )
         }
      stage("Asking for manual approval") {
-         stage = ${env.STAGE_NAME}
+         stage = env.STAGE_NAME
          timeout(time: 5, unit: "MINUTES") {
              input message: 'Please, approve deploy tomcat', ok: 'Approve'
          }
      }
      stage('Deployment (rolling update, zero downtime)') {
-         stage = ${env.STAGE_NAME}
-         sh "echo ${env.STAGE_NAME}"
+         stage = env.STAGE_NAME
+         sh "echo env.STAGE_NAME"
      }
 }

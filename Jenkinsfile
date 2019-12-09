@@ -36,18 +36,19 @@ node {
     stage('Packaging and Publishing results'){
         parallel (
             arch: {
-                sh '''
-                    tar -zxf anikitsenka_dsl_script.tar.gz output.txt
-                    ls -lha
-                    ls -lha helloworld-project/helloworld-ws/target
-                    tar -czf pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz output.txt helloworld-project/helloworld-ws/target/helloworld-ws.war
-                    ls -lha
-                '''
+                // sh '''
+                //     tar -zxf anikitsenka_dsl_script.tar.gz output.txt
+                //     ls -lha
+                //     ls -lha helloworld-project/helloworld-ws/target
+                //     tar -czf pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz output.txt helloworld-project/helloworld-ws/target/helloworld-ws.war
+                //     ls -lha
+                // '''
                 stash includes: "pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz", name: "artefact_targz"
             },
             dock: {
                 checkout([$class: 'GitSCM', branches: [[name: '*/anikitsenka']],
                     userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]])
+                    stash includes: "Dockerfile", name: "Dockerfile"
                 podTemplate(label: label,
                         containers: [
                             containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
@@ -61,12 +62,11 @@ node {
                         stage('Docker Build') {
                             container('docker') {
                                 echo "Building docker image..."
+                                unstash "Docker"
+                                ls -lha
+                                // docker build -t anikitsenka/tomcat .
+                                // docker tag anikitsenka/tomcat 192.168.56.106:30083/anikitsenka/tomcat:${BUILD_ID}
                                 sh """
-                                    hostname
-                                    whoami
-                                    env
-                                    echo $PATH
-                                    ps -ef
                                     docker version
                                     """
                             }

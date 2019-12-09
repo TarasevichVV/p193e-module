@@ -6,12 +6,16 @@ node {
   stage('01 git checkout') {
 // workspace cleanup
 //    sh "rm -rf *"
+
     checkout scm
-    checkout([$class: 'GitSCM',
-      branches: [[name: 'origin/ibletsko']],
-      userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]
-    ])
-//    sh "ls -la"
+    catchError {
+      checkout([$class: 'GitSCM',
+        branches: [[name: 'origin/ibletsko']],
+        userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]
+      ])
+    }
+    step([$class: 'Mailer', recipients: 'alert@no.email'])
+
     stash includes: "Jenkinsfile", name: "st_jenkinsfile"
     stash includes: "Dockerfile", name: "st_dockerfile"
     stash includes: "*.yml", name: "st_yamls"
@@ -21,50 +25,54 @@ node {
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
     ])
     stash 'mnt-source'
-
-//    sh "ls -la"
   }
 
   stage('02 Building code') {
-    withMaven(maven: 'M3') {
-      sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
+    catchError {
+      withMaven(maven: 'M3') {
+        sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
+      }
     }
+    step([$class: 'Mailer', recipients: 'alert@no.email'])
     stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "st_warfile"
   }
 
   stage('03 Sonar scan') {
-// WORKING --
-/*     def scannerHome = tool 'Sonar';
-    withSonarQubeEnv('Sonar') {
-      sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarcheck -Dsonar.sources=helloworld-project/helloworld-ws/src -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+    def scannerHome = tool 'Sonar';
+    catchError {
+      withSonarQubeEnv('Sonar') {
+        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarcheck -Dsonar.sources=helloworld-project/helloworld-ws/src -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+      }
     }
- */  }
+    step([$class: 'Mailer', recipients: 'alert@no.email'])
+  }
 
   stage('04 Testing') {
-    parallel (
-      "parallel 1" : {
-        sh 'echo "PARALLEL 1: mvn pre-integration-test"'
-      },
-      "parallel 2" : {
-        withMaven(maven: 'M3') {
-// WORKING --
-          "sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml integration-test'"
+    catchError {
+      parallel (
+        "parallel 1" : {
+          sh 'echo "PARALLEL 1: mvn pre-integration-test"'
+        },
+        "parallel 2" : {
+          withMaven(maven: 'M3') {
+            "sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xmlintegration-test'"
+          }
+        },
+        "parallel 3" : {
+          sh 'echo "PARALLEL 3: mvn post-integration-test"'
         }
-      },
-      "parallel 3" : {
-        sh 'echo "PARALLEL 3: mvn post-integration-test"'
-      }
-    )
+      )
+    }
+    step([$class: 'Mailer', recipients: 'alert@no.email'])
   }
 
   stage('05 Triggering job and fetching artefact') {
-// WORKING --
     catchError {
-      build job: "${job_to_use_TEST}", parameters: [
+      build job: "${job_to_use}", parameters: [
         [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]//, wait: true by default
       ], wait: true
     }
-    step([$class: 'Mailer', recipients: 'ihar_bletsko@epam.com'])
+    step([$class: 'Mailer', recipients: 'alert@no.email'])
     copyArtifacts projectName: "${job_to_use}", selector: lastCompleted()
     stash includes: "*.txt", name: "st_output"
     archiveArtifacts '*'
@@ -91,17 +99,17 @@ node {
             hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
             ]) {
             node(nodelabel) {
-//              stage('build image') {
-                container('docker') {
-                  unstash "st_dockerfile"
-                  unstash "st_warfile"
-                  sh """
-                    docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
-                    docker login -u admin -p admin $nexusaddr
-                    docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
-                    """
-                }
-//              }
+//            stage('build image') {
+              container('docker') {
+                unstash "st_dockerfile"
+                unstash "st_warfile"
+                sh """
+                  docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
+                  docker login -u admin -p admin $nexusaddr
+                  docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
+                  """
+              }
+//            }
             }
           }
       }
@@ -109,12 +117,11 @@ node {
   }
 
   stage('07 Asking for manual approval') {
-// WORKING --
-/*     script {
+    script {
       timeout(time: 5, unit: 'MINUTES') {
         input(id: "Deploy Gate", message: "Deploy ${currentBuild.projectName}?", ok: '08 Deployment')
       }
-    } */
+    }
   }
 
   stage('08 Deployment') {
@@ -138,7 +145,4 @@ node {
     }
   }
 }
-
-
-
 

@@ -1,0 +1,34 @@
+actions to do to deploy
+
+kubectl apply -f kuber.yaml
+
+sleep 15
+
+if [[ $(curl dprusevich-app.k8s.playpit.by | grep -Eo "commitID=\"[0-9]{1,3}\""
+) != *"${BUILD_NUMBER}"* ]]; then
+kubectl rollout undo deploy/dprusevich-tomcat
+fi
+
+post {
+    failure {
+        mail to: 'team@example.com',
+             subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+             body: "Something is wrong with ${env.BUILD_URL}"
+    }
+}
+
+node ('worker_node1') {
+  try {
+      ...
+    }
+    currentBuild.result = 'SUCCESS'
+  }
+  catch (err) {
+    currentBuild.result = 'FAILURE'
+  }
+  finally {
+    mail to: 'dzmitry_prusevich@epam.com',
+      subject: "Status of pipeline: ${currentBuild.fullDisplayName}",
+      body: "${env.BUILD_URL} has result ${currentBuild.result}"
+  }
+}

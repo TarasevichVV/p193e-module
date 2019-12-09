@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dprusevich
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy1kb2NrLms4cy5wbGF5cGl0LmJ5OjgwIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
+kind: Secret
+metadata:
+  name: docker-secret
+  namespace: dprusevich
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dprusevich-tomcat
+  namespace: dprusevich
+  labels:
+    app: dprusevich-tomcat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dprusevich-tomcat
+  template:
+    metadata:
+      labels:
+        app: dprusevich-tomcat
+    spec:
+      containers:
+        - name: dprusevich-tomcat
+          image: nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:"${BUILD_NUMBER}"
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+      - name: docker-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dprusevich-tomcat-service
+  namespace: dprusevich
+  labels:
+    app: dprusevich-tomcat
+spec:
+  type: LoadBalancer
+  selector:
+    app: dprusevich-tomcat
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: dprusevich-tomcat
+  namespace: dprusevich
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: dprusevich-app.k8s.playpit.by/
+spec:
+  rules:
+  - host: dprusevich-app.k8s.playpit.by
+    http:
+      paths:
+      - backend:
+          serviceName: dprusevich-tomcat-service
+          servicePort: 80

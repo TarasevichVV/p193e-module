@@ -68,7 +68,7 @@ node {
 
     //def label = "worker-${UUID.randomUUID().toString()}"
     def nodelabel = "buildnode"
-    def nexusaddr = "nexus-dock.k8s.playpit.by"
+    def nexusaddr = "nexus-dock.k8s.playpit.by:80"
     podTemplate (label: nodelabel, containers: [
       containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
     ],

@@ -21,8 +21,8 @@ node {
         checkout scm
     }
     stage ('building_code') {
-        // git ([url: 'https://github.com/MNT-Lab/d193l-module.git', branch: 'phardzeyeu'])
-        // stash includes: "Jenkinsfile", name: "jfile"
+        git ([url: 'https://github.com/MNT-Lab/d193l-module.git', branch: 'phardzeyeu'])
+        stash includes: "Jenkinsfile", name: "jfile"
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
         sh '''
         cat <<EOF >> helloworld-project/helloworld-ws/src/main/webapp/index.html
@@ -68,10 +68,9 @@ node {
     stage ('packaging_and_publishing_results'){
         parallel (
                 'archiving_artifact' : {
-                    // unstash "jfile"
+                    unstash "jfile"
                     sh """
                     tar zxvf phardzeyeu_dsl_script.tar.gz
-                    cp var/jenkins_home/workspace/EPBYMINW8778/mntlab-ci-pipeline@script/Jenkinsfile .
                     cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
                     tar czf pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile
                     curl -v -u admin:admin --upload-file pipeline-phardzeyeu-${BUILD_NUMBER}.tar.gz \

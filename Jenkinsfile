@@ -46,6 +46,8 @@ node {
                 stash includes: "pipeline-anikitsenka-${BUILD_NUMBER}.tar.gz", name: "artefact_targz"
             },
             dock: {
+                checkout([$class: 'GitSCM', branches: [[name: '*/anikitsenka']],
+                    userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]])
                 podTemplate(label: label,
                         containers: [
                             containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
@@ -57,8 +59,6 @@ node {
                         ) {
                     node(label) {
                         stage('Docker Build') {
-                            checkout([$class: 'GitSCM', branches: [[name: '*/anikitsenka']],
-                                userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]])
                             container('docker') {
                                 echo "Building docker image..."
                                 sh """

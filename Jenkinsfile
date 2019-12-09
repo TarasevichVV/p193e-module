@@ -34,4 +34,8 @@ node {
         build job: "MNTLAB-ashkraba-child1-build-job", parameters: [string(name: "BRANCH_NAME", value: "ashkraba")], wait: true
         copyArtifacts(projectName: "MNTLAB-ashkraba-child1-build-job", selector: lastSuccessful())
     }
+    stage('Create archive') {
+        sh "tar -zxvf ashkraba_dsl_script.tar.gz"
+        sh "tar -czf pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz output.txt Jenkinsfile helloworld.war"
+    }
 }

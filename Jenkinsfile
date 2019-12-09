@@ -221,7 +221,7 @@ node {
                           name: application-ingress
                           namespace: ayanchuk
                           annotations:
-                            nginx.org/rewrites: serviceName=application-svc rewrite=/helloworld-ws/
+                            nginx.ingress.kubernetes.io/app-root: /helloworld-ws
                         spec:
                           rules:
                           - host: ayanchuk-app.k8s.playpit.by

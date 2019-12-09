@@ -97,7 +97,6 @@ node {
                                         container('docker') {
                                             unstash "targz"
                                             unstash "docker"
-                                            sh """
                                             dockerpush.call(nexus, "helloworld-ykachatkou:$BUILD_NUMBER")
                                         }
 

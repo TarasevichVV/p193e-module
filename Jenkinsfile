@@ -38,6 +38,7 @@ node {
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "warka"
     }
     }
+    /*
     stage ('sonar_scan') {
     def scannerHome = tool 'Sonar'
     withSonarQubeEnv() {
@@ -58,7 +59,8 @@ node {
                     sh "echo 'mvn post-integration-test'"
                 }
             )
-        }
+    }
+    */    
     stage ('triggering_job') {
         build job: 'MNTLAB-phardzeyeu-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: 'phardzeyeu']], wait: true;
         copyArtifacts(projectName: 'MNTLAB-phardzeyeu-child1-build-job', selector: lastSuccessful())

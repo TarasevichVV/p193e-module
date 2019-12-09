@@ -48,7 +48,7 @@ node {
       "parallel 2" : {
         withMaven(maven: 'M3') {
 // WORKING --
-          "sh 'mvn integration-test'"
+          "sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml integration-test'"
         }
       },
       "parallel 3" : {
@@ -60,11 +60,11 @@ node {
   stage('05 Triggering job and fetching artefact') {
 // WORKING --
     catchError {
-      build job: "${job_to_use}", parameters: [
+      build job: "${job_to_use_TEST}", parameters: [
         [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]//, wait: true by default
       ], wait: true
     }
-    step([$class: 'Mailer', recipients: 'alert@no.email'])
+    step([$class: 'Mailer', recipients: 'ihar_bletsko@epam.com'])
     copyArtifacts projectName: "${job_to_use}", selector: lastCompleted()
     stash includes: "*.txt", name: "st_output"
     archiveArtifacts '*'

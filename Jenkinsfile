@@ -2,20 +2,8 @@
 
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def label2 = "centos-jenkins-${UUID.randomUUID().toString()}"
-def Dockerfile='''  
-FROM alpine
-
-RUN apk update && apk add wget tar openjdk8 && \
-wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz && \
-tar -xvf apache-tomcat-8.5.20.tar.gz && \
-mkdir /opt/tomcat && \
-mv apache-tomcat*/* /opt/tomcat/
-
-COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /opt/tomcat/webapps
-
-EXPOSE 8080
-CMD ["/opt/tomcat/bin/catalina.sh", "run"]
-'''
+// def Dockerfile='''  
+// '''
 
 node {
     stage ('1.checking_out') {
@@ -24,6 +12,7 @@ node {
     stage ('2.building_code') {
         git ([url: 'https://github.com/MNT-Lab/p193e-module.git', branch: 'phardzeyeu'])
         stash includes: "tomcat.yml", name: "tomcat"
+        stash includes: "Dockerfile", name: "docker"
         stash includes: "Jenkinsfile", name: "jfile"
         git ([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'phardzeyeu'])
         sh '''
@@ -92,9 +81,9 @@ node {
                         node(label) {
                             stage('6.1.docker_build') {
                                 container('docker') {
+                                    unstash "docker"
                                     unstash "warka"
                                     sh """
-                                    echo "${Dockerfile}" > Dockerfile
                                     docker build -t helloworld-phardzeyeu:${BUILD_NUMBER} .
                                     docker tag helloworld-phardzeyeu:${BUILD_NUMBER} nexus-dock.k8s.playpit.by:80/helloworld-phardzeyeu:${BUILD_NUMBER}
                                     docker login -u admin -p admin nexus-dock.k8s.playpit.by:80

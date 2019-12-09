@@ -1,4 +1,5 @@
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+def label_deploy = "centos-jenkins-${UUID.randomUUID().toString()}"
 
 node {
     stage('Preparation (Checking out)') {
@@ -48,6 +49,7 @@ node {
                 checkout([$class: 'GitSCM', branches: [[name: '*/anikitsenka']],
                     userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]])
                     stash includes: "Dockerfile", name: "Dockerfile"
+                    stash includes: "deploy.yml", name: "Deployment"
                 podTemplate(label: label,
                         containers: [
                             containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
@@ -81,5 +83,26 @@ node {
     }
     stage ('Asking for manual approval') {
     timeout(time: 3, unit: "MINUTES") { input message: 'U r brave, are not u?', ok: 'Yes' }
+    }
+    stage ('Deployment (rolling update, zero downtime)') {
+        podTemplate(label: label_deploy,
+                containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
+                ],
+        ) {
+            node(label_deploy) {
+                    container('centos') {
+                        unstash "Deployment"
+                        sh """
+                        curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                        chmod +x ./kubectl
+                        mv ./kubectl /usr/local/bin/kubectl
+                        sed -i "s/BUILD_NUMBER/${BUILD_NUMBER}/g" deploy.yml
+                        kubectl apply -f deploy.yml
+                        """
+                    }
+                }
+        }
     }
 }

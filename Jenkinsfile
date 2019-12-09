@@ -7,10 +7,8 @@ def nexus = "nexus-dock.k8s.playpit.by:80"
 node {
     try {
         stage("1. Preparation (checking out)"){
-            steps{
-                echo "====++++executing Preparation (checking out)++++===="
-                checkout scm
-            }
+            echo "====++++executing Preparation (checking out)++++===="
+            checkout scm
         }
 
         stage('2. Build') {

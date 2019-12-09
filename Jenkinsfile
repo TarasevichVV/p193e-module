@@ -55,10 +55,9 @@ node {
         ) {
             node(label) {
                 container('docker') {
-                    sh "apk add curl"
-                    sh "apk add tar"
-                    sh "curl -O http://nexus.k8s.playpit.by/repository/maven-releases/app/askraba/\"${BUILD_NUMBER}\"/pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz"
-                    sh "tar xzvf pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz"
+                    sh "apk add wget"
+                    sh "wget --user admin --password admin http://nexus.k8s.playpit.by/repository/maven-releases/app/askraba/\"${BUILD_NUMBER}\"/pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz"
+                    sh "tar -xzvf pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz"
                     sh """
         docker build -t helloworld-ashkrba:"${BUILD_NUMBER}" .
         docker tag helloworld-ashkrba:"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-ashkraba:"${BUILD_NUMBER}"

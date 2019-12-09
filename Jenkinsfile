@@ -8,7 +8,8 @@ node {
         }
         stage('Building code'){
             git branch: 'vtarasevich', url: 'https://github.com/MNT-Lab/build-t00ls'
-            sh label: '', script: '''TimeStamp=$(date)
+            sh label: '', script: '''
+                                    TimeStamp=$(date)
                                     cat << EOF > helloworld-project/helloworld-ws/src/main/webapp/index.html
                                     <!DOCTYPE html>
                                     <html>
@@ -20,7 +21,8 @@ node {
                                     <p>buildTime=$TimeStamp</p>
                                     </body>
                                     </html>
-                                    EOF'''
+                                    EOF
+                                    '''
             withMaven(maven: 'M3') { 
                 sh "mvn clean -f helloworld-project/helloworld-ws/pom.xml  install"
                 stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "war"
@@ -125,9 +127,8 @@ node {
         stage('Sending email'){
             emailext body: '''${SCRIPT, template="groovy-html.template"}''',
             mimeType: 'text/html',
-            subject: "$currentBuild.result: Job '$currentBuild.fullDisplayName ${env.BUILD_NUMBER}' Stage:'${stage}'",
+                subject: "$currentBuild.result: Job '${currentBuild.fullDisplayName} ${currentBuild.number}' Stage:'${stage}'",
             to: "pahosit@gmail.com",
-            replyTo: "${mailRecipients}",
             recipientProviders: [[$class: 'DevelopersRecipientProvider']]
         }
     }  

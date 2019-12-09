@@ -145,6 +145,7 @@ node {
                         """
                         sh """
                         cat <<EOF | kubectl apply -f -
+                        ---
                         apiVersion: v1
                         kind: Namespace
                         metadata:
@@ -171,32 +172,28 @@ node {
                             rollingUpdate:
                               maxSurge: 1
                               maxUnavailable: 25%
-                        selector:
+                          selector:
                             matchLabels:
-                            app: application
-                        template:
+                              app: application
+                          template:
                             metadata:
-                            labels:
+                              labels:
                                 app: application
                             spec:
-                            containers:
-                            - name: hello-app
+                              containers:
+                              - name: hello-app
                                 image: nexus-dock.k8s.playpit.by:80/helloworld-shanchar:$BUILD_NUMBER
                                 ports:
                                 - containerPort: 8080
                                 readinessProbe:
-                                httpGet:
+                                  httpGet:
                                     path: /
                                     port: 8080
-                                    initialDelaySeconds: 5
-                                    periodSeconds: 5
-                                    successThreshold: 1
-                                livenessProbe:
-                                    httpGet:
-                                    path: /helloworld-ws
-                                    port: 8080          
-                            imagePullSecrets:
-                            - name: docker-secret   
+                                  initialDelaySeconds: 5
+                                  periodSeconds: 5
+                                  successThreshold: 1        
+                              imagePullSecrets:
+                              - name: docker-secret   
                         ---
                         apiVersion: v1
                         kind: Service
@@ -231,6 +228,7 @@ node {
                                 backend:
                                   serviceName: application-svc
                                   servicePort: application-svc
+                        EOF
                         """
                     }
                 }

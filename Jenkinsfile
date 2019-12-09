@@ -4,7 +4,7 @@ def job_to_use = "MNTLAB-ibletsko-child1-build-job"
 
 node {
   stage('01 git checkout') {
-    sh "rm -rf ."
+    sh "rm -rf *"
     checkout scm
     checkout([$class: 'GitSCM',
       branches: [[name: 'origin/ibletsko']],

@@ -1,8 +1,8 @@
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def student = "shanchar"
+def label2 = "centos-jenkins-${UUID.randomUUID().toString()}"
 
-
-node ('master') {
+node {
     
     stage ('Preparation (Checking out)') {
       checkout scm
@@ -104,8 +104,33 @@ node ('master') {
     }
 
 
+    stage ('Deployment (rolling update, zero downtime)') {
+        podTemplate(label: label2,
+                containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
+                    ],
+                    volumes: [
+                        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                    ]
+                ) {
+            node(label2) {
+                    stage('Sab2') {
+                        container('centos') {
+                            echo "Building docker image..."
+                            sh """
+                                curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                                chmod +x ./kubectl
+                                mv ./kubectl /usr/local/bin/kubectl
+                                kubectl version
+                               """
+                        }
+                    }
+            }
+        }
+    }
+
 
 
 
 }
-

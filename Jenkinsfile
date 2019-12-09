@@ -8,15 +8,15 @@ node {
             url: 'https://github.com/MNT-Lab/build-t00ls.git'
     }
 
-    stage('Building'){
+    stage('Building') {
         def index_html = """
-<html>
+    <html>
     <head><title>helloworld-ws Quickstart</title></head>
     <body>
-    \t<h1>My customized change to helloworld-ws</h1>
-    \t<p>The <i>helloworld-ws</i> quickstart demonstrates the use of <b>JAX-WS</b> in
-          Red Hat JBoss Enterprise Application Platform as a simple Hello World application</p>
-    \t<p>There is no user interface for this quickstart. Instead, you can verify the
+    <h1>My customized change to helloworld-ws</h1>
+    <p>The <i>helloworld-ws</i> quickstart demonstrates the use of <b>JAX-WS</b> in
+        Red Hat JBoss Enterprise Application Platform as a simple Hello World application</p>
+    <p>There is no user interface for this quickstart. Instead, you can verify the
          Web Service is running and deployed correctly by accessing the following URL:</p>
          <div style="margin-left: 1em;">
          <a href="HelloWorldService?wsdl">HelloWorldService?wsdl</a>
@@ -32,9 +32,8 @@ node {
     </html>
     """
         sh "echo ${index_html} > $WORKSPACE/helloworld-project/helloworld-ws/src/main/webapp/index.html"
-        withMaven (maven: 'maven-3', mavenSettingsConfig: 'my-maven-settings') {
+        withMaven(maven: 'maven-3', mavenSettingsConfig: 'my-maven-settings') {
             sh "mvn clean install -U -f $WORKSPACE/helloworld-project/helloworld-ws/pom.xml"
-        }
         }
     }
 

@@ -46,7 +46,19 @@ node {
     }
 
     stage('Testing'){
-        sh 'echo "Stage testing"'
+        parallel(
+                1: {
+                    echo "Maven pre-integration tests"
+                },
+                2: {
+                    withMaven(maven: 'M3') {
+                        sh "mvn -f helloworld-project/helloworld-ws/pom.xml integration-test"
+                    }
+                },
+                3: {
+                    echo "Maven pre-integration tests"
+                }
+        )
     }
 
     stage('Triggering job and fetching artefact'){

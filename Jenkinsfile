@@ -37,7 +37,8 @@ node {
     stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "st_warfile"
   }
 
-  stage('03 Sonar scan') {
+//commented because sonar pod constantly unavailable due to node resources shortage
+/*   stage('03 Sonar scan') {
     def scannerHome = tool 'Sonar';
     catchError {
       withSonarQubeEnv('Sonar') {
@@ -45,7 +46,7 @@ node {
       }
     }
     step([$class: 'Mailer', recipients: 'alert@no.email'])
-  }
+  } */
 
   stage('04 Testing') {
     catchError {
@@ -127,7 +128,7 @@ node {
   stage('08 Deployment') {
     podTemplate (label: 'deploynode', containers: [
         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-        containerTemplate(name: 'launch', image: 'centos', ttyEnabled: true)
+        containerTemplate(name: 'launch', image: 'cosmintitei/bash-curl', ttyEnabled: true)
     ]) {
       node('deploynode') {
         container('launch') {
@@ -144,5 +145,6 @@ node {
       }
     }
   }
+
 }
 

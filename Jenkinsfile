@@ -1,4 +1,7 @@
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+def label_deploy = "centos-jenkins-${UUID.randomUUID().toString()}"
+def mail_to = "vitali.markov.1996@gmail.com"
+
 
 node {
     stage('Preparation (Checking out)') {
@@ -28,6 +31,85 @@ node {
             test3: { sh 'echo "postintegration-test"' }
         )
     }
-    
+    stage('Triggering job and fetching artefact after finishing'){
+        build job: "MNTLAB-vmarkau-child1-build-job", parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "vmarkau"]], wait: true;
+        copyArtifacts(filter:'*', projectName: 'MNTLAB-vmarkau-child1-build-job', selector: lastSuccessful())
+    }
+    stage('Packaging and Pulling docker image to the nexus'){
+        parallel (
+            arch: {
+                sh '''
+                    tar -zxf vmarkau_dsl_script.tar.gz output.txt
+                    tar -czf pipeline-vmarkau-${BUILD_NUMBER}.tar.gz output.txt helloworld-project/helloworld-ws/target/helloworld-ws.war
+                    curl -v -u admin:admin --upload-file pipeline-vmarkau-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/vmarkau/${BUILD_NUMBER}/pipeline-vmarkau-${BUILD_NUMBER}.tar.gz
+                '''
+                stash includes: "pipeline-vmarkau-${BUILD_NUMBER}.tar.gz", name: "artefact_targz"
+            },
+            dock: {
+                checkout([$class: 'GitSCM', branches: [[name: '*/vmarkau']],
+                    userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]])
+                    stash includes: "Dockerfile", name: "Dockerfile"
+                    stash includes: "deploy.yml", name: "Deployment"
+                podTemplate(label: label,
+                        containers: [
+                            containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                            containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+                            ],
+                        volumes: [
+                            hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                        ]
+                        ) {
+                    node(label) {
+                        stage('Docker Build') {
+                            container('docker') {
+                                sh 'echo "Building docker image..."'
+                                unstash "Dockerfile"
+                                unstash "binary_webapp"
+                                sh '''
+                                    docker build -t vmarkau:${BUILD_ID} .
+                                    docker tag vmarkau:${BUILD_ID} nexus-dock.k8s.playpit.by:80/vmarkau:${BUILD_ID}
+                                    docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                                    docker push nexus-dock.k8s.playpit.by:80/vmarkau:${BUILD_ID}
+                                    docker rmi nexus-dock.k8s.playpit.by:80/vmarkau:${BUILD_ID}
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        )
+    }
+    stage ('Asking for manual approval') {
+    timeout(time: 3, unit: "MINUTES") { input message: 'U r brave, are not u?', ok: 'Yes' }
+    }
+    stage ('Deployment (rolling update, zero downtime)') {
+        podTemplate(label: label_deploy,
+                containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
+                ],
+        ) {
+            node(label_deploy) {
+                    container('centos') {
+                        unstash "Deployment"
+                        sh '''
+                            curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                            chmod +x ./kubectl
+                            mv ./kubectl /usr/local/bin/kubectl
+                            sed -i "s/BUILD_NUMBER/${BUILD_NUMBER}/g" deploy.yml
+                            kubectl apply -f deploy.yml
+                        '''
+                    }
+                }
+        }
+    }
+    stage ('Text me, please') {
+        emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+        mimeType: 'text/html',
+        subject: "Job '${JOB_NAME} ${env.BUILD_ID}'",
+        to: "${mail_to}",
+        // replyTo: "${mail_to}",
+        recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+     }
     
 }

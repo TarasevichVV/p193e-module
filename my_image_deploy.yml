@@ -62,7 +62,7 @@ metadata:
   name: ashkraba-ingress
   namespace: ashkraba
   annotations:
-    nginx.org/rewrites: serviceName=tomcat rewrite=/helloworld-ws/
+    nginx.org/rewrites: serviceName=tomcat rewrite=/
 spec:
   rules:
   - host: ashkraba-app.k8s.playpit.by    

@@ -11,7 +11,7 @@ node {
             sh "cp helloworld-project/helloworld-ws/target/*.war ./helloworld.war"
         }
     }
-   /* 
+    
     stage('Sonar scan for code') {
         def scannerHome = tool 'Sonar'
         withSonarQubeEnv('Sonar') {
@@ -34,7 +34,7 @@ node {
         )
     }
 
-    */
+    
     stage('Triggering job from prev task') {
         build job: "MNTLAB-ashkraba-child1-build-job", parameters: [string(name: "BRANCH_NAME", value: "ashkraba")], wait: true
         copyArtifacts(projectName: "MNTLAB-ashkraba-child1-build-job", selector: lastSuccessful())

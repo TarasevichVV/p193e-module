@@ -114,7 +114,7 @@ cat Dockerfile
 
                                     sh """
 docker build . -t helloworld-${student}:${BUILD_NUMBER}
-docker tag helloworld-${student}:"${BUILD_NUMBER}" http://nexus.k8s.playpit.by/repository/docker/helloworld-${student}:"${BUILD_NUMBER}"
+docker tag helloworld-${student}:"${BUILD_NUMBER}" nexus.k8s.playpit.by/repository/docker/helloworld-${student}:"${BUILD_NUMBER}"
 docker login -u admin -p admin nexus-dock.k8s.playpit.by
 docker push http://nexus.k8s.playpit.by/repository/docker/helloworld-${student}:${BUILD_NUMBER}
 docker rmi helloworld-${student}:${BUILD_NUMBER}"

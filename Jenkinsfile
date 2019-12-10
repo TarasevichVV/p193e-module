@@ -93,7 +93,7 @@ node {
         }
 
         stage('Deployment') {
-            podTemplate(label: label,
+            LodTemplate(label: label,  //BUG BUG BUG for test email
                     containers: [
                             containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                             containerTemplate(name: 'kuber', image: 'lachlanevenson/k8s-kubectl', command: 'cat', ttyEnabled: true),

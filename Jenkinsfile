@@ -95,7 +95,7 @@ node {
         podTemplate(label: label,
                 containers: [
                         containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                        containerTemplate(name: 'kuber', image: 'bitnami/kubectl:latest', command: 'cat', ttyEnabled: true),
+                        containerTemplate(name: 'kuber', image: 'lachlanevenson/k8s-kubectl', command: 'cat', ttyEnabled: true),
                 ],
                 volumes: [
                         hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),

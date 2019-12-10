@@ -1,5 +1,6 @@
 #!/usr/bin/env groovy
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+def deploy_tom = "docker2-jenkins-${UUID.randomUUID().toString()}"
 def student = "dprusevich"
 node {
 

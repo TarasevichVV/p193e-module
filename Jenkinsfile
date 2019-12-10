@@ -93,9 +93,13 @@ curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz 
                                     sh """
 cat > Dockerfile <<EOF
 FROM tomcat
-RUN curl -u admin:admin -o pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz -L && \
-tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz &&\
-mv helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
+#RUN curl -u admin:admin -o pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz -L && \
+#tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz &&\
+
+RUN curl -u admin:admin -o pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz -L
+RUN tar -xvf pipeline-${student}-${BUILD_NUMBER}.tar.gz
+RUN mv helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
+
 #COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps
 CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF

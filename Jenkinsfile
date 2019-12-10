@@ -2,6 +2,11 @@
 def student = "ibletsko"
 def job_to_use = "MNTLAB-ibletsko-child1-build-job"
 
+podTemplate (label: 'deploynode', containers: [
+  containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+  containerTemplate(name: 'launch', image: 'cosmintitei/bash-curl', ttyEnabled: true)
+])
+
 node {
   stage('01 git checkout') {
 // workspace cleanup
@@ -126,10 +131,7 @@ node {
   }
 
   stage('08 Deployment') {
-    podTemplate (label: 'deploynode', containers: [
-        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-        containerTemplate(name: 'launch', image: 'cosmintitei/bash-curl', ttyEnabled: true)
-    ]) {
+  {
       node('deploynode') {
         container('launch') {
           unstash "st_yamls"

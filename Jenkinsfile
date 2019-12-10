@@ -100,8 +100,8 @@ node {
                             """
                             unstash "war"
                             sh """
-                            docker build -t helloworld-${student}:"${BUILD_NUMBER}" .
-                            docker tag helloworld-${student}:"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-${student}:"${BUILD_NUMBER}"
+                            docker build -t helloworld-${student}:${BUILD_NUMBER} .
+                            docker tag helloworld-${student}:${BUILD_NUMBER} nexus-dock.k8s.playpit.by:80/helloworld-${student}:${BUILD_NUMBER}
                             docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
                             docker push nexus-dock.k8s.playpit.by:80/helloworld-${student}:"${BUILD_NUMBER}"
                           """

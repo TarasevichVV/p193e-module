@@ -133,6 +133,7 @@ COPY helloworld-ws.war /usr/local/tomcat/webapps/
     node(deploy_tom) {
       container('docker') {
       echo "Building docker image..."
+      unstash "kuber"
       sh """
 cat /etc/os-release
 apk --no-cache add curl 

@@ -141,6 +141,9 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s http
 chmod +x ./kubectl
 mv ./kubectl /usr/local/bin/kubectl
 kubectl apply -f kuber.yaml
+kubectl get pods -n dprusevich
+kubectl get svc -n 
+kubectl get ingress -A
 """
           }
         }

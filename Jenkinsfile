@@ -123,18 +123,17 @@ node {
         }
 
         currentBuild.result = 'SUCCESS'
-        status = 'SUCCESS'
         def stage_name = 'All right'
     } catch (Exception err) {
         currentBuild.result = 'FAILURE'
-        job_status = 'FAILURE'
+
       }
 
     finally {
         stage('Send email') {
-            emailext attachLog: true, body: "build number is ${BUILD_NUMBER}, ${JOB_NAME} result is ${job_status}, ${FAILED_STAGE}",
+            emailext attachLog: true, body: "build number is ${BUILD_NUMBER}, ${JOB_NAME} result is ${currentBuild.result}, ${FAILED_STAGE}",
                     recipientProviders: [developers()],
-                    subject: "${JOB_NAME} result is ${job_status}",
+                    subject: "${JOB_NAME} result is ${currentBuild.result}",
                     to: 'al.miasnikovich@gmail.com'
         }
     }

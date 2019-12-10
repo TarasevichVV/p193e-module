@@ -160,22 +160,6 @@ docker rmi helloworld-${student}:${BUILD_NUMBER}"
 
         } catch (e) {
             String error = "${e}";
-            emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}";', subject: 'Jenkins Error ${env.JOB_NAME} ', to: 'mk.elz@bk.com'
-            // Make the string with job info, example:
-            // ${env.JOB_NAME}
-            // ${env.BUILD_NUMBER}
-            // ${env.BUILD_URL}
-            // and other variables in the code
-/*        mail bcc: '',
-                cc: '',
-                charset: 'UTF-8',
-                from: '',
-                mimeType: 'text/html',
-                replyTo: '',
-                subject: "ERROR CI: Project name -> ${JOB_NAME}",
-                to: "${mails_to_notify}",
-                //body: "<b>${pivote}</b><br>\n\nError mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}";
-                body: "<br>\n\nError mesage: ${error}\n\n<br>Project: ${JOB_NAME} <br>Build Number: ${BUILD_NUMBER} <br> URL de build: ${BUILD_URL}";*/
-            //error "${error}"
-        }
+            emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} </br> Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}" </br> Stage: {env.STAGE_NAME};', subject: 'Jenkins Error ${env.JOB_NAME} ', to: 'mk.elz@bk.com'
+                }
     }

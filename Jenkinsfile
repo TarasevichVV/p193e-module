@@ -10,6 +10,8 @@ node {
 
     timestamps {
 
+        try {
+
   
 
 
@@ -138,6 +140,11 @@ node {
             
         }
     }
+    }
+    currentBuild.result = 'SUCCESS'
+    catch (err) {
+      currentBuild.result = 'FAILURE'
+    }
         stage ('Implement handling  errors on each stage') {
             echo "Implement handling  errors on each stage"
         }
@@ -146,6 +153,7 @@ node {
 //            sh "kubectl get po -A"
         }
     }
+    
 }
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
-def label2 = "centos-jenkins-${UUID.randomUUID().toString()}"
+def label2 = "kubectl-jenkins-${UUID.randomUUID().toString()}"
 
 String BRANCH_NAME='ayanchuk'
 
@@ -119,24 +119,19 @@ node {
             podTemplate(label: label2,
                 containers: [
                     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                    containerTemplate(name: 'centos', image: 'centos', command: 'cat', ttyEnabled: true),
+                    containerTemplate(name: 'kubectl', image: 'bitnami/kubectl:v1.17.0', command: 'cat', ttyEnabled: true),
                 ],
                 ) {
             node(label2) {
                 stage('Deploy') {
                     container('centos') {
+                        echo "$BUILD_NUMBER"
                         sh """
-                        curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-                        chmod +x ./kubectl
-                        mv ./kubectl /usr/local/bin/kubectl
-                        kubectl version
-                        """
-                        sh """
+                        apk --no-cache add curl
                         curl https://raw.githubusercontent.com/MNT-Lab/p193e-module/ayanchuk/deploy.yaml --output deploy.yaml
                         sed -i "s|BUILD_NUMBER|${BUILD_NUMBER}|" deploy.yaml
                         kubectl apply -f deploy.yaml
                         """
-
                     }
                 }
             }

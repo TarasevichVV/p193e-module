@@ -2,6 +2,14 @@
 def student = "ibletsko"
 def job_to_use = "MNTLAB-ibletsko-child1-build-job"
 
+podTemplate (label: 'deploynode', containers: [
+  containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+  containerTemplate(name: 'kubeworks', image: 'cosmintitei/bash-curl', ttyEnabled: true),
+  containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
+  ],
+  volumes: [
+    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
+]) {
 node {
 stage('01 git checkout') {
 // workspace cleanup
@@ -92,13 +100,6 @@ stage('06 Packaging and Publishing results') {
       def nodelabel = "buildnode"
       def nexusaddr = "nexus-dock.k8s.playpit.by:80"
       sh "echo parallel 2: image"
-      podTemplate (label: nodelabel, containers: [
-        containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
-        ],
-        volumes: [
-          hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
-          ]) {
-          node(nodelabel) {
             container('docker') {
               unstash "st_dockerfile"
               unstash "st_warfile"
@@ -108,12 +109,11 @@ stage('06 Packaging and Publishing results') {
                 docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
                 """
             }
-          }
-        }
+
     }
   )
 }
-
+/* 
 stage('07 Asking for manual approval') {
   script {
     timeout(time: 5, unit: 'MINUTES') {
@@ -121,13 +121,8 @@ stage('07 Asking for manual approval') {
     }
   }
 }
-
+ */
 stage('08 Deployment') {
-  podTemplate (label: 'deploynode', containers: [
-      containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-      containerTemplate(name: 'launch', image: 'cosmintitei/bash-curl', ttyEnabled: true)
-  ]) {
-    node('deploynode') {
       container('launch') {
         unstash "st_yamls"
         sh """
@@ -139,9 +134,8 @@ stage('08 Deployment') {
         kubectl get pod -A
         """
       }
-    }
-  }
+
+}
 }
 
 }
-

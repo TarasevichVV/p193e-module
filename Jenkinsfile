@@ -18,14 +18,11 @@ node {
         }
 
         stage ('Building code') {
-            sh "ls -ahl /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-pipeline"
-            sh "find /var/jenkins_home/workspace/EPBYMINW9146 -name deploy.yaml"
             sh '''
             sed -i "37i Build Number: $BUILD_NUMBER<br></p>" helloworld-project/helloworld-ws/src/main/webapp/index.html
             sed -i "37i BuldTime: $(date)<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
             sed -i "37i TriggeredBy: $(git log -1 --pretty=format:'%an')<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
             sed -i "37i <p>Artefact Version: 1.2.$BUILD_NUMBER<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
-            sed -i "s|BUILD_NUMBER|${BUILD_NUMBER}|" /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-pipeline@script/deploy.yaml 
             '''
             withMaven(
                 maven: 'M3'){
@@ -64,7 +61,6 @@ node {
             build job: 'MNTLAB-ayanchuk-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "$BRANCH_NAME"]]
             copyArtifacts(projectName: 'MNTLAB-ayanchuk-child1-build-job', selector: lastCompleted())
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "app"
-            stash includes: "/var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-pipeline@script/deploy.yaml", name: "deploy"
         }
         stage ('Packaging and Publishing results') {
             parallel(
@@ -143,8 +139,11 @@ node {
                         mv ./kubectl /usr/local/bin/kubectl
                         kubectl version
                         """
-                        unstash "deploy"
-                        sh "kubectl apply -f deploy.yaml"
+                        sh """
+                        curl https://raw.githubusercontent.com/MNT-Lab/p193e-module/ayanchuk/deploy.yaml --output deploy.yaml
+                        sed -i "s|BUILD_NUMBER|${BUILD_NUMBER}|" deploy.yaml
+                        kubectl apply -f deploy.yaml
+                        """
 
                     }
                 }

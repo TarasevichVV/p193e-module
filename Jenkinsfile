@@ -1,6 +1,10 @@
 #!/usr/bin/env groovy
 def student = "ibletsko"
 def job_to_use = "MNTLAB-ibletsko-child1-build-job"
+def branch = "origin/${student}"
+def path_to_app = "helloworld-project/helloworld-ws/target"
+def appfile = "helloworld-ws.war"
+def nexusdockaddr = "nexus-dock.k8s.playpit.by"
 
 podTemplate (label: 'deploynode', containers: [
   containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
@@ -18,7 +22,7 @@ stage('01 git checkout') {
 checkout scm
 catchError {
   checkout([$class: 'GitSCM',
-    branches: [[name: 'origin/ibletsko']],
+    branches: [[name: 'origin/{$branch}']],
     userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]
   ])
 }
@@ -29,7 +33,7 @@ stash includes: "Dockerfile", name: "st_dockerfile"
 stash includes: "*.yml", name: "st_yamls"
 
 checkout([$class: 'GitSCM',
-  branches: [[name: 'origin/ibletsko']],
+  branches: [[name: 'origin/{$branch}']],
   userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
 ])
 }
@@ -41,7 +45,7 @@ catchError {
   }
 }
 step([$class: 'Mailer', recipients: 'alert@no.email'])
-stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "st_warfile"
+stash includes: "${path_to_app}/${appfile}", name: "st_warfile"
 }
 
 //commented because sonar pod constantly unavailable due to node resources shortage
@@ -65,7 +69,7 @@ catchError {
     },
     "parallel 2" : {
       withMaven(maven: 'M3') {
-        "sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xmlintegration-test'"
+        "sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'"
       }
     },
     "parallel 3" : {
@@ -94,27 +98,27 @@ parallel (
     unstash "st_jenkinsfile"
     unstash "st_output"
     sh """
-      tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile
+      tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz ${path_to_app}/${appfile} output.txt Jenkinsfile
       curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
       """
   },
   "parallel 2: image" : {
     def nodelabel = "buildnode"
-    def nexusaddr = "nexus-dock.k8s.playpit.by:80"
+//    def nexusaddr = "nexus-dock.k8s.playpit.by:80"
     sh "echo parallel 2: image"
     container('docker') {
       unstash "st_dockerfile"
       unstash "st_warfile"
       sh """
-        docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
-        docker login -u admin -p admin $nexusaddr
-        docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
+        docker build -t $nexusdockaddr:80/helloworld-$student:$BUILD_NUMBER .
+        docker login -u admin -p admin $nexusdockaddr:80
+        docker push $nexusdockaddr:80/helloworld-$student:$BUILD_NUMBER
       """
     }
   }
 )
 }
-
+/*
 stage('07 Asking for manual approval') {
 script {
   timeout(time: 5, unit: 'MINUTES') {
@@ -122,6 +126,7 @@ script {
   }
 }
 }
+*/
 
 stage('08 Deployment') {
 container('kubeworks') {

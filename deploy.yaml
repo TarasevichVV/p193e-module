@@ -35,16 +35,17 @@ spec:
     spec:
       containers:
       - name: hello-app
-        image: nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:BUILD_NUMBER
+        image: nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUM
         ports:
         - containerPort: 8080
         readinessProbe:
           httpGet:
-            path: /
+            path: /helloworld-ws
             port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          successThreshold: 1        
+          initialDelaySeconds: 30
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 5        
       imagePullSecrets:
       - name: docker-secret   
 ---

@@ -151,35 +151,35 @@ docker rmi helloworld-${student}:${BUILD_NUMBER}"
                 input "Approve deploy to prod?", ok: 'Yes'*/
         }
 
-    stage('8-Deploy') {
-        sh "echo deploy"
-        podTemplate(label: label,
-                containers: [
-                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                        containerTemplate(name: 'kuber', image: 'wernight/kubectl', command: 'cat', ttyEnabled: true),
-                ],
-                volumes: [
-                        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                ]
-        ) {
-            node(label) {
-                container('kuber') {
-                    unstash "yaml"
-                    sh '''
-                        sed -i 's*helloworld-${student}*helloworld-${student}:'"$BUILD_NUMBER"'*' deployment.yaml
-                        kubectl apply -f deployment.yaml
-                        '''
+        stage('8-Deploy') {
+            sh "echo deploy"
+            podTemplate(label: label,
+                    containers: [
+                            containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                            containerTemplate(name: 'kuber', image: 'wernight/kubectl', command: 'cat', ttyEnabled: true),
+                    ],
+                    volumes: [
+                            hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                    ]
+            ) {
+                node(label) {
+                    container('kuber') {
+                        unstash "yaml"
+                        sh '''
+                            sed -i 's*helloworld-${student}*helloworld-${student}:'"$BUILD_NUMBER"'*' deployment.yaml
+                            kubectl apply -f deployment.yaml
+                            '''
+                    }
                 }
             }
         }
+//}
+
+
+    } catch (e) {
+        String error = "${e}";
+        emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} </br> Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}" </br> Stage: {env.STAGE_NAME};',
+                subject: 'Jenkins Error ${env.JOB_NAME} ',
+                to: 'mk.elz@bk.com'
     }
 }
-
-
-        } catch (e) {
-            String error = "${e}";
-            emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} </br> Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}" </br> Stage: {env.STAGE_NAME};',
-                    subject: 'Jenkins Error ${env.JOB_NAME} ',
-                    to: 'mk.elz@bk.com'
-                }
-    }

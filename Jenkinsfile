@@ -35,6 +35,7 @@ node {
                 sh "${scannerHome}/bin/sonar-scanner  -e -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
             }
         }
+
     }
     catch (err) {
         currentBuild.result = 'FAILURE'

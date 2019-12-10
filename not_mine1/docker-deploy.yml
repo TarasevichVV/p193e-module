@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ykachatkou
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy1kb2NrLms4cy5wbGF5cGl0LmJ5OjgwIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
+kind: Secret
+metadata:
+  name: docker-secret
+  namespace: ykachatkou
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ykachatkou-tomcat
+  namespace: ykachatkou
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app: ykachatkou-tomcat
+  template:
+    metadata:
+      labels:
+        app: ykachatkou-tomcat
+    spec:
+      containers:
+      - name: ykachatkou-tomcat
+        image: nexus-dock.k8s.playpit.by:80/helloworld-ykachatkou
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 24
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 5
+      imagePullSecrets:
+      - name: docker-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ykachatkou-tomcat-svc
+  namespace: ykachatkou
+  labels:
+    app: ykachatkou-tomcat
+spec:
+  ports:
+  - port: tomcatport-80
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: ykachatkou-tomcat
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ykachatkou-tomcat-ingress
+  namespace: ykachatkou
+  annotations:
+    nginx.org/rewrites: serviceName=ykachatkou-tomcat-svc rewrite=/helloworld-ws/
+spec:
+  rules:
+  - host: ykachatkou-app.k8s.playpit.by
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: ykachatkou-tomcat-svc
+          servicePort: tomcatport-80

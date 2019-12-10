@@ -23,6 +23,7 @@ node {
             sed -i "37i BuldTime: $(date)<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
             sed -i "37i TriggeredBy: $(git log -1 --pretty=format:'%an')<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
             sed -i "37i <p>Artefact Version: 1.2.$BUILD_NUMBER<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
+            sed -i "s|BUILD_NUMBER|${BUILD_NUMBER}|" deploy.yaml  
             '''
             withMaven(
                 maven: 'M3'){

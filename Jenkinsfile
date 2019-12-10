@@ -18,7 +18,8 @@ node {
         }
 
         stage ('Building code') {
-            sh "find $JENKINS_HOME -name deploy.yaml"
+            sh "ls -ahl /var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-pipeline"
+            sh "find /var/jenkins_home/workspace/EPBYMINW9146 -name deploy.yaml"
             sh '''
             sed -i "37i Build Number: $BUILD_NUMBER<br></p>" helloworld-project/helloworld-ws/src/main/webapp/index.html
             sed -i "37i BuldTime: $(date)<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
@@ -28,10 +29,6 @@ node {
             '''
             withMaven(
                 maven: 'M3'){
-//            sh "pwd"
-//            sh "ls -ahl"
-//            sh "find $JENKINS_HOME -name *Jenkinsfile*"
-//            sh "ls $JENKINS_HOME/workspace/mntlab-ci-pipeline/EPBYMINW9146"
             sh "mvn -f helloworld-project/helloworld-ws/pom.xml clean install"
             }
         }
@@ -67,7 +64,7 @@ node {
             build job: 'MNTLAB-ayanchuk-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "$BRANCH_NAME"]]
             copyArtifacts(projectName: 'MNTLAB-ayanchuk-child1-build-job', selector: lastCompleted())
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "app"
-            stash includes: "deploy.yaml", name: "deploy"
+            stash includes: "/var/jenkins_home/workspace/EPBYMINW9146/mntlab-ci-pipeline@script/deploy.yaml", name: "deploy"
         }
         stage ('Packaging and Publishing results') {
             parallel(

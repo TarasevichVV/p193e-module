@@ -96,7 +96,7 @@ node {
                                         sh """
                                         cat << "EOF" > Dockerfile
                                         FROM tomcat:8.0
-                                        COPY helloworld-ws.war /usr/local/tomcat/webapps/
+                                        COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
                                         """
                                         unstash "war"
                                         sh """

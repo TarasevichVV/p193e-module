@@ -159,9 +159,11 @@ currentBuild.result = 'SUCCESS'
     currentBuild.result = 'FAILURE'
   }
   finally {
+    stage('Sending status') {
     mail to: 'dzmitry_prusevich@epam.com',
       subject: "Status of pipeline: ${currentBuild.fullDisplayName}",
       body: "${env.BUILD_URL} has result ${currentBuild.result}"
+    }
   }
 }
 

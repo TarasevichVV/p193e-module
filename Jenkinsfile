@@ -31,10 +31,10 @@ node {
         }
 
         stage ('Sonar scan') {
-//            def scannerHome = tool 'Sonar';
-//            withSonarQubeEnv('Sonar'){
-//                sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=ayanchuk:helloworld -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
-//            }
+            def scannerHome = tool 'Sonar';
+            withSonarQubeEnv('Sonar'){
+                sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=ayanchuk:helloworld -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+            }
         }
 
         stage ('Testing') {
@@ -43,10 +43,10 @@ node {
                     sh 'echo "mvn pre-integration-test"'
                 },
                 'integration-test': {
-//                    withMaven(
-//                        maven: 'M3'){
-//                            sh "mvn -f helloworld-project/helloworld-ws/pom.xml integration-test"
-//                       }
+                    withMaven(
+                        maven: 'M3'){
+                            sh "mvn -f helloworld-project/helloworld-ws/pom.xml integration-test"
+                      }
                     
                     sh 'echo "mvn integration-test"'
                 },
@@ -110,9 +110,9 @@ node {
         }
         stage ('Asking for manual approval') {
             echo "Asking for manual approval"
-//            timeout(time: 2, unit: "MINUTES") {
-//                input message: "Approve Deploy $JOB_BASE_NAME / $BUILD_NUMBER ?", ok: 'Yes'
-//            }
+            timeout(time: 2, unit: "MINUTES") {
+                input message: "Approve Deploy $JOB_BASE_NAME / $BUILD_NUMBER ?", ok: 'Yes'
+            }
         }
         stage ('Deployment (rolling update, zero downtime)') {
             echo "Deployment (rolling update, zero downtime)"

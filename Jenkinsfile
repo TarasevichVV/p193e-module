@@ -118,7 +118,7 @@ COPY helloworld-ws.war /usr/local/tomcat/webapps/
 */
 
   stage ('Deployment (rolling update, zero downtime)') {
-    podTemplate(label: deploy,
+    podTemplate(label: deploy_tom,
     containers: [
       containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
       containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
@@ -127,7 +127,7 @@ COPY helloworld-ws.war /usr/local/tomcat/webapps/
       hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
     ]
     ) {
-    node(deploy) {
+    node(deploy_tom) {
       container('docker') {
       echo "Building docker image..."
       sh """

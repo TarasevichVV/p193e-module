@@ -105,7 +105,7 @@ node {
             hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
             ]) {
             node(nodelabel) {
-//            stage('build image') {
+
               container('docker') {
                 unstash "st_dockerfile"
                 unstash "st_warfile"
@@ -115,7 +115,7 @@ node {
                   docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
                   """
               }
-//            }
+
             }
           }
       }
@@ -131,7 +131,7 @@ node {
   }
 
   stage('08 Deployment') {
-  {
+
       node('deploynode') {
         container('launch') {
           unstash "st_yamls"
@@ -145,7 +145,7 @@ node {
           """
         }
       }
-    }
+
   }
 
 }

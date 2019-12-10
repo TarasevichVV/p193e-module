@@ -137,22 +137,22 @@ stage('07 Asking for manual approval') {
 stage('08 Deployment') {
   podTemplate (label: 'deploynode', containers: [
     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-    containerTemplate(name: 'kubework', image: 'cosmintitei/bash-curl', ttyEnabled: true)
+    containerTemplate(name: 'kubework', image: 'alpine', ttyEnabled: true)
     ]) {
     node('deploynode') {
       container('kubework') {
         unstash "st_yamls"
         sh """
-        curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-        chmod +x ./kubectl
-        mv ./kubectl /usr/local/bin/kubectl
-        sed -i "s/_deploy_ver_/$BUILD_NUMBER/" deploy-all.yml
-        kubectl apply -f deploy-all.yml
-        kubectl get pod -A
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          mv ./kubectl /usr/local/bin/kubectl
+          sed -i "s/_deploy_ver_/$BUILD_NUMBER/" deploy-all.yml
+          kubectl apply -f deploy-all.yml
+          kubectl get pod -A
         """
       }
     }
-  }
+    }
 }
 }
 

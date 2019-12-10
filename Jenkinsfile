@@ -132,7 +132,8 @@ COPY helloworld-ws.war /usr/local/tomcat/webapps/
       container('docker') {
       echo "Building docker image..."
       sh """
-cat /etc/os-release 
+cat /etc/os-release
+apk --no-cache add curl 
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl

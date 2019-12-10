@@ -88,9 +88,28 @@ node {
     }
     stage('get_yaml_from_git'){
         git([url: 'https://github.com/MNT-Lab/p193e-module.git', branch: 'amiasnikovich', credentialsId: '33c48519f78014a6f656a10b73d153cfa1da8f1e'])
+        stash includes: 'deployment.yaml', name: 'yaml'
     }
 
-//    stage('Deployment') {
-//
-//    }
+    stage('Deployment') {
+        podTemplate(label: label,
+                containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'kuber', image: 'bitnami/kubectl:latest', command: 'cat', ttyEnabled: true),
+                ],
+                volumes: [
+                        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                ]
+        ) {
+            node(label) {
+                container('docker') {
+                    unstash "yaml"
+                    sh '''
+                        sed -i 's*helloworld-amiasnikovich*helloworld-amiasnikovich:'"$BUILD_NUMBER"'*' deployment.yaml
+                        kubectl apply -f deployment.yaml
+                        '''
+                }
+            }
+        }
+    }
 }

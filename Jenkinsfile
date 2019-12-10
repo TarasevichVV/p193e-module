@@ -162,6 +162,8 @@ docker rmi helloworld-${student}:${BUILD_NUMBER}"
 
         } catch (e) {
             String error = "${e}";
-            emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} </br> Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}" </br> Stage: {env.STAGE_NAME};', subject: 'Jenkins Error ${env.JOB_NAME} ', to: 'mk.elz@bk.com'
+            emailext body: 'Error mesage: ${error}\n\n<br>Project: ${env.JOB_NAME} </br> Build Number: ${env.BUILD_NUMBER} <br> URL build: ${env.BUILD_URL}" </br> Stage: {env.STAGE_NAME};',
+                    subject: 'Jenkins Error ${env.JOB_NAME} ',
+                    to: 'mk.elz@bk.com'
                 }
     }

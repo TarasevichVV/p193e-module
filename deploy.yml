@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vmarkau-ns
+
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy1kb2NrLms4cy5wbGF5cGl0LmJ5OjgwIjp7InVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6ImFkbWluIiwiYXV0aCI6IllXUnRhVzQ2WVdSdGFXND0ifX19
+kind: Secret
+metadata:
+  name: docker-secret-vmarkau
+  namespace: vmarkau
+type: kubernetes.io/dockerconfigjson
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vmarkau-tomcat
+  namespace: vmarkau-ns
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app: vmarkau-tomcat
+  template:
+    metadata:
+      labels:
+        app: vmarkau-tomcat
+    spec:
+      containers:
+        - name: vmarkau-tomcat
+          image: nexus-dock.k8s.playpit.by:80/vmarkau:BUILD_NUMBER
+          ports:
+          - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /helloworld-ws
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+      imagePullSecrets:
+      - name: docker-secret-vmarkau
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vmarkau-tomcat-svc
+  namespace: vmarkau-ns
+spec:
+  selector:
+    app: vmarkau-tomcat
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: vmarkau-tomcat-ingress
+  namespace: vmarkau-ns
+  annotations:
+    nginx.org/rewrites: serviceName=vmarkau-tomcat-svc rewrite=/helloworld-ws/
+spec:
+  rules:
+  - host: vmarkau-app.k8s.playpit.by
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: vmarkau-tomcat-svc
+          servicePort: 80

@@ -12,6 +12,7 @@ podTemplate (label: 'deploynode', containers: [
 ]) {
 node ('deploynode') {
 stage('01 git checkout') {
+container('jnlp') {
 // workspace cleanup
 //    sh "rm -rf *"
   checkout scm
@@ -31,8 +32,10 @@ stage('01 git checkout') {
   ])
   stash 'mnt-source'
 }
+}
 
 stage('02 Building code') {
+container('jnlp') {
   catchError {
     withMaven(maven: 'M3') {
       sh """
@@ -45,6 +48,7 @@ stage('02 Building code') {
   }
   step([$class: 'Mailer', recipients: 'alert@no.email'])
   stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "st_warfile"
+}
 }
 
 //commented because sonar pod constantly unavailable due to node resources shortage
@@ -61,6 +65,7 @@ stage('03 Sonar scan') {
 */
 
 stage('04 Testing') {
+container('jnlp') {
   catchError {
     parallel (
       "parallel 1" : {
@@ -78,8 +83,10 @@ stage('04 Testing') {
   }
   step([$class: 'Mailer', recipients: 'alert@no.email'])
 }
+}
 
 stage('05 Triggering job and fetching artefact') {
+container('jnlp') {
   catchError {
     build job: "${job_to_use}", parameters: [
       [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]// wait: true by default
@@ -90,8 +97,10 @@ stage('05 Triggering job and fetching artefact') {
   stash includes: "*.txt", name: "st_output"
   archiveArtifacts '*'
 }
+}
 
 stage('06 Packaging and Publishing results') {
+container('jnlp') {
   parallel (
     "parallel 1: archiving" : {
       unstash "st_jenkinsfile"
@@ -114,11 +123,12 @@ stage('06 Packaging and Publishing results') {
                 docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
                 """
             }
-
     }
   )
 }
-/* 
+}
+
+/*
 stage('07 Asking for manual approval') {
   script {
     timeout(time: 5, unit: 'MINUTES') {
@@ -128,6 +138,7 @@ stage('07 Asking for manual approval') {
 }
  */
 stage('08 Deployment') {
+container('jnlp') {
       container('launch') {
         unstash "st_yamls"
         sh """
@@ -139,7 +150,7 @@ stage('08 Deployment') {
         kubectl get pod -A
         """
       }
-
+}
 }
 }
 

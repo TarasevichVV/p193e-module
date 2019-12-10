@@ -57,7 +57,7 @@ node {
             node(label) {
                 container('docker') {
                     sh """
-                        apk add wget"
+                        apk add wget
                         wget --user admin --password admin http://nexus.k8s.playpit.by/repository/maven-releases/app/askraba/\"${BUILD_NUMBER}\"/pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz
                         tar -xzvf pipeline-ashkraba-\"${BUILD_NUMBER}\".tar.gz
                         docker build -t helloworld-ashkrba:"${BUILD_NUMBER}" .

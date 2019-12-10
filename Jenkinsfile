@@ -122,18 +122,18 @@ node {
             }
         }
 
-        currentBuild.currentResult = 'SUCCESS'
+        currentBuild.result = 'SUCCESS'
         stage_name = 'All right'
     } catch (Exception err) {
-        currentBuild.currentResult = 'FAILURE'
+        currentBuild.result = 'FAILURE'
         stage_name = $FAILED_STAGE
         }
 
     finally {
         stage('Send email') {
-            emailext attachLog: true, body: "build number is $BUILD_NUMBER, $JOB_NAME result is $currentBuild.currentResult, $stage_name",
+            emailext attachLog: true, body: "build number is $BUILD_NUMBER, $JOB_NAME result is $currentBuild.result, $stage_name",
                     recipientProviders: [developers()],
-                    subject: "$JOB_NAME result is $currentBuild.currentResult",
+                    subject: "$JOB_NAME result is $currentBuild.result",
                     to: 'al.miasnikovich@gmail.com'
         }
     }

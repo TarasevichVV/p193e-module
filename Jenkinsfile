@@ -4,8 +4,8 @@ def deploy_tom = "docker2-jenkins-${UUID.randomUUID().toString()}"
 def student = "dprusevich"
 node {
   try {
-  stage ('Preparation (Checking out)') {
-    checkout scm
+    stage ('Preparation (Checking out)') {
+      checkout scm
   }
   
   stage ('Building code') {
@@ -159,7 +159,7 @@ currentBuild.result = 'SUCCESS'
     currentBuild.result = 'FAILURE'
   }
   finally {
-    stage('Sending status') {
+    stage('Sending email') {
     mail to: 'dzmitry_prusevich@epam.com',
       subject: "Status of pipeline: ${currentBuild.fullDisplayName}",
       body: "${env.BUILD_URL} has result ${currentBuild.result}"

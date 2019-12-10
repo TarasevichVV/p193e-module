@@ -86,4 +86,11 @@ node {
             input(id: 'Deployment', message: 'Deploy or not?', ok: 'Deploy')
         }
     }
+    stage('get_yaml_from_git'){
+        git([url: 'https://github.com/MNT-Lab/p193e-module.git', branch: 'amiasnikovich', credentialsId: '33c48519f78014a6f656a10b73d153cfa1da8f1e'])
+    }
+
+//    stage('Deployment') {
+//
+//    }
 }

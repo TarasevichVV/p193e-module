@@ -67,7 +67,7 @@ node {
                 'Create docker image': {
                     podTemplate(label: label,
                         containers: [
-                                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+//                                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                                     containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
                             ],
                             volumes: [
@@ -118,13 +118,13 @@ node {
             echo "Deployment (rolling update, zero downtime)"
             podTemplate(label: label2,
                 containers: [
-                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+//                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                     containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.17.0', command: 'cat', ttyEnabled: true),
                 ],
                 ) {
             node(label2) {
                 stage('Deploy') {
-                    container('centos') {
+                    container('kubectl') {
                         echo "$BUILD_NUMBER"
                         sh """
                         apk --no-cache add curl

@@ -119,7 +119,7 @@ node {
             podTemplate(label: label2,
                 containers: [
                     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                    containerTemplate(name: 'kubectl', image: 'lachlanevenson/kubectl:v1.17.0', command: 'cat', ttyEnabled: true),
+                    containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.17.0', command: 'cat', ttyEnabled: true),
                 ],
                 ) {
             node(label2) {

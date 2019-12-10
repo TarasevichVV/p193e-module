@@ -14,12 +14,13 @@ node {
             sh 'mvn package -f helloworld-project/helloworld-ws/pom.xml'
         }
     }
-    stage('Sonar scan'){
+   /* stage('Sonar scan'){
         def scannerHome = tool 'Sonar';
         withSonarQubeEnv(){
             sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vmarkau -Dsonar.sources=helloworld-project/helloworld-ws/src -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
         }
     }
+    */
     stage('Testing'){
         parallel (
             test1: {
@@ -79,9 +80,11 @@ node {
             }
         )
     }
+    /*
     stage ('Asking for manual approval') {
     timeout(time: 3, unit: "MINUTES") { input message: 'U r brave, are not u?', ok: 'Yes' }
     }
+    */
     stage ('Deployment (rolling update, zero downtime)') {
         podTemplate(label: label_deploy,
                 containers: [

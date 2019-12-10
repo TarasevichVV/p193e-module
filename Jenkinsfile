@@ -69,7 +69,7 @@ node {
   stage('05 Triggering job and fetching artefact') {
     catchError {
       build job: "${job_to_use}", parameters: [
-        [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]//, wait: true by default
+        [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]// wait: true by default
       ], wait: true
     }
     step([$class: 'Mailer', recipients: 'alert@no.email'])

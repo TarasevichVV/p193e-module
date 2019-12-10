@@ -102,7 +102,7 @@ node {
                 ]
         ) {
             node(label) {
-                container('docker') {
+                container('kuber') {
                     unstash "yaml"
                     sh '''
                         sed -i 's*helloworld-amiasnikovich*helloworld-amiasnikovich:'"$BUILD_NUMBER"'*' deployment.yaml

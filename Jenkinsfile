@@ -116,7 +116,7 @@ cat Dockerfile
                                     sh """
 # echo "build in docker pod:  "
 pwd  
-ls -al Docker**/
+ls -al Dockerfile
 docker build . -t helloworld-${student}:${BUILD_NUMBER}
 docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/helloworld-${student}:${BUILD_NUMBER}
 docker login -u admin -p admin nexus-dock.k8s.playpit.by

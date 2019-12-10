@@ -156,15 +156,15 @@ docker rmi helloworld-${student}:${BUILD_NUMBER}"
             podTemplate(label: label,
                     containers: [
                             containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                            containerTemplate(name: 'kuber', image: 'wernight/kubectl', command: 'cat', ttyEnabled: true),
+                            containerTemplate(name: 'kubercontrol', image: 'wernight/kubectl', command: 'cat', ttyEnabled: true),
                     ],
                     volumes: [
                             hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
                     ]
             ) {
                 node(label) {
-                    container('kuber') {
-                        unstash "yaml"
+                    container('kubercontrol') {
+                        //git([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'melizarov'])
                         sh '''
                             sed -i 's*helloworld-${student}*helloworld-${student}:'"$BUILD_NUMBER"'*' deployment.yaml
                             kubectl apply -f deployment.yaml

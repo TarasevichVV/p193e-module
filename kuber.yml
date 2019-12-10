@@ -21,6 +21,11 @@ metadata:
     app: dprusevich-tomcat
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%
   selector:
     matchLabels:
       app: dprusevich-tomcat
@@ -34,6 +39,14 @@ spec:
           image: nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:change_number
           ports:
             - containerPort: 8080
+          readinessProbe:
+          httpGet:
+            path: /helloworld-ws/
+            port: 8080
+          initialDelaySeconds: 25
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 5
       imagePullSecrets:
       - name: docker-secret
 ---

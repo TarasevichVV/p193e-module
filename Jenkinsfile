@@ -69,44 +69,48 @@ node {
 
     stage('Packaging and Publishing results'){
         parallel(
-                'Archive': {
-                    stage("Archiving artifact form MNTLAB-${student}-child1-build-job") {
-                        sh """
-                        tar -xzvf ${student}_dsl_script.tar.gz; 
+                'Archiving': {
+                    sh """
+                        tar xzf ${student}_dsl_script.tar.gz
+                        cp -r /var/jenkins_home/workspace/EPBYMINW4141/mntlab-ci-pipeline@script/* .
                         cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
-                        tar -czvf pipeline-${student}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
+                        tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-ws.war output.txt Jenkinsfile 
                         curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
                         """
-                        stash includes: 'helloworld-project/helloworld-ws/target/helloworld-ws.war', name: 'war'
-                    }
-
+                    stash includes: 'helloworld-project/helloworld-ws/target/helloworld-ws.war', name: 'war'
                 },
-                'Docker': {
+                'Docker Image': {
                     podTemplate(label: label,
                             containers: [
                                     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                                    containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+                                    containerTemplate(name: 'docker', image: 'docker:18-dind', command: 'cat', ttyEnabled: true),
                             ],
                             volumes: [
-                                    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                            ]
-                    )
-                    node(label) {
-                        container('docker') {
-                            sh """
-                            cat << "EOF" > Dockerfile
-                            FROM tomcat:8.0
-                            COPY helloworld-ws.war /usr/local/tomcat/webapps/
-                            """
-                            unstash "war"
-                            sh """
-                            docker build -t helloworld-${student}:${BUILD_NUMBER} .
-                            docker tag helloworld-${student}:${BUILD_NUMBER} nexus-dock.k8s.playpit.by:80/helloworld-${student}:${BUILD_NUMBER}
-                            docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
-                            docker push nexus-dock.k8s.playpit.by:80/helloworld-${student}:"${BUILD_NUMBER}"
-                          """
-                        }
-                    }
+                                    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
+
+                            ])
+
+                            {
+                                node(label) {
+                                    container('docker') {
+                                        sh """
+                                        cat << "EOF" > Dockerfile
+                                        FROM tomcat:8.0
+                                        COPY helloworld-ws.war /usr/local/tomcat/webapps/
+                                        """
+                                        unstash "war"
+                                        sh """
+                                        docker build -t helloworld-${student}:${BUILD_NUMBER} .
+                                        docker tag helloworld-${student}:${BUILD_NUMBER} nexus-dock.k8s.playpit.by:80/helloworld-${student}:"${BUILD_NUMBER}"
+                                        docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                                        docker push nexus-dock.k8s.playpit.by:80/helloworld-${student}:"${BUILD_NUMBER}"
+                                        docker rmi helloworld-${student}:${BUILD_NUMBER}
+                                        """
+                                    }
+
+                                }
+                            }
+
 
                 }
 

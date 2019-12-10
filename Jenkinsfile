@@ -147,7 +147,12 @@ kubectl get svc -n dprusevich
 kubectl get ingress -A
 
 sleep 15
-
+"""
+sh """
+kubectl get pods -n dprusevich
+\$(curl dprusevich-app.k8s.playpit.by
+\$(curl dprusevich-app.k8s.playpit.by | grep "version"
+\$(curl dprusevich-app.k8s.playpit.by | grep -Eo "version=\"[0-9]{1,3}\""
 if [[ \$(curl dprusevich-app.k8s.playpit.by | grep -Eo "version=\"[0-9]{1,3}\"") != *"${BUILD_NUMBER}"* ]]; then
 kubectl rollout undo deploy/dprusevich-tomcat
 fi

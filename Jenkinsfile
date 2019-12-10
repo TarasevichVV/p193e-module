@@ -61,8 +61,10 @@ node {
       sh """
       tar -zxvf "${student}"_dsl_script.tar.gz output.txt
       cp "${JENKINS_HOME}"/workspace/EPBYMINW8538/mntlab-ci-pipeline@script/Jenkinsfile .
+      cp "${JENKINS_HOME}"/workspace/EPBYMINW8538/mntlab-ci-pipeline@script/kuber.yml kuber.yaml
       tar czf pipeline-"${student}"-"${BUILD_NUMBER}".tar.gz output.txt Jenkinsfile helloworld-ws.war
       """
+      stash name: "kuber", includes: "kuber.yaml"
       sh """
       cat << "EOF" > Dockerfile
 FROM tomcat:8.0
@@ -137,7 +139,7 @@ apk --no-cache add curl
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 mv ./kubectl /usr/local/bin/kubectl
-kubectl version
+kubectl apply -f kuber.yaml
 """
           }
         }

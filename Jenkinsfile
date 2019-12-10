@@ -137,7 +137,7 @@ stage('07 Asking for manual approval') {
 stage('08 Deployment') {
   podTemplate (label: 'deploynode', containers: [
     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-    containerTemplate(name: 'kubework', image: 'alpine', ttyEnabled: true)
+    containerTemplate(name: 'kubework', image: 'centos', ttyEnabled: true)
     ]) {
     node('deploynode') {
       container('kubework') {

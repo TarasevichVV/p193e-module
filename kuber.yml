@@ -38,15 +38,15 @@ spec:
         - name: dprusevich-tomcat
           image: nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:change_number
           ports:
-            - containerPort: 8080
+          - containerPort: 8080
           readinessProbe:
-          httpGet:
-            path: /helloworld-ws/
-            port: 8080
-          initialDelaySeconds: 25
-          periodSeconds: 5
-          successThreshold: 1
-          timeoutSeconds: 5
+            httpGet:
+              path: /helloworld-ws/
+              port: 8080
+            initialDelaySeconds: 25
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 5
       imagePullSecrets:
       - name: docker-secret
 ---

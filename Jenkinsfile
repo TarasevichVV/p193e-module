@@ -81,16 +81,8 @@ node {
                                         unstash "app"
                                         sh """
                                         cat <<EOF > /Dockerfile
-                                        FROM alpine
-                                        RUN apk update && apk add wget tar openjdk8 && \
-                                        wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz && \
-                                        tar -xvf apache-tomcat-8.5.20.tar.gz && \
-                                        mkdir /opt/tomcat && \
-                                        mv apache-tomcat*/* /opt/tomcat/
-                                        COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /opt/tomcat/webapps/
-                                        EXPOSE 8080
-                                        HEALTHCHECK CMD curl --fail http://localhost:8080/ || exit 1
-                                        CMD ["/opt/tomcat/bin/catalina.sh", "run"]
+                                        FROM tomcat:8.0
+                                        COPY helloworld-project/helloworld-ws/target/helloworld-ws.war /usr/local/tomcat/webapps/
                                         """
                                         sh """docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
                                         docker build -f /Dockerfile -t nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:$BUILD_NUMBER .

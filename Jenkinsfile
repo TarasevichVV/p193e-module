@@ -10,7 +10,7 @@ node {
 
     timestamps {
 
-        try {
+//        try {
 
   
 
@@ -139,11 +139,11 @@ node {
             }
             
         }
-    }
-    }
-    currentBuild.result = 'SUCCESS'
-    catch (err) {
-      currentBuild.result = 'FAILURE'
+//    }
+//    }
+//    currentBuild.result = 'SUCCESS'
+//    catch (err) {
+//      currentBuild.result = 'FAILURE'
     }
         stage ('Implement handling  errors on each stage') {
             echo "Implement handling  errors on each stage"

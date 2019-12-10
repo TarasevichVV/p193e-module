@@ -38,12 +38,12 @@ node {
         }
     }
 
-    stage('Sonar scan'){
-        def sonarhome = tool name: 'Sonar'
-        withSonarQubeEnv(installationName: 'Sonar') {
-            sh "${sonarhome}/bin/sonar-scanner  -e -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
-        }
-    }
+//    stage('Sonar scan'){
+//        def sonarhome = tool name: 'Sonar'
+//        withSonarQubeEnv(installationName: 'Sonar') {
+//            sh "${sonarhome}/bin/sonar-scanner  -e -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+//        }
+//    }
 
     stage('Testing'){
         parallel(

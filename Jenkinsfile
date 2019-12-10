@@ -60,37 +60,37 @@ EOF
         }*/
         stage('6-Archiving') {
             parallel(
-                '6-1-archiving_artifact': {
-                    //sh 'find / -name Jenkinsfile -type f -exec ls -al {} '
-                    //sh 'find / -name output.txt'
-                    //sh 'find / -name *.war'
-                    sh """
+                    '6-1-archiving_artifact': {
+                        //sh 'find / -name Jenkinsfile -type f -exec ls -al {} '
+                        //sh 'find / -name output.txt'
+                        //sh 'find / -name *.war'
+                        sh """
 tar zxvf ${student}_dsl_script.tar.gz
 cp /var/jenkins_home/workspace/EPBYMINW6852/mntlab-ci-pipeline@script/Jenkinsfile ./
 cp helloworld-project/helloworld-ws/target/helloworld-ws.war ./
 tar czf pipeline-${student}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war Jenkinsfile
 curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
 """
-                },
-                '6-2-creating_docker': {
+                    },
+                    '6-2-creating_docker': {
 
-                    sh "echo '-----------------------------------------docker build list dockerfile--------------------------------------------'"
-                    sh "ls -al Dockerfile"
-                    def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+                        sh "echo '-----------------------------------------docker build list dockerfile--------------------------------------------'"
+                        sh "ls -al Dockerfile"
+                        def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 
-                    podTemplate(label: label,
-                        containers: [
-                            containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                            containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-                        ],
-                        volumes: [
-                                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                        ]
-                    ) {
-                        node(label) {
-                            stage('6-2-1-Docker Build') {
-                                container('docker') {
-                                    sh """
+                        podTemplate(label: label,
+                                containers: [
+                                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                                        containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+                                ],
+                                volumes: [
+                                        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                                ]
+                        ) {
+                            node(label) {
+                                stage('6-2-1-Docker Build') {
+                                    container('docker') {
+                                        sh """
 cat > Dockerfile <<EOF
 FROM tomcat
 RUN curl -u admin:admin -o pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz -L && \
@@ -112,20 +112,20 @@ cat Dockerfile
                                     sh "echo '6-2-1--b:  Building docker image...---tomcat_${student}----'"
 */
 
-                                    sh """
+                                        sh """
 docker build . -t helloworld-${student}:${BUILD_NUMBER}
 docker tag helloworld-${student}:"${BUILD_NUMBER}" nexus.k8s.playpit.by/repository/docker/helloworld-${student}:"${BUILD_NUMBER}"
 docker login -u admin -p admin nexus-dock.k8s.playpit.by
 docker push http://nexus.k8s.playpit.by/repository/docker/helloworld-${student}:${BUILD_NUMBER}
 docker rmi helloworld-${student}:${BUILD_NUMBER}"
 """
+                                    }
                                 }
                             }
                         }
                     }
-                 }
-                    )
-                        // }
+            )
+            // }
 //            nexusArtifactUploader {
 //                nexusVersion('nexus2')
 //                protocol('http')
@@ -147,14 +147,34 @@ docker rmi helloworld-${student}:${BUILD_NUMBER}"
         stage('7-Asking approval') {
 
             sh "echo Asking"
-            timeout (time:1, unit:'MINUTES') {
-                input "Approve deploy to prod?", ok: 'Yes'
+/*            timeout (time:1, unit:'MINUTES') {
+                input "Approve deploy to prod?", ok: 'Yes'*/
+        }
+
+    stage('8-Deploy') {
+        sh "echo deploy"
+        podTemplate(label: label,
+                containers: [
+                        containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                        containerTemplate(name: 'kuber', image: 'wernight/kubectl', command: 'cat', ttyEnabled: true),
+                ],
+                volumes: [
+                        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                ]
+        ) {
+            node(label) {
+                container('kuber') {
+                    unstash "yaml"
+                    sh '''
+                        sed -i 's*helloworld-${student}*helloworld-${student}:'"$BUILD_NUMBER"'*' deployment.yaml
+                        kubectl apply -f deployment.yaml
+                        '''
+                }
             }
         }
-        stage('8-Deploy') {
-            sh "echo deploy"
+    }
+}
 
-        }
 
         } catch (e) {
             String error = "${e}";

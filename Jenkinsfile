@@ -25,6 +25,7 @@ node {
             sed -i "37i <p>Artefact Version: 1.2.$BUILD_NUMBER<br>" helloworld-project/helloworld-ws/src/main/webapp/index.html
             sed -i "s|BUILD_NUMBER|${BUILD_NUMBER}|" deploy.yaml  
             '''
+            sh "find $JENKINS_HOME -name deploy.yaml"
             withMaven(
                 maven: 'M3'){
 //            sh "pwd"

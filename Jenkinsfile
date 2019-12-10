@@ -1,5 +1,6 @@
 def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def label_deploy = "centos-jenkins-${UUID.randomUUID().toString()}"
+def mail_to = "3995220@gmail.com"
 
 node {
     stage('Preparation (Checking out)') {
@@ -80,7 +81,6 @@ node {
                                 unstash "Dockerfile"
                                 unstash "binary_webapp"
                                 sh '''
-                                    ls -lha
                                     docker build -t anikitsenka:${BUILD_ID} .
                                     docker tag anikitsenka:${BUILD_ID} nexus-dock.k8s.playpit.by:80/anikitsenka:${BUILD_ID}
                                     docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
@@ -118,4 +118,12 @@ node {
                 }
         }
     }
+    stage ('Text me, please') {
+        emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+        mimeType: 'text/html',
+        subject: "Job '${JOB_NAME} ${env.BUILD_ID}'",
+        to: "${mail_to}",
+        // replyTo: "${mail_to}",
+        recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+     }
 }

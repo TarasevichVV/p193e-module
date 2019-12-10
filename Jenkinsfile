@@ -27,12 +27,12 @@ node {
          }
       }
 
-//   stage('Testing Phase I (Sonar)'){
-//        def scannerHome = tool 'Sonar';
-//        withSonarQubeEnv(){
-//            sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=skudrenko -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
-//        }
-//    }
+   stage('Testing Phase I (Sonar)'){
+        def scannerHome = tool 'Sonar';
+        withSonarQubeEnv(){
+            sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=skudrenko -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+        }
+    }
 
    stage ('Testing Phase II (Unit)') {
         parallel(
@@ -100,11 +100,11 @@ stage('Packaging and Publishing results'){
                 }
             )
         }
-//  stage ('Asking for manual Approval') {
-//        timeout(time: 5, unit: "MINUTES") {
-//            input message: 'Send this deploy to production?', ok: 'Yes'
-//        }
-//    }
+  stage ('Asking for manual Approval') {
+        timeout(time: 5, unit: "MINUTES") {
+            input message: 'Send this deploy to production?', ok: 'Yes'
+        }
+    }
   stage ('Deploy') {
         podTemplate(label: machine,
                     containers: [
@@ -127,5 +127,16 @@ stage('Packaging and Publishing results'){
                 }
             }
         }
+    }
+    stage('Notification'){
+            def email = "yourmail@example.com"
+            def jobName = currentBuild.fullDisplayName
+
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                mimeType: 'text/html',
+                subject: "$currentBuild.result: Job '${env.JOB_NAME} ${env.BUILD_NUMBER}' Stage:'${env.STAGE_NAME}'",
+                to: "${email}",
+                replyTo: "${email}",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
     }
 }

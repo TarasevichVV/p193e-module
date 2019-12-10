@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: dprusevich-tomcat
-          image: nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:"${BUILD_NUMBER}"
+          image: nexus-dock.k8s.playpit.by:80/helloworld-dprusevich:change_number
           ports:
             - containerPort: 8080
       imagePullSecrets:

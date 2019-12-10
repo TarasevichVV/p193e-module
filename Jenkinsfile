@@ -140,9 +140,10 @@ apk --no-cache add curl
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 mv ./kubectl /usr/local/bin/kubectl
+sed -i "s|change_number|${BUILD_NUMBER}|" kuber.yaml
 kubectl apply -f kuber.yaml
 kubectl get pods -n dprusevich
-kubectl get svc -n 
+kubectl get svc -n dprusevich
 kubectl get ingress -A
 """
           }

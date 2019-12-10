@@ -64,7 +64,6 @@ node {
                         docker tag helloworld-ashkrba:"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-ashkraba:"${BUILD_NUMBER}"
                         docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
                         docker push nexus-dock.k8s.playpit.by:80/helloworld-ashkraba:"${BUILD_NUMBER}"
-                        docker rmi helloworld-ashkraba:"${BUILD_NUMBER}"
                        """
                 }
             }

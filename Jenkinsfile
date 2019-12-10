@@ -28,7 +28,7 @@ stage('02 Building code') {
   catchError {
     withMaven(maven: 'M3') {
       sh """
-        echo '<p>buildtime: \$(date +'%Y-%m-%d_%H-%M-%S')</p>' > helloworld-project/helloworld-ws/src/main/webapp/index.html
+        echo '<p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>' > helloworld-project/helloworld-ws/src/main/webapp/index.html
         echo '<p>version: $BUILD_NUMBER</p>' >> helloworld-project/helloworld-ws/src/main/webapp/index.html
       """
       sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"

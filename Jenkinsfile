@@ -122,9 +122,14 @@ node {
     } else {
         stage_name = 'All right'
     }
-
-    emailext attachLog: true, body: "build number is $BUILD_NUMBER, $JOB_NAME result is $currentBuild.result, $stage_name",
-            recipientProviders: [developers()],
-            subject: "$JOB_NAME result is $currentBuild.result",
-            to: 'al.miasnikovich@gmail.com'
+    post {
+        always {
+            stage('send Email') {
+                emailext attachLog: true, body: "build number is $BUILD_NUMBER, $JOB_NAME result is $currentBuild.result, $stage_name",
+                        recipientProviders: [developers()],
+                        subject: "$JOB_NAME result is $currentBuild.result",
+                        to: 'al.miasnikovich@gmail.com'
+            }
+        }
+    }
 }

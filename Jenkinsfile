@@ -90,7 +90,7 @@ node {
                            curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
                            chmod +x ./kubectl
                            mv ./kubectl /usr/local/bin/kubectl
-                           kubectl apply -f https://raw.githubusercontent.com/MNT-Lab/p193e-module/ashkraba/my_image_deploy.yaml
+                           kubectl apply -f https://raw.githubusercontent.com/MNT-Lab/p193e-module/ashkraba/my_image_deploy.yml
                            kubectl set image deployment tomcat -n ashkraba tomcat=nexus-dock.k8s.playpit.by:80/helloworld-ashkraba:"$BUILD_NUMBER"
                            """
                     }

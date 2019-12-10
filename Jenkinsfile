@@ -66,6 +66,7 @@ node {
             build job: 'MNTLAB-ayanchuk-child1-build-job', parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "$BRANCH_NAME"]]
             copyArtifacts(projectName: 'MNTLAB-ayanchuk-child1-build-job', selector: lastCompleted())
             stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "app"
+            stash includes: "deploy.yaml", name: "deploy"
         }
         stage ('Packaging and Publishing results') {
             parallel(
@@ -144,7 +145,8 @@ node {
                         mv ./kubectl /usr/local/bin/kubectl
                         kubectl version
                         """
-                        sh "kubectl apply -f https://raw.githubusercontent.com/MNT-Lab/p193e-module/ayanchuk/deploy.yaml"
+                        unstash "deploy"
+                        sh "kubectl apply -f deploy.yaml"
 
                     }
                 }

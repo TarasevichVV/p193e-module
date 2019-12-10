@@ -2,17 +2,8 @@
 def student = "ibletsko"
 def job_to_use = "MNTLAB-ibletsko-child1-build-job"
 
-podTemplate (label: 'deploynode', containers: [
-  containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-  containerTemplate(name: 'kubeworks', image: 'cosmintitei/bash-curl', ttyEnabled: true),
-  containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
-  ],
-  volumes: [
-    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
-]) {
-node ('deploynode') {
+node {
 stage('01 git checkout') {
-container('jnlp') {
 // workspace cleanup
 //    sh "rm -rf *"
   checkout scm
@@ -32,23 +23,20 @@ container('jnlp') {
   ])
   stash 'mnt-source'
 }
-}
 
 stage('02 Building code') {
-container('jnlp') {
   catchError {
     withMaven(maven: 'M3') {
       sh """
-        echo '<p>buildtime: \$(date +'%Y-%m-%d_%H-%M-%S')</p>' > ${app_path}/src/main/webapp/index.html
-        echo '<p>version: $BUILD_NUMBER</p>' >> ${app_path}/src/main/webapp/index.html
+        echo '<p>buildtime: \$(date +'%Y-%m-%d_%H-%M-%S')</p>' > helloworld-project/helloworld-ws/src/main/webapp/index.html
+        echo '<p>version: $BUILD_NUMBER</p>' >> helloworld-project/helloworld-ws/src/main/webapp/index.html
       """
-      sh "mvn -f ${app_path}/pom.xml package"
-      sh "cat ${app_path}/src/main/webapp/index.html"
+      sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
+      sh "cat helloworld-project/helloworld-ws/src/main/webapp/index.html"
     }
   }
   step([$class: 'Mailer', recipients: 'alert@no.email'])
   stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "st_warfile"
-}
 }
 
 //commented because sonar pod constantly unavailable due to node resources shortage
@@ -65,7 +53,6 @@ stage('03 Sonar scan') {
 */
 
 stage('04 Testing') {
-container('jnlp') {
   catchError {
     parallel (
       "parallel 1" : {
@@ -83,10 +70,8 @@ container('jnlp') {
   }
   step([$class: 'Mailer', recipients: 'alert@no.email'])
 }
-}
 
 stage('05 Triggering job and fetching artefact') {
-container('jnlp') {
   catchError {
     build job: "${job_to_use}", parameters: [
       [$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]// wait: true by default
@@ -97,10 +82,8 @@ container('jnlp') {
   stash includes: "*.txt", name: "st_output"
   archiveArtifacts '*'
 }
-}
 
 stage('06 Packaging and Publishing results') {
-container('jnlp') {
   parallel (
     "parallel 1: archiving" : {
       unstash "st_jenkinsfile"
@@ -114,6 +97,13 @@ container('jnlp') {
       def nodelabel = "buildnode"
       def nexusaddr = "nexus-dock.k8s.playpit.by:80"
       sh "echo parallel 2: image"
+      podTemplate (label: nodelabel, containers: [
+        containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
+        ],
+        volumes: [
+          hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
+          ]) {
+          node(nodelabel) {
             container('docker') {
               unstash "st_dockerfile"
               unstash "st_warfile"
@@ -123,12 +113,12 @@ container('jnlp') {
                 docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
                 """
             }
+          }
+        }
     }
   )
 }
-}
-
-/*
+/* 
 stage('07 Asking for manual approval') {
   script {
     timeout(time: 5, unit: 'MINUTES') {
@@ -136,9 +126,14 @@ stage('07 Asking for manual approval') {
     }
   }
 }
+
  */
 stage('08 Deployment') {
-container('jnlp') {
+  podTemplate (label: 'deploynode', containers: [
+      containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+      containerTemplate(name: 'launch', image: 'cosmintitei/bash-curl', ttyEnabled: true)
+  ]) {
+    node('deploynode') {
       container('launch') {
         unstash "st_yamls"
         sh """
@@ -150,8 +145,9 @@ container('jnlp') {
         kubectl get pod -A
         """
       }
-}
-}
+    }
+  }
 }
 
 }
+

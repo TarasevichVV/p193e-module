@@ -114,7 +114,7 @@ cat Dockerfile
 */
 
                                     sh """
-/*echo "build in docker pod:  "
+# echo "build in docker pod:  "
 pwd  
 ls -al Docker**/
 docker build . -t helloworld-${student}:${BUILD_NUMBER}

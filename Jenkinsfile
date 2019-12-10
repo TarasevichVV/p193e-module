@@ -106,15 +106,17 @@ EOF
 
 cat Dockerfile  
 """;
+/*
 
                                     sh "echo '6-2-1--a: dockerfile:'"
                                     sh "ls -al Dockerfile"
                                     sh "echo '6-2-1--b:  Building docker image...---tomcat_${student}----'"
+*/
 
                                     sh """
-echo "build in docker pod:  "
+/*echo "build in docker pod:  "
 pwd  
-ls -al Docker*
+ls -al Docker**/
 docker build . -t helloworld-${student}:${BUILD_NUMBER}
 docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/helloworld-${student}:${BUILD_NUMBER}
 docker login -u admin -p admin nexus-dock.k8s.playpit.by

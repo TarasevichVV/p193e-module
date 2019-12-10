@@ -145,6 +145,12 @@ kubectl apply -f kuber.yaml
 kubectl get pods -n dprusevich
 kubectl get svc -n dprusevich
 kubectl get ingress -A
+
+sleep 15
+
+if [[ \$(curl dprusevich-app.k8s.playpit.by | grep -Eo "version=\"[0-9]{1,3}\"") != *"${BUILD_NUMBER}"* ]]; then
+kubectl rollout undo deploy/dprusevich-tomcat
+fi
 """
           }
         }

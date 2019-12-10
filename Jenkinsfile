@@ -2,21 +2,24 @@ def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 node {
     try {
         stage('check src to build') {
+            FAILED_STAGE=env.STAGE_NAME
             git([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'amiasnikovich', credentialsId: '33c48519f78014a6f656a10b73d153cfa1da8f1e'])
         }
         stage('build artefact') {
+            FAILED_STAGE=env.STAGE_NAME
             withMavenN(maven: 'M3') {          //BUG BUG BUG for test email
                 sh 'mvn clean install -f clear_project/helloworld-ws/pom.xml'
             }
         }
 //    stage('sonar scaner') {
+//        FAILED_STAGE=env.STAGE_NAME
 //        scannerHome = tool 'Sonar'
 //        withSonarQubeEnv('Sonar') {
 //            sh "${scannerHome}/bin/sonar-scanner  -e -Dsonar.projectKey=mias -e -Dsonar.projectName=amiasnikovich -e -Dsonar.sources=clear_project/helloworld-ws/src -e -Dsonar.java.binaries=clear_project/helloworld-ws/target"
 //        }
 //    }
         stage('parallel testing') {
-
+            FAILED_STAGE=env.STAGE_NAME
             parallel(
                     'kind-pre-integration-test': {
                         echo 'mvn pre-integration-test -f clear_project/helloworld-ws/pom.xml'
@@ -32,6 +35,7 @@ node {
             )
         }
         stage('build_child_job') {
+            FAILED_STAGE=env.STAGE_NAME
             build job: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', parameters: [
                     string(name: 'BRANCH_NAME', value: 'amiasnikovich')
             ], wait: true
@@ -39,6 +43,7 @@ node {
             copyArtifacts filter: '*.tar.gz', fingerprintArtifacts: true, projectName: 'DSL-jobs/MNTLAB-amiasnikovich-child1-build-job', target: 'Artifact'
         }
         stage('pack_and_pub_res') {
+            FAILED_STAGE=env.STAGE_NAME
             parallel(
                     get_artifact: {
                         sh "tar -xvzf Artifact/amiasnikovich-script.tar.gz -C ./"
@@ -83,16 +88,19 @@ node {
             )
         }
         stage('approval') {
+            FAILED_STAGE=env.STAGE_NAME
             timeout(time: 10, unit: 'MINUTES') {
                 input(id: 'Deployment', message: 'Deploy or not?', ok: 'Deploy')
             }
         }
         stage('get_yaml_from_git') {
+            FAILED_STAGE=env.STAGE_NAME
             git([url: 'https://github.com/MNT-Lab/p193e-module.git', branch: 'amiasnikovich', credentialsId: '33c48519f78014a6f656a10b73d153cfa1da8f1e'])
             stash includes: 'deployment.yaml', name: 'yaml'
         }
 
         stage('Deployment') {
+            FAILED_STAGE=env.STAGE_NAME
             podTemplate(label: label,
                     containers: [
                             containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
@@ -118,14 +126,14 @@ node {
         stage_name = 'All right'
     } catch (Exception err) {
         currentBuild.result = 'FAILURE'
-        stage_name = env.STAGE_NAME + "failed"
+        stage_name = "$FAILED_STAGE failed"
         }
 
     finally {
         stage('Send email') {
-            emailext attachLog: true, body: "build number is $BUILD_NUMBER, $JOB_NAME result is $currentBuild.result, $stage_name",
+            emailext attachLog: true, body: "build number is $BUILD_NUMBER, $JOB_NAME result is $currentBuild.currentResult, $stage_name",
                     recipientProviders: [developers()],
-                    subject: "$JOB_NAME result is $currentBuild.result",
+                    subject: "$JOB_NAME result is $currentBuild.currentResult",
                     to: 'al.miasnikovich@gmail.com'
         }
     }

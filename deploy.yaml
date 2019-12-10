@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
       - name: hello-app
-        image: nexus-dock.k8s.playpit.by:80/helloworld-shanchar:$BUILD_NUMBER
+        image: nexus-dock.k8s.playpit.by:80/helloworld-ayanchuk:${BUILD_NUMBER}
         ports:
         - containerPort: 8080
         readinessProbe:

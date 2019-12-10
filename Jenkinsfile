@@ -6,7 +6,7 @@ podTemplate (label: 'deploynode', containers: [
   containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
   containerTemplate(name: 'launch', image: 'cosmintitei/bash-curl', ttyEnabled: true)
 ])
-
+{
 node {
   stage('01 git checkout') {
 // workspace cleanup
@@ -147,6 +147,6 @@ node {
       }
 
   }
-
+}
 }
 

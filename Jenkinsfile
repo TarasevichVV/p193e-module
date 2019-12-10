@@ -1,21 +1,25 @@
 #!/usr/bin/env groovy
 def student = "ibletsko"
-def job_to_use = "MNTLAB-ibletsko-child1-build-job"
+def job_to_use = "MNTLAB-${student}-child1-build-job"
+def branch = "origin/${student}"
+def app_path = "helloworld-project/helloworld-ws"
+def app_file = "helloworld-ws.war"
+def nexus_dockaddr = "nexus-dock.k8s.playpit.by"
+def archive_name = "pipeline-${student}-${BUILD_NUMBER}.tar.gz"
 
 podTemplate (label: 'deploynode', containers: [
   containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-  containerTemplate(name: 'launch', image: 'cosmintitei/bash-curl', ttyEnabled: true)
+  containerTemplate(name: 'kubework', image: 'cosmintitei/bash-curl', ttyEnabled: true)
 ])
 {
 node {
   stage('01 git checkout') {
 // workspace cleanup
 //    sh "rm -rf *"
-
     checkout scm
     catchError {
       checkout([$class: 'GitSCM',
-        branches: [[name: 'origin/ibletsko']],
+        branches: [[name: "origin/${student}"]],
         userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/p193e-module.git']]
       ])
     }
@@ -26,7 +30,7 @@ node {
     stash includes: "*.yml", name: "st_yamls"
 
     checkout([$class: 'GitSCM',
-      branches: [[name: 'origin/ibletsko']],
+      branches: [[name: "origin/${student}"]],
       userRemoteConfigs: [[url: 'https://github.com/MNT-Lab/build-t00ls.git']]
     ])
     stash 'mnt-source'
@@ -35,11 +39,15 @@ node {
   stage('02 Building code') {
     catchError {
       withMaven(maven: 'M3') {
-        sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
+        sh """
+          echo "<p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>" > ${app_path}/src/main/webapp/index.html
+          echo "<p>version: 1.$BUILD_NUMBER</p>" > ${app_path}/src/main/webapp/index.html
+        """
+        sh "mvn -f ${app_path}/pom.xml package"
       }
     }
     step([$class: 'Mailer', recipients: 'alert@no.email'])
-    stash includes: "helloworld-project/helloworld-ws/target/helloworld-ws.war", name: "st_warfile"
+    stash includes: "${app_path}/target/${app_file}", name: "st_warfile"
   }
 
 //commented because sonar pod constantly unavailable due to node resources shortage
@@ -47,7 +55,7 @@ node {
     def scannerHome = tool 'Sonar';
     catchError {
       withSonarQubeEnv('Sonar') {
-        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarcheck -Dsonar.sources=helloworld-project/helloworld-ws/src -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarcheck -Dsonar.sources=${app_path}/src -Dsonar.java.binaries=${app_path}/target"
       }
     }
     step([$class: 'Mailer', recipients: 'alert@no.email'])
@@ -61,7 +69,7 @@ node {
         },
         "parallel 2" : {
           withMaven(maven: 'M3') {
-            "sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xmlintegration-test'"
+            "sh 'mvn integration-test -f ${app_path}/pom.xmlintegration-test'"
           }
         },
         "parallel 3" : {
@@ -90,38 +98,35 @@ node {
         unstash "st_jenkinsfile"
         unstash "st_output"
         sh """
-          tar -czf pipeline-${student}-${BUILD_NUMBER}.tar.gz helloworld-project/helloworld-ws/target/helloworld-ws.war output.txt Jenkinsfile
-          curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
-          """
+          tar -czf ${archive_name} ${app_path}/target/${app_file} output.txt Jenkinsfile
+          curl -v -u admin:admin --upload-file ${archive_name} nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/${archive_name}
+        """
       },
       "parallel 2: image" : {
-        def nodelabel = "buildnode"
         def nexusaddr = "nexus-dock.k8s.playpit.by:80"
         sh "echo parallel 2: image"
-        podTemplate (label: nodelabel, containers: [
+        podTemplate (label: "buildnode", containers: [
           containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
           ],
           volumes: [
             hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
-            ]) {
-            node(nodelabel) {
-
-              container('docker') {
-                unstash "st_dockerfile"
-                unstash "st_warfile"
-                sh """
-                  docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
-                  docker login -u admin -p admin $nexusaddr
-                  docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
-                  """
-              }
-
+          ]) {
+          node(nodelabel) {
+            container('docker') {
+              unstash "st_dockerfile"
+              unstash "st_warfile"
+              sh """
+                docker build -t $nexusaddr/helloworld-$student:$BUILD_NUMBER .
+                docker login -u admin -p admin $nexusaddr
+                docker push $nexusaddr/helloworld-$student:$BUILD_NUMBER
+              """
             }
+          }
           }
       }
     )
   }
-
+/* 
   stage('07 Asking for manual approval') {
     script {
       timeout(time: 5, unit: 'MINUTES') {
@@ -129,11 +134,11 @@ node {
       }
     }
   }
+*/
 
   stage('08 Deployment') {
-
       node('deploynode') {
-        container('launch') {
+        container('kubework') {
           unstash "st_yamls"
           sh """
           curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl

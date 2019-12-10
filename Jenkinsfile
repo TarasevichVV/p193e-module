@@ -40,8 +40,8 @@ node {
     catchError {
       withMaven(maven: 'M3') {
         sh """
-          echo '<p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>' > ${app_path}/src/main/webapp/index.html
-          echo '<p>version: $BUILD_NUMBER</p>' > ${app_path}/src/main/webapp/index.html
+          echo '<p>buildtime: $(date +'%Y-%m-%d_%H-%M-%S')</p>' > $app_path/src/main/webapp/index.html
+          echo '<p>version: $BUILD_NUMBER</p>' > $app_path/src/main/webapp/index.html
         """
         sh "mvn -f ${app_path}/pom.xml package"
       }

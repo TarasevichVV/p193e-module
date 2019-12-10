@@ -40,8 +40,8 @@ spec:
             memory: "1Gi"
             cpu: "1000m"
           requests:
-            memory: "1Gi"
-            cpu: "500m"
+            memory: "250M"
+            cpu: "100m"
         ports:
         - containerPort: 8080
           protocol: TCP

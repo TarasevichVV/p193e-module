@@ -3,7 +3,7 @@ def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 def deploy_tom = "docker2-jenkins-${UUID.randomUUID().toString()}"
 def student = "dprusevich"
 node {
-
+  try {
   stage ('Preparation (Checking out)') {
     checkout scm
   }
@@ -145,15 +145,26 @@ kubectl apply -f kuber.yaml
 kubectl get pods -n dprusevich
 kubectl get svc -n dprusevich
 kubectl get ingress -A
-sleep 15
+sleep 20
 kubectl get pods -n dprusevich
 """
           }
         }
       }
     }
-
 }
+currentBuild.result = 'SUCCESS'
+  }
+  catch (err) {
+    currentBuild.result = 'FAILURE'
+  }
+  finally {
+    mail to: 'dzmitry_prusevich@epam.com',
+      subject: "Status of pipeline: ${currentBuild.fullDisplayName}",
+      body: "${env.BUILD_URL} has result ${currentBuild.result}"
+  }
+}
+
 
 
 

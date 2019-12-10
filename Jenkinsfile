@@ -1,6 +1,7 @@
 #!/usr/bin/env groovy
 
 def student = 'apavlovsky'
+def label = "docker-jenkins-${UUID.randomUUID().toString()}"
 
 node {
     stage('Preparation (Checking out)'){
@@ -37,14 +38,14 @@ node {
             sh "mvn clean install -U -f helloworld-project/helloworld-ws/pom.xml"
         }
     }
-
-//    stage('Sonar scan'){
-//        def sonarhome = tool name: 'Sonar'
-//        withSonarQubeEnv(installationName: 'Sonar') {
-//            sh "${sonarhome}/bin/sonar-scanner  -e -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
-//        }
-//    }
-
+/*
+    stage('Sonar scan'){
+        def scannerHome = tool name: 'Sonar'
+        withSonarQubeEnv(installationName: 'Sonar') {
+            sh "${scannerHome}/bin/sonar-scanner  -e -Dsonar.projectKey=${student} -e -Dsonar.sources=helloworld-project/helloworld-ws/src -e -Dsonar.java.binaries=helloworld-project/helloworld-ws/target"
+        }
+    }
+*/
     stage('Testing'){
         parallel(
                 1: {
@@ -67,11 +68,56 @@ node {
     }
 
     stage('Packaging and Publishing results'){
-        sh 'echo "Packaging and Publishing"'
+        parallel(
+                'Archive': {
+                    stage("Archiving artifact form MNTLAB-${student}-child1-build-job") {
+                        sh """
+                        tar -xzvf ${student}_dsl_script.tar.gz; 
+                        cp helloworld-project/helloworld-ws/target/helloworld-ws.war .
+                        tar -czvf pipeline-${student}-${BUILD_NUMBER}.tar.gz output.txt helloworld-ws.war
+                        curl -v -u admin:admin --upload-file pipeline-${student}-${BUILD_NUMBER}.tar.gz nexus.k8s.playpit.by/repository/maven-releases/app/${student}/${BUILD_NUMBER}/pipeline-${student}-${BUILD_NUMBER}.tar.gz
+                        """
+                        stash includes: 'helloworld-project/helloworld-ws/target/helloworld-ws.war', name: 'war'
+                    }
+
+                },
+                'Docker': {
+                    podTemplate(label: label,
+                            containers: [
+                                    containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                                    containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+                            ],
+                            volumes: [
+                                    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                            ]
+                    )
+                    node(label) {
+                        container('docker') {
+                            sh """
+                            cat << "EOF" > Dockerfile
+                            FROM tomcat:8.0
+                            COPY helloworld-ws.war /usr/local/tomcat/webapps/
+                            """
+                            unstash "war"
+                            sh """
+                            docker build -t helloworld-${student}:"${BUILD_NUMBER}" .
+                            docker tag helloworld-${student}:"${BUILD_NUMBER}" nexus-dock.k8s.playpit.by:80/helloworld-${student}:"${BUILD_NUMBER}"
+                            docker login -u admin -p admin nexus-dock.k8s.playpit.by:80
+                            docker push nexus-dock.k8s.playpit.by:80/helloworld-${student}:"${BUILD_NUMBER}"
+                          """
+                        }
+                    }
+
+                }
+
+        )
+
     }
 
     stage('Asking for manual approval'){
-        sh 'echo "Manual approval"'
+        timeout(time: 5, unit: "MINUTES") {
+            input message: 'Continue deploy?', ok: 'Yes'
+        }
     }
 
     stage('Deployment'){

@@ -99,9 +99,9 @@ mv helloworld-ws.war /usr/local/tomcat/webapps
 CMD bash /usr/local/tomcat/bin/catalina.sh run
 EOF
 
-docker build . -t helloworld-${student}:${BUILD_NUMBER}
-docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
-docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+#docker build . -t helloworld-${student}:${BUILD_NUMBER}
+#docker tag helloworld-${student}:"${BUILD_NUMBER}" http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
+#docker push http://nexus.k8s.playpit.by/repository/docker/${student}:${BUILD_NUMBER}
 
 cat Dockerfile  
 """;
@@ -113,11 +113,8 @@ cat Dockerfile
 */
 
                                     sh """
-# echo "build in docker pod:  "
-pwd  
-ls -al Dockerfile
 docker build . -t helloworld-${student}:${BUILD_NUMBER}
-docker tag helloworld-${student}:${BUILD_NUMBER} http://nexus.k8s.playpit.by/repository/docker/helloworld-${student}:${BUILD_NUMBER}
+docker tag "helloworld-${student}:${BUILD_NUMBER}" http://nexus.k8s.playpit.by/repository/docker/helloworld-${student}:${BUILD_NUMBER}
 docker login -u admin -p admin nexus-dock.k8s.playpit.by
 docker push http://nexus.k8s.playpit.by/repository/docker/helloworld-${student}:${BUILD_NUMBER}
 docker rmi helloworld-${student}:${BUILD_NUMBER}"

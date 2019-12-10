@@ -45,7 +45,6 @@ node {
 
         }
         stage('Testing') {
-            stage = env.STAGE_NAME
             parallel(
                     'pre-integration-test': {
                         echo "mvn pre-integration-test"
@@ -109,7 +108,6 @@ node {
             )
         }
         stage("Asking for manual approval") {
-            stage = env.STAGE_NAME
             timeout(time: 10, unit: "MINUTES") {
                 input message: 'Approve Deploy?', ok: 'Yes'
 
@@ -118,7 +116,6 @@ node {
 
         }
         stage('Deployment (rolling update, zero downtime)') {
-            stage = env.STAGE_NAME
             podTemplate(label: label2,
                     containers: [
                             containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
@@ -158,7 +155,7 @@ node {
 
             emailext body: '''${SCRIPT, template="groovy-html.template"}''',
             mimeType: 'text/html',
-            subject: "$currentBuild.result: Job '${env.JOB_NAME} ${env.BUILD_NUMBER}' Stage:'${stage}'",
+            subject: "$currentBuild.result: Job '${env.JOB_NAME} ${env.BUILD_NUMBER}' Stage:'${env.STAGE_NAME}'",
             to: "${mailRecipients}",
             replyTo: "${mailRecipients}",
             recipientProviders: [[$class: 'DevelopersRecipientProvider']]

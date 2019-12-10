@@ -62,7 +62,8 @@ node {
     }
 
     stage('Triggering job and fetching artefact'){
-        sh 'echo "Stage triggering job"'
+        build job: "MNTLAB-${student}-child1-build-job", parameters: [[$class: 'StringParameterValue', name: 'BRANCH_NAME', value: "${student}"]], wait: true
+        copyArtifacts projectName: "MNTLAB-${student}-child1-build-job", selector: lastCompleted()
     }
 
     stage('Packaging and Publishing results'){

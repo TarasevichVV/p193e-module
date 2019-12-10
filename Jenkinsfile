@@ -5,7 +5,7 @@ node {
             git([url: 'https://github.com/MNT-Lab/build-t00ls.git', branch: 'amiasnikovich', credentialsId: '33c48519f78014a6f656a10b73d153cfa1da8f1e'])
         }
         stage('build artefact') {
-            withMaven(maven: 'M3') {
+            withMavenN(maven: 'M3') {          //BUG BUG BUG for test email
                 sh 'mvn clean install -f clear_project/helloworld-ws/pom.xml'
             }
         }
@@ -93,7 +93,7 @@ node {
         }
 
         stage('Deployment') {
-            LodTemplate(label: label,  //BUG BUG BUG for test email
+            podTemplate(label: label,
                     containers: [
                             containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                             containerTemplate(name: 'kuber', image: 'lachlanevenson/k8s-kubectl', command: 'cat', ttyEnabled: true),
@@ -122,14 +122,13 @@ node {
     } else {
         stage_name = 'All right'
     }
+
     post {
         always {
-            stage('send Email') {
-                emailext attachLog: true, body: "build number is $BUILD_NUMBER, $JOB_NAME result is $currentBuild.result, $stage_name",
-                        recipientProviders: [developers()],
-                        subject: "$JOB_NAME result is $currentBuild.result",
-                        to: 'al.miasnikovich@gmail.com'
-            }
+            emailext attachLog: true, body: "build number is $BUILD_NUMBER, $JOB_NAME result is $currentBuild.result, $stage_name",
+                    recipientProviders: [developers()],
+                    subject: "$JOB_NAME result is $currentBuild.result",
+                    to: 'al.miasnikovich@gmail.com'
         }
     }
 }

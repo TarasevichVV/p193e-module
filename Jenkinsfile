@@ -111,7 +111,7 @@ node {
           volumes: [
             hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
           ]) {
-          node('deploynode') {
+          node('buildnode') {
             container('docker') {
               unstash "st_dockerfile"
               unstash "st_warfile"

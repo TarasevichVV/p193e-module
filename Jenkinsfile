@@ -122,11 +122,11 @@ node {
             }
         }
 
-        currentBuild.result = 'SUCCESS'
+        currentBuild.currentResult = 'SUCCESS'
         stage_name = 'All right'
     } catch (Exception err) {
-        currentBuild.result = 'FAILURE'
-        stage_name = "$FAILED_STAGE failed"
+        currentBuild.currentResult = 'FAILURE'
+        stage_name = $FAILED_STAGE
         }
 
     finally {

@@ -152,7 +152,7 @@ kubectl get pods -n dprusevich
         }
       }
     }
-}
+
 currentBuild.result = 'SUCCESS'
   }
   catch (err) {

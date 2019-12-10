@@ -10,7 +10,7 @@ podTemplate (label: 'deploynode', containers: [
   volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
 ]) {
-node {
+node ('deploynode') {
 stage('01 git checkout') {
 // workspace cleanup
 //    sh "rm -rf *"
@@ -35,7 +35,12 @@ stage('01 git checkout') {
 stage('02 Building code') {
   catchError {
     withMaven(maven: 'M3') {
-      sh "mvn -f helloworld-project/helloworld-ws/pom.xml package"
+      sh """
+        echo '<p>buildtime: \$(date +'%Y-%m-%d_%H-%M-%S')</p>' > ${app_path}/src/main/webapp/index.html
+        echo '<p>version: $BUILD_NUMBER</p>' >> ${app_path}/src/main/webapp/index.html
+      """
+      sh "mvn -f ${app_path}/pom.xml package"
+      sh "cat ${app_path}/src/main/webapp/index.html"
     }
   }
   step([$class: 'Mailer', recipients: 'alert@no.email'])
@@ -63,7 +68,7 @@ stage('04 Testing') {
       },
       "parallel 2" : {
         withMaven(maven: 'M3') {
-          "sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xmlintegration-test'"
+          "sh 'mvn integration-test -f helloworld-project/helloworld-ws/pom.xml'"
         }
       },
       "parallel 3" : {

@@ -29,7 +29,7 @@ spec:
         app: tomcat
     spec:
       containers:
-        - name: 
+        - name: tomcat
           image: nexus-dock.k8s.playpit.by:80/helloworld-ashkraba
           ports:
             - containerPort: 8080
@@ -60,7 +60,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: ashkraba-ingress
-  namespace: shanchar
+  namespace: ashkraba
   annotations:
     nginx.org/rewrites: serviceName=tomcat rewrite=/helloworld-ws/
 spec:

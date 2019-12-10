@@ -127,6 +127,8 @@ node {
                     container('kubectl') {
                         echo "$BUILD_NUMBER"
                         sh """
+                        export BUILD_NUM=$BUILD_NUMBER
+                        echo $BUILD_NUM
                         apk --no-cache add curl
                         curl https://raw.githubusercontent.com/MNT-Lab/p193e-module/ayanchuk/deploy.yaml --output deploy.yaml
                         sed -i "s|BUILD_NUMBER|${BUILD_NUMBER}|" deploy.yaml
